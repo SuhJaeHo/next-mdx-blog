@@ -27,8 +27,8 @@ importers:
         specifier: ^5.6.1
         version: 5.6.1
       group-tabs-layout:
-        specifier: ^0.0.4
-        version: 0.0.4(next@14.2.5(@playwright/test@1.45.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.79.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.0.5
+        version: 0.0.5(next@14.2.5(@playwright/test@1.45.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.79.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       lucide-react:
         specifier: ^0.468.0
         version: 0.468.0(react@18.3.1)
@@ -1003,8 +1003,8 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
-  group-tabs-layout@0.0.4:
-    resolution: {integrity: sha512-W1X3qjWXPmhiL5vo32lwK7ejbdRVlmZQMS8UTfqtw/DLm7Vv7LJ44D1ArfL3aQ7RjQMjIgS2cqHpZ9jtadQ1ww==}
+  group-tabs-layout@0.0.5:
+    resolution: {integrity: sha512-ri6hnC+5Yx+wXwSVdWEmfPE0Kz1J4qSlqT+5HYMi417RPo6Jco4+jxy7t34n8WUbaPeq5rNSq7PRX0BB25TuVQ==}
     peerDependencies:
       next: '14'
       react: '18'
@@ -3342,7 +3342,7 @@ snapshots:
 
   graphemer@1.4.0: {}
 
-  group-tabs-layout@0.0.4(next@14.2.5(@playwright/test@1.45.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.79.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  group-tabs-layout@0.0.5(next@14.2.5(@playwright/test@1.45.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.79.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       class-variance-authority: 0.7.1
       clsx: 2.1.1

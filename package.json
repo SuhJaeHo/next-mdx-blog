@@ -15,7 +15,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "github-markdown-css": "^5.6.1",
-    "group-tabs-layout": "^0.0.4",
+    "group-tabs-layout": "^0.0.5",
     "lucide-react": "^0.468.0",
     "next": "14.2.5",
     "next-mdx-remote": "^5.0.0",
