@@ -1,0 +1,149 @@
+# Npm package publish
+
+### Npn pacakge
+
+[group-tabs-layout](https://www.npmjs.com/package/group-tabs-layout)
+
+### Why Rollup
+
+1. Simpler Configuration
+2. Supports powerful tree shaking
+3. Optimized for ES Modules
+
+### Rollup Configuration
+
+<p>Defines how Rollup should bundle code</p>
+
+- @rollup/plugin-babel
+  <br />
+  Integrates Babel into the Rollup bundling process.
+  <details>
+    <summary>What is babel preset</summary>
+    <p>Babel by itself is a tool for transforming Javascript, but it doesn't do anything on its own.</p>
+    <p>To make Babel what to transform and how to do, need to install a plugin and preset is bundled of plugins which make it easier to configure Babel</p>
+  </details>
+- @rollup/plugin-typescript
+  <br />
+  <p>Allows rollup to compile Typescript code to Javascript in a build process with integrates tsc.</p>
+  <p>Run tsc seperately, as this Rollup plugin doesn't perform type-checking.</p>
+- @rollup/plugin-node-resolve
+  <br />
+  <p>Allows rollup to find external dependencies and bundle them properly.</p>
+  <p>It helps in cases where your react component imports libraries from node_modules.</p>
+- @rollup/plugin-commonjs
+  <br />
+  <p>By default, Rollup only supports ES Modules for imports and exports, but many libraries are written in CommonJS.</p>
+  <p>It allows Rollup to handle modules written in the CommonJS</p>
+- rollup-plugin-peer-deps-external
+  <br />
+  <p>Mark peer dependencies automatically as external in Rollup bundle.</p>
+  <details>
+    <summary>What is Peer Dependencies</summary>
+    <p>Peer dependencies are libraies that instead of bundling them with your package, you let user install and manage them.</p>
+    <p>Prevent bundling common dependencies such as react, react-dom, styled-components.</p>
+  </details>
+- rollup-plugin-postcss
+
+```js
+import babel from "@rollup/plugin-babel";
+import commonjs from "@rollup/plugin-commonjs";
+import typescript from "@rollup/plugin-typescript";
+import resolve from "@rollup/plugin-node-resolve";
+import peerDepsExternal from "rollup-plugin-peer-deps-external";
+import postcss from "rollup-plugin-postcss";
+import { terser } from "rollup-plugin-terser";
+import autoprefixer from "autoprefixer";
+import tailwindcss from "tailwindcss";
+
+export default {
+  input: "src/index.ts",
+  output: [
+    {
+      file: "dist/index.js",
+      format: "cjs",
+      sourcemap: true,
+    },
+    {
+      file: "dist/index.esm.js",
+      format: "esm",
+      sourcemap: true,
+    },
+  ],
+  plugins: [
+    babel({
+      babelHelpers: "bundled",
+      exclude: "node_modules/**",
+      presets: ["@babel/preset-env", "@babel/preset-react"],
+      extensions: [".js", ".jsx", ".ts", ".tsx"],
+    }),
+    typescript(),
+    peerDepsExternal(),
+    resolve(),
+    commonjs(),
+    postcss({
+      extract: true,
+      minimize: true,
+      postcss({
+        extract: true,
+        minimize: true,
+      }),
+    }),
+    terser(),
+  ],
+};
+```
+
+### Typescript Configuration
+
+<p>Defines how Typescript should be compiled</p>
+
+```json
+{
+  "compilerOptions": {
+    // "lib": Specifies which set of built-in type definitions the TypeScript compiler should include for project
+    "lib": ["dom", "dom.iterable", "esnext"],
+    // "target": Specifies which version of JavaScript TypeScript should compile
+    "target": "esnext",
+    // "module": Defines which module system to use in the generated Javascript
+    "module": "esnext",
+    // "jsx": Controls how Typescript handle JSX during compilation
+    // The task of transforming JSX is passed to Babel instead of being handled during Typescript compilation
+    "jsx": "preserve",
+    // "declaration": Generate declaration files of Typescript
+    "declaration": true,
+    // "declarationDir" : Specifies the directory where the generated declaration files should be placed
+    "declarationDir": "dist/types",
+    // "emitDeclarationOnly" : Type checking with emit declaration files without emit Javascript files
+    "emitDeclarationOnly": true,
+    // "moduleResolution": Determines how TypeScript resolves modules when importing them into code
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true
+  },
+  // "include" : Specifies an array of files that should be included in Typescript compilation process.
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Package.json
+
+- main
+  <br />
+  <p>The entry point of package when it is required by CommonJS environments.</p>
+- module
+  <br />
+  <p>The entry point of ES Module versions of package.</p>
+  <p>It is intended for Javascript environments that support ECMAScript Modules.</p>
+- files
+  <br />
+  <p>Specifies which files and directories should be included in npm package whein it is published.</p>
+
+### Reference
+
+- <a href="https://chamdom.blog/babel-and-tsc/" target="_blank">
+    Babel with tsc
+  </a>
+  <br />
+  <br />
+  <br />

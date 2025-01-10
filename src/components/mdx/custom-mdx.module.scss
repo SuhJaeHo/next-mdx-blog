@@ -1,0 +1,49 @@
+.custom {
+  font-size: 0.875em;
+  padding-bottom: 80px;
+
+  ol {
+    list-style: decimal;
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  li {
+    white-space: nowrap;
+    width: max-content;
+    > p {
+      margin-top: 0px;
+      padding: 0px;
+    }
+  }
+
+  h3 {
+    padding-left: 4px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    margin: 0px;
+    padding: 4px;
+    white-space: nowrap;
+  }
+
+  details {
+    margin-top: 4px;
+    margin-bottom: 8px;
+
+    > p {
+      padding: 0px 0px 0px 12px;
+    }
+
+    > summary {
+      width: max-content;
+    }
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}

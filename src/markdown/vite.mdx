@@ -1,0 +1,33 @@
+# vite
+
+### Why vite
+
+1. Fast dev server startup
+2. Instant hot module replacement
+
+### How vite improves dev server startup
+
+Vite divides the modules into dependencies and source code
+
+1. Dependencies
+   <br />
+   Vite uses esbuild to pre-bundle dependencies
+   <details>
+     <summary>Why vite serves dependencies by pre-bundle instead of native ESM</summary>
+     <div>
+       <ul>
+         <li>Reducing network Requests</li>
+         <p>When a browser encounters a lot of seperate ESM modules, browser sends seperate network requests for each one.</p>
+         <p>Pre-bundling reduces the number of HTTP requests by combining dependencies into a single bundle.</p>
+         <li>CommonJS dependencies</li>
+       </ul>
+     </div>
+   </details>
+2. Source code
+   <br />
+   Vite serves source code over native ESM and browser can directly loads ES modules without bundling.
+
+### Why bundle for production
+
+Shipping unbundled ESM in production is still inefficient.<br />
+It is still better to bundle code with tree-shaking, lazy-loading and common chunk splitting.

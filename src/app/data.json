@@ -1,0 +1,114 @@
+{
+  "blog": {
+    "selectedPageId": "resume",
+    "page": {
+      "start-blog": {
+        "id": "start-blog",
+        "groupIds": ["ed3bc28c-f05c-4033-8545-3d7c16c56c07"],
+        "name": "Start blog"
+      },
+      "build-tool": {
+        "id": "build-tool",
+        "groupIds": ["0891-40e6-a7a4-245f40bf613d"],
+        "name": "build tool"
+      }
+    },
+    "group": {
+      "2a52-416f-876c-430502142051": {
+        "id": "2a52-416f-876c-430502142051",
+        "tabIds": ["eb7c60bd-5cf5-4872-9997-61c717b0f0c0"],
+        "selectedTabId": "eb7c60bd-5cf5-4872-9997-61c717b0f0c0",
+        "size": {
+          "width": 400,
+          "height": 300
+        },
+        "prevSize": {
+          "width": 400,
+          "height": 300
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "prevPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "ed3bc28c-f05c-4033-8545-3d7c16c56c07": {
+        "id": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
+        "tabIds": ["5a76f275-0917-4d11-94cf-547b57be5fe6", "abf3a276-c01c-473f-93e9-2b3a2cbac3a9", "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0"],
+        "selectedTabId": "5a76f275-0917-4d11-94cf-547b57be5fe6",
+        "size": {
+          "width": 400,
+          "height": 300
+        },
+        "prevSize": {
+          "width": 400,
+          "height": 300
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "prevPosition": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "0891-40e6-a7a4-245f40bf613d": {
+        "id": "0891-40e6-a7a4-245f40bf613d",
+        "tabIds": ["b8f3ed8f-61a3-4017-8415-63c624719b1a"],
+        "selectedTabId": "b8f3ed8f-61a3-4017-8415-63c624719b1a",
+        "size": {
+          "width": 400,
+          "height": 300
+        },
+        "prevSize": {
+          "width": 400,
+          "height": 300
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "prevPosition": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    "tab": {
+      "eb7c60bd-5cf5-4872-9997-61c717b0f0c0": {
+        "id": "eb7c60bd-5cf5-4872-9997-61c717b0f0c0",
+        "groupId": "2a52-416f-876c-430502142051",
+        "name": "Resume",
+        "contentFile": "resume.mdx"
+      },
+      "5a76f275-0917-4d11-94cf-547b57be5fe6": {
+        "id": "5a76f275-0917-4d11-94cf-547b57be5fe6",
+        "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
+        "name": "Npm",
+        "contentFile": "npm-publish.mdx"
+      },
+      "abf3a276-c01c-473f-93e9-2b3a2cbac3a9": {
+        "id": "abf3a276-c01c-473f-93e9-2b3a2cbac3a9",
+        "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
+        "name": "MDX",
+        "contentFile": "mdx.mdx"
+      },
+      "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0": {
+        "id": "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0",
+        "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
+        "name": "Readme",
+        "contentFile": "npm-readme.mdx"
+      },
+      "b8f3ed8f-61a3-4017-8415-63c624719b1a": {
+        "id": "b8f3ed8f-61a3-4017-8415-63c624719b1a",
+        "groupId": "0891-40e6-a7a4-245f40bf613d",
+        "name": "vite",
+        "contentFile": "vite.mdx"
+      }
+    }
+  }
+}

@@ -1,0 +1,77 @@
+# MDX
+
+### What is MDX
+
+<p>MDX is an extended form of Markdown that allows to embed JSX components directly within Markdown files.</p>
+
+### MDX Process
+
+1. Markdown Parsing & MDX Parsing
+
+   <p>Convert Markdown/MDX into a Markdown AST</p>
+
+2. Apply Remark Plugins
+
+   <p>Use plugins to extend Markdown AST</p>
+
+3. Convert Markdown AST to HTML AST
+
+   <p>Transform modified Markdown AST into an HTML AST, mapping Markdown syntax to HTML tags</p>
+
+4. Apply Rehype Plugins
+
+   <p>Use plugins to customize HTML AST</p>
+
+5. Render HTML or React Components
+
+### next-mdx-remote
+
+<p>1. serialize converts MDX string into an object that can be passed directly to MDXRemote, which is typically intended to run on the server side.</p>
+<p>2. MDXRemote is used to convert the serialized data into a React component for rendereing while maintaining client-side routing.</p>
+
+```json
+pnpm add next-mdx-remote
+```
+
+### with core MDX library
+
+```js
+import { compile, run } from "@mdx-js/mdx";
+import * as runtime from "react/jsx-runtime";
+
+/**
+ * Server-side
+ * Compile the MDX source code to a function body.
+ */
+const mdxCode = await compile(mdxContent, {
+  outputFormat: "function-body",
+});
+const serializedMDX = JSON.stringify(mdxCode);
+
+/**
+ * Client-side
+ * Compiled code is executed as a React component and rendered.
+ * Serialized MDX code is restored to a React component using 'run' method, which integrates compiled Javascript code with React runtime environment.
+ */
+const { default: MDXContent } = await run(serializedMDX, { ...runTime });
+return <MDXContent />;
+```
+
+### Plugins
+
+- remarkPlugins
+  <br />
+  <p>remarkPlugins transform **Markdown** syntax</p>
+- rehypePlugins
+  <br />
+  <p>rehypePlugins transform **HTML** syntax, which is what the Markdown content becomes after passing through Remark phase.</p>
+
+### Reference
+
+- <a href="https://github.com/hashicorp/next-mdx-remote" target="_blank">
+    next-mdx-remote
+  </a>
+
+- <a href="https://colinhemphill.com/blog/markdown-syntax-highlighting-with-the-nextjs-app-router" target="_blank">
+    Markdown Syntax Highlighting
+  </a>
