@@ -3,6 +3,7 @@
 import * as React from "react";
 import { NextIntlClientProvider } from "next-intl";
 import type { Locale } from "@/i18n/routing";
+import { timeZone } from "@/i18n/config";
 import ko from "@/messages/ko.json";
 import ja from "@/messages/ja.json";
 import en from "@/messages/en.json";
@@ -29,7 +30,7 @@ export function LocaleProvider({ children, initialLocale }: { children: React.Re
 
   return (
     <LocaleContext.Provider value={value}>
-      <NextIntlClientProvider locale={locale} messages={messages[locale]}>
+      <NextIntlClientProvider locale={locale} messages={messages[locale]} timeZone={timeZone}>
         {children}
       </NextIntlClientProvider>
     </LocaleContext.Provider>

@@ -1,0 +1,112 @@
+# Professional Experience
+
+## Jaeho Seo · Frontend Engineer
+
+A frontend engineer who identifies operational problems and drives them through resolution in high-frequency real-time data and Web3 transaction environments. Over four years, I have developed blockchain web services and WebView applications from architecture and implementation through launch and operations.
+
+## Technical Skills
+
+- **Languages** TypeScript, JavaScript, Python
+- **Frontend** React, Next.js, Zustand, Redux Toolkit, TanStack Query
+- **Web3** Wagmi, Ethers.js, Viem, WalletConnect, Reown AppKit
+- **Real-time & Visualization** WebSocket, TradingView, Canvas API, Rive
+- **UI & Styling** Tailwind CSS, Emotion, MUI, Framer Motion
+- **Tooling & Infra** Jira, Confluence, Slack, Figma, GitHub Actions
+
+## [NEXUS](https://www.homepage.nexus/) · Frontend Engineer
+
+**Feb 2025 – May 2026**
+
+### Cross Public Sale
+
+- Delivered project setup, design requirements, wallet integration, RPC, KYC, and smart-contract calls within one week
+- Diagnosed data delays caused by public RPC rate limits and migrated to a JWT-authenticated private RPC
+- Completed a public sale worth approximately **KRW 20 billion without a critical incident**
+- Recorded zero data-retrieval delays after the RPC migration
+
+### CrossX · WebView Hybrid Wallet
+
+- Designed a Web–Native bridge that standardized RN WebView messaging as Promise-based functions
+- Made the RN Bridge compatible with TanStack Query's QueryFn, unifying bridge communication and server APIs under the same asynchronous state-management model
+- Built a virtual history stack for a single-route SPA and connected screen state to Android hardware back events
+- Synchronized current and previous screen offsets with drawer drag progress for native-quality navigation gestures
+- Released on both iOS and Android, reaching **more than 100,000 cumulative downloads**
+
+### Cross Exchange · Game-Token Exchange
+
+- Unified duplicated transaction flows through an adapter injected into the SDK
+- Led migration from a monorepo to an independent project
+- Built automatic generation of DTOs, entities, and repositories from Swagger specifications
+- Preserved existing features while **reducing the total codebase by approximately 30%**
+- Externalized market configuration to S3, eliminating code changes and redeployment for new markets
+
+### Cross STAKING · Token Staking Service
+
+- Rebuilt an internal AI-generated prototype to match Figma designs and production requirements
+- Added configurable date and time controls for validating operational phase transitions in advance
+- Fixed layout, wallet integration, and core features within five days of handoff and launched on schedule
+
+### Cross Points · Points Service (Discontinued)
+
+- Used EIP-1193 wallet detection to reduce the wallet connection flow from three steps to two and improve the connection UX
+- Designed a cookie-based JWT architecture and consolidated authentication behind a single API entry point by handling token extraction, refresh, and header injection in a middleware proxy
+- Implemented PKCE-based Twitter OAuth 2.0 and resolved authentication-session loss in iOS in-app browsers through deep-link callback redirects
+
+## [Wemade](https://www.wemade.com/en) · Frontend Engineer
+
+**Sep 2022 – Feb 2025**
+
+### Pnix Exchange · Multi-Market Order-Book DEX
+
+- Owned the web frontend in a two-person team from initial DEX architecture through launch and maintenance
+- Integrated historical market APIs and live WebSocket streams through the TradingView DataFeed interface
+- Applied ref-based buffering and batched updates to high-frequency order-book traffic, preventing frame drops
+- Controlled event subscriptions with the Page Visibility API, reducing frame drops caused by processing messages accumulated while the page was in the background
+- Designed React keys around price levels so animations ran only for quantity changes at the same price, minimizing unnecessary re-renders
+- Traced skipped CSS transitions to style changes accumulating within the same frame and moved the interaction to rAF-based animation for reliable state transitions
+- Used `useDeferredValue` to separate rendering priorities and preserve tab responsiveness during rapid trades
+- Maintained stable order-book rendering under bot tests simulating large-scale traffic
+
+### 40 Wonders
+
+- Migrated landing-page JSON resources to Azure Storage with AzCopy
+- Separated content updates from application deployments, improving operational efficiency
+
+## Side Project
+
+### Chrome-like Tab Resizing UI
+
+- Implemented eight-direction resizing, group movement, tab reordering, splitting, and merging with the Vanilla DOM API
+- Recreated Chrome's tab UX and published it as an NPM package
+
+## Portfolio
+
+<div className="portfolio-grid">
+  <a className="portfolio-card" href="https://www.crosstoken.sale" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/cross-public-sale.jpg" alt="Cross Public Sale" />
+    <span className="portfolio-card-body"><strong>Cross Public Sale</strong><span>Web3 public sale · KYC · RPC · smart-contract integration</span></span>
+  </a>
+  <a className="portfolio-card" href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=en" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/crossx.png" alt="CrossX" />
+    <span className="portfolio-card-body"><strong>CrossX</strong><span>WebView hybrid wallet · over 100K downloads</span></span>
+  </a>
+  <a className="portfolio-card" href="https://x.crosstoken.io" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/cross-exchange.png" alt="Cross Exchange" />
+    <span className="portfolio-card-body"><strong>Cross Exchange</strong><span>Game-token exchange · transaction architecture and market automation</span></span>
+  </a>
+  <a className="portfolio-card" href="https://stake.ogfcorp.com" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/cross-staking.png" alt="Cross STAKING" />
+    <span className="portfolio-card-body"><strong>Cross STAKING</strong><span>Token staking · scheduled operational feature transitions</span></span>
+  </a>
+  <a className="portfolio-card" href="https://pnix.exchange" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/pnix-exchange.png" alt="Pnix Exchange" />
+    <span className="portfolio-card-body"><strong>Pnix Exchange</strong><span>Multi-market order-book DEX · real-time data optimization</span></span>
+  </a>
+</div>
+
+## Education & Certifications
+
+- B.E. in Applied Chemical Engineering, Korea University of Technology and Education, Mar 2014 – Feb 2022
+- Full-Stack Bootcamp, Vanilla Coding, Apr 2022 – Jul 2022
+- Computer Specialist in Spreadsheet & Database, Level 1, Mar 2019
+- TOEIC 825, Aug 2019

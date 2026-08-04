@@ -4,13 +4,17 @@
     "description": "An MDX panel blog with draggable and resizable windows"
   },
   "Navigation": {
-    "start-blog": "Start blog",
-    "build-tool": "Build tool"
+    "introduce": "Introduce",
+    "start-blog": "Building This Portfolio",
+    "build-tool": "Technical Notes"
   },
   "Tabs": {
-    "npmPublish": "NPM Publish",
-    "mdx": "MDX",
-    "npmReadme": "README",
+    "portfolioOverview": "Overview",
+    "introduce": "About Me",
+    "career": "Experience",
+    "npmPublish": "Board Package",
+    "mdx": "MDX Integration",
+    "npmReadme": "Documentation",
     "vite": "Vite"
   },
   "Header": {

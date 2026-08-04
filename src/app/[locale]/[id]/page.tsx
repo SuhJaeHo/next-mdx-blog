@@ -26,17 +26,18 @@ export function generateStaticParams() {
 async function getMdxSources(locale: Locale) {
   const localizedDir = path.join(process.cwd(), "src", "markdown", locale);
   const fallbackDir = path.join(process.cwd(), "src", "markdown");
-
-  let mdxDir = localizedDir;
+  const fallbackFiles = (await fs.readdir(fallbackDir)).filter((file) => file.endsWith(".mdx"));
+  let localizedFiles: string[] = [];
   try {
-    await fs.access(localizedDir);
+    localizedFiles = (await fs.readdir(localizedDir)).filter((file) => file.endsWith(".mdx"));
   } catch {
-    mdxDir = fallbackDir;
+    // A locale directory is optional; untranslated documents use the shared source.
   }
 
-  const files = (await fs.readdir(mdxDir)).filter((file) => file.endsWith(".mdx"));
+  const files = Array.from(new Set([...fallbackFiles, ...localizedFiles]));
   const entries = await Promise.all(
     files.map(async (fileName) => {
+      const mdxDir = localizedFiles.includes(fileName) ? localizedDir : fallbackDir;
       const content = String(await fs.readFile(path.join(mdxDir, fileName)));
       const serialized = await serialize(content, {
         mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypePrism], format: "mdx" },
@@ -52,9 +53,14 @@ export default async function Page({ params }: IPageProps) {
   if (!hasLocale(routing.locales, params.locale) || !(params.id in data.blog.page)) notFound();
 
   setRequestLocale(params.locale);
-  const locale = params.locale as Locale;
-  const mdxSources = await getMdxSources(locale);
-  const boardData = data.blog as BoardDataState;
+  const localizedSources = await Promise.all(
+    routing.locales.map(async (sourceLocale) => [sourceLocale, await getMdxSources(sourceLocale)] as const)
+  );
+  const mdxSourcesByLocale = Object.fromEntries(localizedSources) as Record<Locale, Record<string, MDXRemoteSerializeResult>>;
+  const boardData: BoardDataState = {
+    ...data.blog,
+    selectedPageId: params.id,
+  };
 
   return (
     <main className="size-full grid grid-rows-[auto_1fr_auto]">
@@ -63,7 +69,7 @@ export default async function Page({ params }: IPageProps) {
         <LanguageSwitcher />
       </header>
       <div className="grid grid-cols-[auto_1fr_auto]">
-        <GroupTabsLayout data={boardData} mdxSources={mdxSources} />
+        <GroupTabsLayout data={boardData} mdxSourcesByLocale={mdxSourcesByLocale} />
         <aside className="h-full w-[30px] border-l" />
       </div>
       <footer className="h-[30px] w-full border-t" />

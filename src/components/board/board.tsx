@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useLayoutEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   getGroupElementBoundaryPositions,
@@ -25,6 +25,9 @@ import { useTranslations } from "next-intl";
 import { useLocaleController } from "@app/[locale]/locale-provider";
 
 const tabMessageKeys = {
+  "portfolio-overview.mdx": "portfolioOverview",
+  "introduce.mdx": "introduce",
+  "career.mdx": "career",
   "npm-publish.mdx": "npmPublish",
   "mdx.mdx": "mdx",
   "npm-readme.mdx": "npmReadme",
@@ -134,9 +137,11 @@ const NavList = React.forwardRef<React.ElementRef<"div">, INavListProps>(({ clas
 
 NavList.displayName = "NavList";
 
-interface IPanelProps extends React.ComponentPropsWithoutRef<"div"> {}
+interface IPanelProps extends React.ComponentPropsWithoutRef<"div"> {
+  autoFitIntroduce?: boolean;
+}
 
-const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, children }) => {
+const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduce = true, className, children }) => {
   const { boardDataState, boardDataDispatch } = useBoardDataContext();
   const { boardLayoutState, boardLayoutConstants, boardLayoutDispatch } = useBoardLayoutContext();
   const { GROUP_MINIMUM_SIZE } = boardLayoutConstants;
@@ -154,6 +159,79 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
   useEffect(() => {
     boardDataContextRef.current = boardDataState;
   }, [boardDataState]);
+
+  useLayoutEffect(() => {
+    if (!autoFitIntroduce) return;
+
+    const container = containerRef.current;
+    if (!container || !("ResizeObserver" in window)) return;
+
+    let previousContainerSize: { width: number; height: number } | null = null;
+    const animationFrames = new Set<number>();
+    const cleanupTimers = new Set<number>();
+
+    const fitIntroduceGroup = (width: number, height: number) => {
+      if (width <= 0 || height <= 0) return;
+
+      const groupId = boardDataContextRef.current.page.introduce?.groupIds[0];
+      const group = groupId ? boardDataContextRef.current.group[groupId] : null;
+      if (!groupId || !group) return;
+
+      const groupElement = container.querySelector<HTMLElement>(`[data-group][data-page-id="introduce"]`);
+      const isInitialFit = previousContainerSize === null;
+      const wasStillAutoFitted =
+        !!groupElement &&
+        !!previousContainerSize &&
+        groupElement.offsetLeft === 0 &&
+        groupElement.offsetTop === 0 &&
+        groupElement.offsetWidth === previousContainerSize.width &&
+        groupElement.offsetHeight === previousContainerSize.height;
+
+      previousContainerSize = { width, height };
+      if (!isInitialFit && !wasStillAutoFitted) return;
+
+      if (groupElement) {
+        const clearTransition = (event?: TransitionEvent) => {
+          if (event && event.target !== groupElement) return;
+          groupElement.style.transition = "";
+          groupElement.removeEventListener("transitionend", clearTransition);
+        };
+
+        groupElement.addEventListener("transitionend", clearTransition);
+        groupElement.style.setProperty("transition", GROUP_RESIZE_SNAP_TRANSITION, "important");
+
+        const cleanupTimer = window.setTimeout(() => {
+          clearTransition();
+          cleanupTimers.delete(cleanupTimer);
+        }, GROUP_RESIZE_SNAP_DURATION_MS + 100);
+        cleanupTimers.add(cleanupTimer);
+      }
+
+      // Keep the initial dimensions on screen for one frame so the browser can
+      // interpolate to the fitted dimensions instead of applying both layouts
+      // before the first paint.
+      const animationFrame = requestAnimationFrame(() => {
+        animationFrames.delete(animationFrame);
+        boardDataDispatch({
+          type: "UPDATE_GROUP_SIZE",
+          payload: { groupId, x: 0, y: 0, width, height },
+        });
+      });
+      animationFrames.add(animationFrame);
+    };
+
+    const observer = new ResizeObserver(([entry]) => {
+      if (!entry) return;
+      fitIntroduceGroup(Math.round(entry.contentRect.width), Math.round(entry.contentRect.height));
+    });
+
+    observer.observe(container);
+    return () => {
+      observer.disconnect();
+      animationFrames.forEach(cancelAnimationFrame);
+      cleanupTimers.forEach(window.clearTimeout);
+    };
+  }, [autoFitIntroduce, boardDataDispatch]);
 
   const handleMouseMoveContainer = (e: MouseEvent) => {
     if (!containerRef.current) return;
@@ -887,11 +965,12 @@ const TabContent = React.forwardRef<React.ElementRef<"div">, ITabContentProps>((
   if (!groupData) return null;
 
   const { id, selectedTabId } = groupData;
-  const mdxContent = mdxSources ? mdxSources[boardDataState.tab[selectedTabId].contentFile] : null;
+  const contentFile = boardDataState.tab[selectedTabId].contentFile;
+  const mdxContent = mdxSources ? mdxSources[contentFile] : null;
 
   return (
     <div ref={forwardedRef} className={cn("overflow-auto", className)}>
-      {!mdxContent ? <div>{children}</div> : React.cloneElement(children as React.ReactElement, { groupId: id, mdxContent: mdxContent })}
+      {!mdxContent ? <div>{children}</div> : React.cloneElement(children as React.ReactElement, { groupId: id, mdxContent, contentFile })}
     </div>
   );
 });

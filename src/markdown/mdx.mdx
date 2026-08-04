@@ -1,77 +1,130 @@
-# MDX
+# Integrating MDX with the Board
 
-### What is MDX
+MDX is Markdown extended with JSX syntax. It allows prose, Markdown structures, JavaScript expressions, and components to participate in the same document pipeline.
 
-<p>MDX is an extended form of Markdown that allows to embed JSX components directly within Markdown files.</p>
+In this portfolio, MDX keeps content independent from the Board interaction code. A tab stores a `contentFile`, and the selected file is rendered inside `Board.TabContent`.
 
-### MDX Process
+## Compilation Pipeline
 
-1. Markdown Parsing & MDX Parsing
+A useful simplified model is:
 
-   <p>Convert Markdown/MDX into a Markdown AST</p>
+1. **Parse Markdown and MDX syntax into mdast**
 
-2. Apply Remark Plugins
+   Markdown nodes and MDX-specific nodes are represented in a Markdown abstract syntax tree.
 
-   <p>Use plugins to extend Markdown AST</p>
+2. **Run remark plugins**
 
-3. Convert Markdown AST to HTML AST
+   Remark plugins inspect or transform mdast. For example, `remark-gfm` adds support for GitHub Flavored Markdown features such as tables and task lists.
 
-   <p>Transform modified Markdown AST into an HTML AST, mapping Markdown syntax to HTML tags</p>
+3. **Convert mdast to hast**
 
-4. Apply Rehype Plugins
+   Markdown structures are mapped to an HTML-style abstract syntax tree. MDX nodes are preserved so they can later become JavaScript and component expressions.
 
-   <p>Use plugins to customize HTML AST</p>
+4. **Run rehype plugins**
 
-5. Render HTML or React Components
+   Rehype plugins inspect or transform hast. This portfolio uses `rehype-prism-plus` to annotate code blocks for syntax highlighting.
 
-### next-mdx-remote
+5. **Compile to JavaScript**
 
-<p>1. serialize converts MDX string into an object that can be passed directly to MDXRemote, which is typically intended to run on the server side.</p>
-<p>2. MDXRemote is used to convert the serialized data into a React component for rendereing while maintaining client-side routing.</p>
+   MDX ultimately compiles into JavaScript that uses a JSX runtime. Rendering that module produces React elements; the pipeline does not simply return an HTML string.
 
-```json
-pnpm add next-mdx-remote
+## How This Portfolio Loads MDX
+
+The server reads the Markdown files and serializes them during static generation:
+
+```ts
+import { serialize } from "next-mdx-remote/serialize";
+import rehypePrism from "rehype-prism-plus";
+import remarkGfm from "remark-gfm";
+
+const source = await serialize(fileContent, {
+  mdxOptions: {
+    remarkPlugins: [remarkGfm],
+    rehypePlugins: [rehypePrism],
+    format: "mdx",
+  },
+});
 ```
 
-### with core MDX library
+The serialized result is passed to the renderer:
 
-```js
+```tsx
+import { MDXRemote } from "next-mdx-remote";
+
+const components = {
+  pre: CodeBlock,
+};
+
+export function CustomMDX({ source }) {
+  return <MDXRemote {...source} components={components} />;
+}
+```
+
+`serialize` consumes a source string and returns a serializable object containing compiled code and scope data. `MDXRemote` evaluates that compiled source with the JSX runtime and renders the resulting React elements. Custom component mappings can replace standard elements—for example, this project replaces Markdown `pre` elements with a code-block component.
+
+## Connecting a Tab to a Document
+
+Board data contains only the relationship between a tab and its document:
+
+```json
+{
+  "id": "portfolio-overview-tab",
+  "groupId": "portfolio-group",
+  "name": "Overview",
+  "contentFile": "portfolio-overview.mdx"
+}
+```
+
+At render time:
+
+```ts
+const contentFile = boardData.tab[selectedTabId].contentFile;
+const mdxContent = mdxSources[contentFile];
+```
+
+This separation provides several benefits:
+
+- Board reducers do not need to understand document content.
+- New documents can be added without changing drag or layout logic.
+- The same Board can render a résumé, cover letter, package documentation, or study note.
+- Locale-specific files can replace the shared source while preserving the active Board state.
+
+## Using the Core MDX Compiler
+
+The same idea can be expressed directly with `@mdx-js/mdx`:
+
+```tsx
 import { compile, run } from "@mdx-js/mdx";
 import * as runtime from "react/jsx-runtime";
 
-/**
- * Server-side
- * Compile the MDX source code to a function body.
- */
-const mdxCode = await compile(mdxContent, {
+const compiled = await compile(mdxContent, {
   outputFormat: "function-body",
 });
-const serializedMDX = JSON.stringify(mdxCode);
 
-/**
- * Client-side
- * Compiled code is executed as a React component and rendered.
- * Serialized MDX code is restored to a React component using 'run' method, which integrates compiled Javascript code with React runtime environment.
- */
-const { default: MDXContent } = await run(serializedMDX, { ...runTime });
+const { default: MDXContent } = await run(String(compiled), {
+  ...runtime,
+  baseUrl: import.meta.url,
+});
+
 return <MDXContent />;
 ```
 
-### Plugins
+`compile` returns a virtual file whose string value is JavaScript code. With `outputFormat: "function-body"`, `run` evaluates that code using the supplied JSX runtime. The source must be trusted: evaluating user-controlled MDX can execute JavaScript and create a security vulnerability.
 
-- remarkPlugins
-  <br />
-  <p>remarkPlugins transform **Markdown** syntax</p>
-- rehypePlugins
-  <br />
-  <p>rehypePlugins transform **HTML** syntax, which is what the Markdown content becomes after passing through Remark phase.</p>
+## Remark vs. Rehype
 
-### Reference
+- **Remark plugins** operate primarily on Markdown syntax and mdast.
+- **Rehype plugins** operate primarily on HTML-like structures and hast.
+- Their exact behavior depends on each plugin; the distinction is the syntax tree they receive, not whether the final output is “Markdown” or “HTML.”
 
-- <a href="https://github.com/hashicorp/next-mdx-remote" target="_blank">
-    next-mdx-remote
-  </a>
+## Security and Maintenance Note
 
-- <a href="https://colinhemphill.com/blog/markdown-syntax-highlighting-with-the-nextjs-app-router" target="_blank">
-    Markdown Syntax Highlighting
-  </a>
+This portfolio loads version-controlled local MDX files, not arbitrary user input. That trust boundary is important because compiled MDX is executable JavaScript.
+
+The `next-mdx-remote` repository was archived in April 2026 and is now read-only. The current integration remains functional, but a future maintenance pass should evaluate migration to the RSC-oriented APIs or another actively maintained MDX solution.
+
+## References
+
+- [MDX: What is MDX?](https://mdxjs.com/docs/what-is-mdx/)
+- [`@mdx-js/mdx` API](https://mdxjs.com/packages/mdx/)
+- [`next-mdx-remote` documentation](https://github.com/hashicorp/next-mdx-remote)

@@ -1,0 +1,112 @@
+# 職務経歴
+
+## ソ・ジェホ · フロントエンドエンジニア
+
+高頻度のリアルタイムデータとWeb3トランザクション環境において、運用課題を自ら定義し、解決までやり遂げるフロントエンドエンジニアです。約4年間、ブロックチェーンWebサービスとWebViewアプリケーションを、設計・実装からリリース・運用まで担当してきました。
+
+## 技術
+
+- **言語** TypeScript, JavaScript, Python
+- **フロントエンド** React, Next.js, Zustand, Redux Toolkit, TanStack Query
+- **Web3** Wagmi, Ethers.js, Viem, WalletConnect, Reown AppKit
+- **リアルタイム処理・可視化** WebSocket, TradingView, Canvas API, Rive
+- **UI・スタイリング** Tailwind CSS, Emotion, MUI, Framer Motion
+- **ツール・インフラ** Jira, Confluence, Slack, Figma, GitHub Actions
+
+## [NEXUS](https://www.homepage.nexus/) · フロントエンドエンジニア
+
+**2025年2月 – 2026年5月**
+
+### Cross Public Sale
+
+- 1週間でプロジェクト設定、デザイン要件、ウォレット連携、RPC、KYC、スマートコントラクト呼び出しを実装
+- パブリックRPCのRate Limitによる遅延を分析し、JWT認証のプライベートRPCへ移行
+- 約**200億ウォン規模のPublic Saleを重大な障害なく完了**
+- RPC移行後のデータ取得遅延は0件
+
+### CrossX · WebViewハイブリッドウォレット
+
+- RN WebViewのメッセージ通信をPromiseベースの関数に標準化したWeb–Nativeブリッジを設計
+- RNブリッジをTanStack QueryのQueryFnと互換性のある形で設計し、ブリッジ通信をサーバーAPIと同じ非同期状態管理モデルへ統合
+- 単一ルートSPAに仮想履歴スタックを構築し、Androidのハードウェア戻る操作と画面状態を連携
+- ドロワーのドラッグ進捗に合わせて現在・前画面の位置を同期し、ネイティブ品質の画面遷移ジェスチャーを実現
+- iOS・Androidの両ストアでリリースし、**累計10万ダウンロード以上**を達成
+
+### Cross Exchange · ゲームトークン取引所
+
+- 重複していたトランザクション処理をSDK注入型アダプターで統合
+- モノレポから独立プロジェクトへの移行を主導
+- Swagger仕様に基づくDTO・Entity・Repositoryの自動生成を構築
+- 既存機能を維持しながら**コード量を約30%削減**
+- マーケット設定をS3で外部管理し、新規マーケット追加時のコード修正と再デプロイを不要化
+
+### Cross STAKING · トークンステーキング
+
+- 社内AIエージェントのプロトタイプをFigmaとサービス要件に合わせて再実装
+- 運用フェーズの画面・機能切り替えを事前検証できる日時設定機能を構築
+- 引き継ぎ後5日以内にレイアウト、ウォレット連携、主要機能を改善し、期限内にリリース
+
+### Cross Points · ポイントサービス（サービス終了）
+
+- EIP-1193によるウォレット検出で接続フローを3段階から2段階へ短縮し、接続UXを改善
+- CookieベースのJWT認証基盤を設計し、ミドルウェアプロキシでトークン抽出・更新・ヘッダー注入を一括処理することで認証APIを単一の入口に統合
+- PKCEベースのTwitter OAuth 2.0を実装し、iOSアプリ内ブラウザで発生していた認証セッション消失をディープリンクによるコールバックリダイレクトで解決
+
+## [Wemade](https://www.wemade.com/en) · フロントエンドエンジニア
+
+**2022年9月 – 2025年2月**
+
+### Pnix Exchange · オーダーブック型マルチマーケットDEX
+
+- 2名チームでDEXの初期設計からリリース、運用保守までWebフロントエンドを担当
+- TradingView DataFeedに過去価格APIとリアルタイムWebSocketを連携した価格ストリーミングチャートを実装
+- 高頻度オーダーブックにrefベースのバッファリングとバッチ更新を適用し、フレームドロップを防止
+- Page Visibility APIでイベント購読を制御し、バックグラウンドで蓄積されたメッセージ処理によるフレームドロップを改善
+- 価格帯単位でReact keyを設計し、同一価格帯の数量変更時のみアニメーションを実行することで不要な再レンダリングを最小化
+- 同一フレーム内にスタイル変更が蓄積してCSSトランジションが無視される原因を分析し、rAFベースのアニメーションへ移行して安定した状態変化を実現
+- `useDeferredValue`でレンダリング優先度を分離し、取引更新中もタブ操作の応答性を維持
+- 大規模トラフィックを想定したボットテストでも安定したレンダリングを維持
+
+### 40 Wonders
+
+- AzCopyでランディングページのJSONリソースをAzure Storageへ移行
+- コンテンツ更新とアプリケーションデプロイを分離し、運用効率を改善
+
+## サイドプロジェクト
+
+### Chrome風タブサイズ調整UI
+
+- Vanilla DOM APIで8方向のサイズ変更、グループ移動、タブの並べ替え・分割・結合を実装
+- ChromeのタブUXを再現し、NPMパッケージとして公開
+
+## ポートフォリオ
+
+<div className="portfolio-grid">
+  <a className="portfolio-card" href="https://www.crosstoken.sale" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/cross-public-sale.jpg" alt="Cross Public Sale" />
+    <span className="portfolio-card-body"><strong>Cross Public Sale</strong><span>Web3パブリックセール · KYC · RPC · コントラクト連携</span></span>
+  </a>
+  <a className="portfolio-card" href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ja" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/crossx.png" alt="CrossX" />
+    <span className="portfolio-card-body"><strong>CrossX</strong><span>WebViewハイブリッドウォレット · 累計10万ダウンロード</span></span>
+  </a>
+  <a className="portfolio-card" href="https://x.crosstoken.io" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/cross-exchange.png" alt="Cross Exchange" />
+    <span className="portfolio-card-body"><strong>Cross Exchange</strong><span>ゲームトークン取引所 · トランザクション設計とマーケット自動化</span></span>
+  </a>
+  <a className="portfolio-card" href="https://stake.ogfcorp.com" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/cross-staking.png" alt="Cross STAKING" />
+    <span className="portfolio-card-body"><strong>Cross STAKING</strong><span>トークンステーキング · 運用スケジュール別の機能切り替え</span></span>
+  </a>
+  <a className="portfolio-card" href="https://pnix.exchange" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/pnix-exchange.png" alt="Pnix Exchange" />
+    <span className="portfolio-card-body"><strong>Pnix Exchange</strong><span>オーダーブック型マルチマーケットDEX · リアルタイムデータ最適化</span></span>
+  </a>
+</div>
+
+## 学歴・資格
+
+- 韓国技術教育大学 応用化学工学科、2014年3月 – 2022年2月
+- Vanilla Coding フルスタック・ブートキャンプ、2022年4月 – 2022年7月
+- コンピュータ活用能力1級、2019年3月
+- TOEIC 825、2019年8月

@@ -4,5 +4,5 @@ import { routing } from "@/i18n/routing";
 
 export default function LocaleIndexPage({ params }: { params: { locale: string } }) {
   const locale = hasLocale(routing.locales, params.locale) ? params.locale : routing.defaultLocale;
-  redirect(`/${locale}/start-blog`);
+  redirect(`/${locale}/introduce`);
 }

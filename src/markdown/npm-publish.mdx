@@ -1,149 +1,144 @@
-# Npm package publish
+# Building and Publishing the Board Package
 
-### Npn pacakge
+The Board began as the interaction model behind this portfolio: movable and resizable groups containing reorderable tabs. I separated the reusable foundation from the portfolio content and published it as an NPM package.
 
-[group-tabs-layout](https://www.npmjs.com/package/group-tabs-layout)
+[View `group-tabs-layout` on NPM](https://www.npmjs.com/package/group-tabs-layout)
 
-### Why Rollup
+## Why Rollup
 
-1. Simpler Configuration
-2. Supports powerful tree shaking
-3. Optimized for ES Modules
+Rollup is a good fit for a component library because it:
 
-### Rollup Configuration
+1. Produces standard ES module and CommonJS outputs
+2. Performs tree-shaking through static analysis of the module graph
+3. Provides a focused plugin system for TypeScript, CommonJS dependencies, CSS, and minification
 
-<p>Defines how Rollup should bundle code</p>
+Tree-shaking is not automatic proof that every consumer receives the smallest possible bundle. It works best when the library preserves ES module boundaries, avoids unnecessary side effects, and declares package metadata correctly.
 
-- @rollup/plugin-babel
-  <br />
-  Integrates Babel into the Rollup bundling process.
-  <details>
-    <summary>What is babel preset</summary>
-    <p>Babel by itself is a tool for transforming Javascript, but it doesn't do anything on its own.</p>
-    <p>To make Babel what to transform and how to do, need to install a plugin and preset is bundled of plugins which make it easier to configure Babel</p>
-  </details>
-- @rollup/plugin-typescript
-  <br />
-  <p>Allows rollup to compile Typescript code to Javascript in a build process with integrates tsc.</p>
-  <p>Run tsc seperately, as this Rollup plugin doesn't perform type-checking.</p>
-- @rollup/plugin-node-resolve
-  <br />
-  <p>Allows rollup to find external dependencies and bundle them properly.</p>
-  <p>It helps in cases where your react component imports libraries from node_modules.</p>
-- @rollup/plugin-commonjs
-  <br />
-  <p>By default, Rollup only supports ES Modules for imports and exports, but many libraries are written in CommonJS.</p>
-  <p>It allows Rollup to handle modules written in the CommonJS</p>
-- rollup-plugin-peer-deps-external
-  <br />
-  <p>Mark peer dependencies automatically as external in Rollup bundle.</p>
-  <details>
-    <summary>What is Peer Dependencies</summary>
-    <p>Peer dependencies are libraies that instead of bundling them with your package, you let user install and manage them.</p>
-    <p>Prevent bundling common dependencies such as react, react-dom, styled-components.</p>
-  </details>
-- rollup-plugin-postcss
+## Build Responsibilities
+
+### `@rollup/plugin-typescript`
+
+Uses the TypeScript compiler to transpile TypeScript and report compiler diagnostics. It can also emit declaration files when `declaration` is enabled. I still run `tsc --noEmit` separately in CI because an explicit type-check command is easier to understand and enforce independently from bundling.
+
+### `@rollup/plugin-node-resolve`
+
+Resolves packages using Node-style resolution so Rollup can locate dependencies imported from `node_modules`.
+
+### `@rollup/plugin-commonjs`
+
+Converts CommonJS modules into ES modules that Rollup can analyze. Rollup itself is centered on ES modules, so this plugin is useful when a dependency only exposes CommonJS.
+
+### Peer dependencies and `external`
+
+React and React DOM should be peer dependencies of a React component library. The consuming application supplies them, which prevents the package from bundling a second React runtime.
+
+Declaring a peer dependency does not, by itself, guarantee that Rollup excludes it. The build should also mark it as `external` (or use a plugin that derives externals from `peerDependencies`).
+
+### PostCSS
+
+`rollup-plugin-postcss` processes imported styles. Depending on the package contract, CSS can be injected by JavaScript or extracted into a separate file that consumers import explicitly.
+
+## Corrected Rollup Configuration
 
 ```js
-import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
-import typescript from "@rollup/plugin-typescript";
 import resolve from "@rollup/plugin-node-resolve";
-import peerDepsExternal from "rollup-plugin-peer-deps-external";
+import terser from "@rollup/plugin-terser";
+import typescript from "@rollup/plugin-typescript";
 import postcss from "rollup-plugin-postcss";
-import { terser } from "rollup-plugin-terser";
-import autoprefixer from "autoprefixer";
-import tailwindcss from "tailwindcss";
 
 export default {
   input: "src/index.ts",
+  external: ["react", "react-dom"],
   output: [
     {
       file: "dist/index.js",
-      format: "cjs",
+      format: "esm",
       sourcemap: true,
     },
     {
-      file: "dist/index.esm.js",
-      format: "esm",
+      file: "dist/index.cjs",
+      format: "cjs",
+      exports: "named",
       sourcemap: true,
     },
   ],
   plugins: [
-    babel({
-      babelHelpers: "bundled",
-      exclude: "node_modules/**",
-      presets: ["@babel/preset-env", "@babel/preset-react"],
-      extensions: [".js", ".jsx", ".ts", ".tsx"],
-    }),
-    typescript(),
-    peerDepsExternal(),
     resolve(),
     commonjs(),
+    typescript({ tsconfig: "./tsconfig.build.json" }),
     postcss({
-      extract: true,
+      extract: "styles.css",
       minimize: true,
-      postcss({
-        extract: true,
-        minimize: true,
-      }),
     }),
     terser(),
   ],
 };
 ```
 
-### Typescript Configuration
+This example intentionally omits Babel. TypeScript can emit modern JavaScript directly, which avoids running two overlapping transpilation pipelines. Babel is still useful when a library needs target-specific syntax transforms; in that case, `@babel/preset-typescript` or a clearly separated TypeScript/Babel responsibility is required.
 
-<p>Defines how Typescript should be compiled</p>
+## TypeScript Build Configuration
 
 ```json
 {
   "compilerOptions": {
-    // "lib": Specifies which set of built-in type definitions the TypeScript compiler should include for project
-    "lib": ["dom", "dom.iterable", "esnext"],
-    // "target": Specifies which version of JavaScript TypeScript should compile
-    "target": "esnext",
-    // "module": Defines which module system to use in the generated Javascript
-    "module": "esnext",
-    // "jsx": Controls how Typescript handle JSX during compilation
-    // The task of transforming JSX is passed to Babel instead of being handled during Typescript compilation
-    "jsx": "preserve",
-    // "declaration": Generate declaration files of Typescript
+    "target": "ES2019",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "ES2020"],
+    "jsx": "react-jsx",
     "declaration": true,
-    // "declarationDir" : Specifies the directory where the generated declaration files should be placed
     "declarationDir": "dist/types",
-    // "emitDeclarationOnly" : Type checking with emit declaration files without emit Javascript files
-    "emitDeclarationOnly": true,
-    // "moduleResolution": Determines how TypeScript resolves modules when importing them into code
-    "moduleResolution": "node",
+    "emitDeclarationOnly": false,
     "strict": true,
     "skipLibCheck": true
   },
-  // "include" : Specifies an array of files that should be included in Typescript compilation process.
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
 ```
 
-### Package.json
+`emitDeclarationOnly` is `false` because this configuration asks the TypeScript Rollup plugin to produce JavaScript as well as declarations. If declarations are generated in a separate `tsc` step, then `emitDeclarationOnly: true` belongs in that separate declaration-specific configuration.
 
-- main
-  <br />
-  <p>The entry point of package when it is required by CommonJS environments.</p>
-- module
-  <br />
-  <p>The entry point of ES Module versions of package.</p>
-  <p>It is intended for Javascript environments that support ECMAScript Modules.</p>
-- files
-  <br />
-  <p>Specifies which files and directories should be included in npm package whein it is published.</p>
+## Package Entry Points
 
-### Reference
+A modern package should expose its public API explicitly:
 
-- <a href="https://chamdom.blog/babel-and-tsc/" target="_blank">
-    Babel with tsc
-  </a>
-  <br />
-  <br />
-  <br />
+```json
+{
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": ["dist"],
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "sideEffects": ["**/*.css"]
+}
+```
+
+- `main` is the legacy CommonJS entry point.
+- `module` is a widely supported convention for the ES module build.
+- `exports` is the authoritative public entry-point map for modern Node.js and bundlers.
+- `types` points TypeScript to the package declarations.
+- `files` limits the files included in the published package.
+- `sideEffects` preserves CSS imports while allowing JavaScript tree-shaking.
+
+Before publishing, `npm pack --dry-run` is useful for checking exactly which files will be included.
+
+## References
+
+- [Rollup documentation](https://rollupjs.org/)
+- [Official Rollup plugins](https://github.com/rollup/plugins)
+- [Babel plugins and presets](https://babeljs.io/docs/plugins/)
+- [Node.js package entry points](https://nodejs.org/api/packages.html#package-entry-points)

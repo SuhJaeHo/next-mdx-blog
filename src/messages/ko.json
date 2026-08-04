@@ -4,13 +4,17 @@
     "description": "드래그하고 크기를 조절할 수 있는 MDX 패널 블로그"
   },
   "Navigation": {
-    "start-blog": "블로그 시작",
-    "build-tool": "빌드 도구"
+    "introduce": "소개",
+    "start-blog": "이 포트폴리오를 만든 과정",
+    "build-tool": "기술 학습 기록"
   },
   "Tabs": {
-    "npmPublish": "NPM 배포",
-    "mdx": "MDX",
-    "npmReadme": "README",
+    "portfolioOverview": "소개",
+    "introduce": "자기소개서",
+    "career": "직무경력",
+    "npmPublish": "Board 패키지",
+    "mdx": "MDX 통합",
+    "npmReadme": "문서화",
     "vite": "Vite"
   },
   "Header": {

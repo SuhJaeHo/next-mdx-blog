@@ -1,0 +1,38 @@
+# Building This Portfolio
+
+This is not a portfolio assembled from a fixed template. I designed and built the Board interface myself, published its reusable foundation as an NPM package, and combined it with MDX to create a portfolio that can continue to grow with my career.
+
+> The portfolio itself demonstrates how I define a problem, design interactions, build reusable architecture, ship it, and improve it through real use.
+
+## What I Built
+
+- **Interactive Board UI** — movable and resizable panels inspired by browser tabs and tiling window managers
+- **Advanced interactions** — tab reordering, panel splitting and merging, edge snapping, and fullscreen restoration
+- **Reusable package** — isolated the Board foundation and published it through NPM for use beyond this site
+- **MDX content system** — separated content from interface logic so new writing can be added without rebuilding the Board
+- **Localized portfolio** — presents my profile, professional experience, and technical notes in English, Korean, and Japanese
+
+## Why This Format
+
+A conventional portfolio presents every visitor with the same fixed sequence. I wanted a format that better reflects how I work: explore several contexts, reorganize information, and focus on the part that matters now.
+
+The Board treats each document as a tab. A recruiter can keep my introduction and experience side by side, while an engineer can open the implementation notes behind the portfolio itself. The same interface supports career documents today and will continue to hold project retrospectives and technical study notes over time.
+
+## How the Pieces Connect
+
+| Layer | Responsibility |
+| --- | --- |
+| Board | Manages panels, tabs, drag, resize, split, merge, and focus |
+| NPM package | Makes the interaction model reusable outside this portfolio |
+| MDX | Stores career documents and technical writing independently from UI code |
+| Locale content | Provides English, Korean, and Japanese versions without resetting Board state |
+| Next.js | Pre-renders routes and delivers the portfolio as an actual maintained product |
+
+## The Story in This Section
+
+1. **Overview** explains why this portfolio exists and what it demonstrates.
+2. **Board Package** covers how the reusable UI was packaged and published.
+3. **MDX Integration** explains how documents are connected to tabs.
+4. **Documentation** shows how another developer can install and use the package.
+
+I use this portfolio as both a career presentation and a living record of what I learn. The format is therefore not decoration around the content—it is one of the projects I want to present.

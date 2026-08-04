@@ -1,23 +1,49 @@
 {
   "blog": {
-    "selectedPageId": "start-blog",
+    "selectedPageId": "introduce",
     "page": {
+      "introduce": {
+        "id": "introduce",
+        "groupIds": ["introduce-profile-group"],
+        "name": "Introduce"
+      },
       "start-blog": {
         "id": "start-blog",
         "groupIds": ["ed3bc28c-f05c-4033-8545-3d7c16c56c07"],
-        "name": "Start blog"
+        "name": "Building This Portfolio"
       },
       "build-tool": {
         "id": "build-tool",
         "groupIds": ["0891-40e6-a7a4-245f40bf613d"],
-        "name": "build tool"
+        "name": "Technical Notes"
       }
     },
     "group": {
+      "introduce-profile-group": {
+        "id": "introduce-profile-group",
+        "tabIds": ["introduce-cover-letter-tab", "introduce-career-tab"],
+        "selectedTabId": "introduce-cover-letter-tab",
+        "size": {
+          "width": 720,
+          "height": 560
+        },
+        "prevSize": {
+          "width": 720,
+          "height": 560
+        },
+        "position": {
+          "x": 24,
+          "y": 24
+        },
+        "prevPosition": {
+          "x": 24,
+          "y": 24
+        }
+      },
       "ed3bc28c-f05c-4033-8545-3d7c16c56c07": {
         "id": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
-        "tabIds": ["5a76f275-0917-4d11-94cf-547b57be5fe6", "abf3a276-c01c-473f-93e9-2b3a2cbac3a9", "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0"],
-        "selectedTabId": "5a76f275-0917-4d11-94cf-547b57be5fe6",
+        "tabIds": ["portfolio-overview-tab", "5a76f275-0917-4d11-94cf-547b57be5fe6", "abf3a276-c01c-473f-93e9-2b3a2cbac3a9", "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0"],
+        "selectedTabId": "portfolio-overview-tab",
         "size": {
           "width": 400,
           "height": 300
@@ -58,22 +84,40 @@
       }
     },
     "tab": {
+      "portfolio-overview-tab": {
+        "id": "portfolio-overview-tab",
+        "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
+        "name": "Overview",
+        "contentFile": "portfolio-overview.mdx"
+      },
+      "introduce-cover-letter-tab": {
+        "id": "introduce-cover-letter-tab",
+        "groupId": "introduce-profile-group",
+        "name": "About Me",
+        "contentFile": "introduce.mdx"
+      },
+      "introduce-career-tab": {
+        "id": "introduce-career-tab",
+        "groupId": "introduce-profile-group",
+        "name": "Experience",
+        "contentFile": "career.mdx"
+      },
       "5a76f275-0917-4d11-94cf-547b57be5fe6": {
         "id": "5a76f275-0917-4d11-94cf-547b57be5fe6",
         "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
-        "name": "Npm",
+        "name": "Board Package",
         "contentFile": "npm-publish.mdx"
       },
       "abf3a276-c01c-473f-93e9-2b3a2cbac3a9": {
         "id": "abf3a276-c01c-473f-93e9-2b3a2cbac3a9",
         "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
-        "name": "MDX",
+        "name": "MDX Integration",
         "contentFile": "mdx.mdx"
       },
       "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0": {
         "id": "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0",
         "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
-        "name": "Readme",
+        "name": "Documentation",
         "contentFile": "npm-readme.mdx"
       },
       "b8f3ed8f-61a3-4017-8415-63c624719b1a": {

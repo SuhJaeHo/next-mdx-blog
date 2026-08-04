@@ -1,0 +1,71 @@
+# Group Tabs Layout
+
+`group-tabs-layout`は、JSONデータとContext APIを連携し、Next.jsの動的ルーティングでMDXファイルをレンダリングする状態駆動型UIライブラリです。
+
+## インストール
+
+```bash
+pnpm add group-tabs-layout
+```
+
+## 使用方法
+
+```tsx
+"use client";
+
+import Board from "group-tabs-layout";
+
+export default function GroupTabsLayout({ data, mdxSources }) {
+  return (
+    <Board.Root
+      boardData={data}
+      customConstants={{
+        TAB_SIZES: { WIDTH: 100, HEIGHT: 50 },
+        GROUP_MINIMUM_SIZE: { WIDTH: 200, HEIGHT: 300 },
+      }}
+    >
+      <Board.Nav>
+        <Board.NavList />
+      </Board.Nav>
+      <Board.Panel>
+        <Board.GroupIndicate />
+        <Board.Groups>
+          <Board.Group mdxSources={mdxSources}>
+            <Board.GroupHeader>
+              <Board.Tab />
+              <Board.TabIndicate />
+            </Board.GroupHeader>
+            <Board.TabContent>
+              <CustomMDX />
+            </Board.TabContent>
+          </Board.Group>
+        </Board.Groups>
+      </Board.Panel>
+    </Board.Root>
+  );
+}
+```
+
+`boardData`には現在のページ、パネル、タブの関係と、各パネルの位置・サイズを保存します。各タブの`contentFile`はレンダリングするMDXファイルを示します。
+
+## API
+
+### Context API連携
+
+パッケージは`boardData`を状態として管理し、Context APIを通じてBoardの子コンポーネントへ共有します。
+
+### MDX連携
+
+- JSONのタブオブジェクトに`contentFile`プロパティを追加します。
+- `contentFile`にはレンダリングするMDXファイル名を指定します。
+- `MDXRemote`のようなカスタムコンポーネントでドキュメントを動的にレンダリングします。
+- カスタムMDXコンポーネントへ`mdxContent`と`groupId`を渡します。
+
+### `Board.Root`
+
+- `boardData`: レイアウトを初期化するデータです。
+- `customConstants`: タブサイズやパネルの最小サイズなどの定数を設定します。
+
+### スタイリング
+
+パッケージはTailwind CSSを使用します。各BoardコンポーネントへclassNameを渡すことで、自由にスタイルを変更できます。

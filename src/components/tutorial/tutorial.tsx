@@ -9,7 +9,7 @@ import { createTutorialSteps } from "./steps";
 import { ITutorialStep } from "./types";
 import { forceMouseUp } from "./simulate";
 
-const STORAGE_KEY = "tutorial-seen";
+export const TUTORIAL_STORAGE_KEY = "tutorial-seen";
 const SPOTLIGHT_PADDING = 8;
 const TOOLTIP_GAP = 16;
 const TOOLTIP_WIDTH = 320;
@@ -51,7 +51,7 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
 
   React.useEffect(() => {
     setMounted(true);
-    if (!localStorage.getItem(STORAGE_KEY)) {
+    if (!localStorage.getItem(TUTORIAL_STORAGE_KEY)) {
       const timer = setTimeout(() => setIsActive(true), 700);
       return () => clearTimeout(timer);
     }
@@ -139,7 +139,7 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
   const finish = React.useCallback(() => {
     abortCurrentStep();
     stopTracking();
-    localStorage.setItem(STORAGE_KEY, "true");
+    localStorage.setItem(TUTORIAL_STORAGE_KEY, "true");
     setIsActive(false);
     setStepIndex(0);
     setIsPlaying(false);
