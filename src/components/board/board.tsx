@@ -636,7 +636,10 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
           groupElement.removeEventListener("transitionend", clearSnapTransition);
         };
         groupElement.addEventListener("transitionend", clearSnapTransition);
-        groupElement.style.transition = GROUP_RESIZE_SNAP_TRANSITION;
+        // tailwind.config.ts sets `important: true`, so Group's static `transition-group` utility
+        // emits an `!important` transition-property rule that a plain inline assignment can't beat —
+        // setProperty(..., "important") is required to actually override it here.
+        groupElement.style.setProperty("transition", GROUP_RESIZE_SNAP_TRANSITION, "important");
 
         groupElement.style.left = `${position.x}px`;
         groupElement.style.top = `${position.y}px`;
@@ -813,6 +816,18 @@ const GroupHeader = React.forwardRef<React.ElementRef<"div">, IGroupHeaderProps>
 
     if (containerElement && groupElement) {
       const isFullScreen = groupElement.offsetWidth === containerElement.offsetWidth && groupElement.offsetHeight === containerElement.offsetHeight;
+
+      const clearFullScreenTransition = (event: TransitionEvent) => {
+        if (event.target !== groupElement) return;
+        groupElement.style.transition = "";
+        groupElement.removeEventListener("transitionend", clearFullScreenTransition);
+      };
+      groupElement.addEventListener("transitionend", clearFullScreenTransition);
+      // See the identical note in handleMouseUpContainer's Move Group snap: `important: true`
+      // in tailwind.config.ts means Group's static transition-group utility must be beaten with
+      // setProperty(..., "important"), not a plain assignment.
+      groupElement.style.setProperty("transition", GROUP_RESIZE_SNAP_TRANSITION, "important");
+
       boardDataDispatch({
         type: "UPDATE_GROUP_FULL_SCREEN",
         payload: {
