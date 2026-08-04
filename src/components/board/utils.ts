@@ -221,11 +221,11 @@ const resetGroupTabsTranslate = (groupHeaderElement: HTMLElement, currTabElement
 const setGroupElementForeground = (currGroupId: string) => {
   const groupElements = document.querySelectorAll("[data-group]");
   groupElements.forEach((groupElement) => {
-    if (groupElement.id === currGroupId) {
-      (groupElement as HTMLElement).style.zIndex = CUSTOM_ZINDEX.FOREGROUND;
-    } else {
-      (groupElement as HTMLElement).style.zIndex = CUSTOM_ZINDEX.DEFAULT;
-    }
+    const isForeground = groupElement.id === currGroupId;
+    (groupElement as HTMLElement).style.zIndex = isForeground ? CUSTOM_ZINDEX.FOREGROUND : CUSTOM_ZINDEX.DEFAULT;
+    // Drives the subtle foreground styling (border/shadow) in group-tabs-layout.tsx via a data-attribute selector,
+    // since zIndex itself is only ever set imperatively and isn't otherwise observable from CSS.
+    groupElement.setAttribute("data-foreground", String(isForeground));
   });
 };
 

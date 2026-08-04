@@ -763,6 +763,7 @@ const Group = React.forwardRef<React.ElementRef<"div">, IGroupProps>(({ children
       data-page-id={boardDataState.selectedPageId}
       data-position={JSON.stringify({ x: 0, y: 0 })}
       data-dragged={false}
+      data-foreground={false}
       {...props}
     >
       {React.Children.map(children, (child) => (React.isValidElement(child) ? React.cloneElement(child as React.ReactElement, { groupData, mdxSources }) : child))}

@@ -19,9 +19,12 @@ export default function GroupTabsLayout({ data, mdxSources }: IGrooupTabsLayoutP
       <Board.Panel className="bg-background">
         <Board.GroupIndicate className="bg-indicator/30 border-[1px] border-indicator" />
         <Board.Groups>
-          <Board.Group mdxSources={mdxSources} className="bg-background border border-border shadow-xl grid grid-rows-[auto_1fr]">
-            <Board.GroupHeader className="cursor-pointer border-b border-border">
-              <Board.Tab className="flex justify-center items-center cursor-pointer data-[selected=true]:bg-secondary hover:bg-secondary transition-transform duration-300 text-sm" />
+          <Board.Group
+            mdxSources={mdxSources}
+            className="bg-background border border-border/40 shadow-sm transition-group duration-200 grid grid-rows-[auto_1fr] data-[foreground=true]:border-border/70 data-[foreground=true]:shadow-2xl dark:data-[foreground=true]:ring-1 dark:data-[foreground=true]:ring-foreground/20 dark:data-[foreground=true]:shadow-[0_20px_45px_-15px_rgba(255,255,255,0.12)]"
+          >
+            <Board.GroupHeader className="cursor-pointer border-b border-border/60">
+              <Board.Tab className="flex justify-center items-center cursor-pointer text-sm text-muted-foreground border-r border-border/50 last:border-r-0 transition-tab duration-300 hover:bg-secondary/50 hover:text-foreground data-[selected=true]:bg-secondary data-[selected=true]:text-foreground data-[selected=true]:font-medium" />
               <Board.TabIndicate className="bg-indicator/30 border-[1px] border-indicator" />
             </Board.GroupHeader>
             <Board.TabContent className="bg-background text-foreground">
