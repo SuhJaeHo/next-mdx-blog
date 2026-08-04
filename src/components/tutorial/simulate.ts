@@ -34,24 +34,55 @@ export const centerOf = (el: Element): IPoint => {
  */
 export async function simulateDrag(target: Element, from: IPoint, to: IPoint, opts: { steps?: number; stepDelayMs?: number; signal?: AbortSignal } = {}) {
   const { steps = 36, stepDelayMs = 16, signal } = opts;
+  const durationMs = steps * Math.max(stepDelayMs, 28);
 
   dispatchMouse(target, "mousedown", from.x, from.y);
-  await sleep(stepDelayMs, signal);
+  await sleep(48, signal);
 
-  for (let i = 1; i <= steps; i++) {
-    const t = i / steps;
-    // ease-in-out for a more natural feel than a linear sweep
-    const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-    const x = from.x + (to.x - from.x) * eased;
-    const y = from.y + (to.y - from.y) * eased;
-    dispatchMouse(document, "mousemove", x, y);
-    await sleep(stepDelayMs, signal);
-  }
+  await new Promise<void>((resolve, reject) => {
+    let animationFrame = 0;
+    let startTime: number | null = null;
+
+    const cleanup = () => {
+      cancelAnimationFrame(animationFrame);
+      signal?.removeEventListener("abort", handleAbort);
+    };
+
+    const handleAbort = () => {
+      cleanup();
+      reject(new DOMException("Aborted", "AbortError"));
+    };
+
+    const animate = (timestamp: number) => {
+      if (startTime === null) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / durationMs, 1);
+      const eased = progress < 0.5 ? 4 * progress ** 3 : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      const x = from.x + (to.x - from.x) * eased;
+      const y = from.y + (to.y - from.y) * eased;
+
+      dispatchMouse(document, "mousemove", x, y);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        cleanup();
+        resolve();
+      }
+    };
+
+    if (signal?.aborted) {
+      handleAbort();
+      return;
+    }
+
+    signal?.addEventListener("abort", handleAbort, { once: true });
+    animationFrame = requestAnimationFrame(animate);
+  });
 
   dispatchMouse(document, "mouseup", to.x, to.y);
   // Let React commit the board's mouseup reducer update before the tutorial enables
   // navigation to the next step.
-  await sleep(80, signal);
+  await sleep(140, signal);
 }
 
 export async function simulateDoubleClick(target: Element, at: IPoint) {

@@ -4,10 +4,11 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { HelpCircle, X, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 import { cn } from "@lib/utils";
 import { createTutorialSteps } from "./steps";
 import { ITutorialStep } from "./types";
-import { forceMouseUp } from "./simulate";
+import { forceMouseUp, sleep } from "./simulate";
 
 export const TUTORIAL_STORAGE_KEY = "tutorial-seen";
 const SPOTLIGHT_PADDING = 8;
@@ -34,11 +35,14 @@ interface ITutorialProps {
 
 export default function Tutorial({ onFinish }: ITutorialProps) {
   const t = useTranslations("Tutorial");
+  const pathname = usePathname();
+  const currentPageId = pathname.split("/").filter(Boolean).at(-1);
   const tutorialSteps = React.useMemo(
     () => createTutorialSteps((key) => t(`steps.${key}`)),
     [t]
   );
   const [mounted, setMounted] = React.useState(false);
+  const [hasSeenTutorial, setHasSeenTutorial] = React.useState<boolean | null>(null);
   const [isActive, setIsActive] = React.useState(false);
   const [stepIndex, setStepIndex] = React.useState(0);
   const [rect, setRect] = React.useState<IRect | null>(null);
@@ -51,11 +55,15 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
 
   React.useEffect(() => {
     setMounted(true);
-    if (!localStorage.getItem(TUTORIAL_STORAGE_KEY)) {
-      const timer = setTimeout(() => setIsActive(true), 700);
-      return () => clearTimeout(timer);
-    }
+    setHasSeenTutorial(localStorage.getItem(TUTORIAL_STORAGE_KEY) === "true");
   }, []);
+
+  React.useEffect(() => {
+    if (!mounted || hasSeenTutorial !== false || currentPageId === "introduce" || isActive) return;
+
+    const timer = window.setTimeout(() => setIsActive(true), 500);
+    return () => window.clearTimeout(timer);
+  }, [currentPageId, hasSeenTutorial, isActive, mounted]);
 
   const stopTracking = React.useCallback(() => {
     if (rafRef.current !== null) {
@@ -110,8 +118,8 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
       startTracking();
       setIsPlaying(true);
 
-      step
-        .play(controller.signal)
+      sleep(280, controller.signal)
+        .then(() => step.play(controller.signal))
         .then((finalEl) => {
           if (controller.signal.aborted) return;
           if (finalEl) targetElRef.current = finalEl;
@@ -136,10 +144,35 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, stepIndex]);
 
+  React.useEffect(() => {
+    if (!isActive) return;
+
+    const blockUserInput = (event: Event) => {
+      // Tutorial simulations dispatch untrusted MouseEvents directly to document and must
+      // continue to reach the Board. Only real user input is blocked while a step is active.
+      if (!event.isTrusted) return;
+
+      const target = event.target;
+      const tutorialButton = target instanceof Element ? target.closest<HTMLElement>("[data-tutorial-controls] button") : null;
+      if (tutorialButton && !tutorialButton.hasAttribute("disabled")) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    };
+
+    const eventTypes = ["pointerdown", "pointermove", "pointerup", "mousedown", "mousemove", "mouseup", "touchstart", "touchmove", "touchend"] as const;
+    eventTypes.forEach((eventType) => document.addEventListener(eventType, blockUserInput, { capture: true, passive: false }));
+
+    return () => {
+      eventTypes.forEach((eventType) => document.removeEventListener(eventType, blockUserInput, { capture: true }));
+    };
+  }, [isActive]);
+
   const finish = React.useCallback(() => {
     abortCurrentStep();
     stopTracking();
     localStorage.setItem(TUTORIAL_STORAGE_KEY, "true");
+    setHasSeenTutorial(true);
     setIsActive(false);
     setStepIndex(0);
     setIsPlaying(false);
@@ -166,7 +199,7 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
 
   return createPortal(
     <>
-      {!isActive && (
+      {!isActive && hasSeenTutorial === true && (
         <button
           type="button"
           onClick={handleReplay}
@@ -182,6 +215,7 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
           stepIndex={stepIndex}
           total={tutorialSteps.length}
           rect={rect}
+          tooltipAnchorRect={rect}
           isPlaying={isPlaying}
           onNext={handleNext}
           onSkip={finish}
@@ -198,27 +232,32 @@ interface ITutorialOverlayProps {
   stepIndex: number;
   total: number;
   rect: IRect;
+  tooltipAnchorRect: IRect;
   isPlaying: boolean;
   onNext: () => void;
   onSkip: () => void;
   labels: { next: string; done: string; skip: string };
 }
 
-function TutorialOverlay({ step, stepIndex, total, rect, isPlaying, onNext, onSkip, labels }: ITutorialOverlayProps) {
+function TutorialOverlay({ step, stepIndex, total, rect, tooltipAnchorRect, isPlaying, onNext, onSkip, labels }: ITutorialOverlayProps) {
   const holeTop = rect.top - SPOTLIGHT_PADDING;
   const holeLeft = rect.left - SPOTLIGHT_PADDING;
   const holeWidth = rect.width + SPOTLIGHT_PADDING * 2;
   const holeHeight = rect.height + SPOTLIGHT_PADDING * 2;
+  const anchorTop = tooltipAnchorRect.top - SPOTLIGHT_PADDING;
+  const anchorLeft = tooltipAnchorRect.left - SPOTLIGHT_PADDING;
+  const anchorWidth = tooltipAnchorRect.width + SPOTLIGHT_PADDING * 2;
+  const anchorHeight = tooltipAnchorRect.height + SPOTLIGHT_PADDING * 2;
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
 
   let placement = step.placement;
-  if (placement === "bottom" && holeTop + holeHeight + TOOLTIP_GAP + 160 > viewportHeight) placement = "top";
-  if (placement === "top" && holeTop - TOOLTIP_GAP - 160 < 0) placement = "bottom";
+  if (placement === "bottom" && anchorTop + anchorHeight + TOOLTIP_GAP + 160 > viewportHeight) placement = "top";
+  if (placement === "top" && anchorTop - TOOLTIP_GAP - 160 < 0) placement = "bottom";
 
-  const clampedLeft = Math.min(Math.max(holeLeft, VIEWPORT_MARGIN), viewportWidth - TOOLTIP_WIDTH - VIEWPORT_MARGIN);
-  const clampedSideTop = Math.min(Math.max(holeTop, VIEWPORT_MARGIN), viewportHeight - 200);
+  const clampedLeft = Math.min(Math.max(anchorLeft, VIEWPORT_MARGIN), viewportWidth - TOOLTIP_WIDTH - VIEWPORT_MARGIN);
+  const clampedSideTop = Math.min(Math.max(anchorTop, VIEWPORT_MARGIN), viewportHeight - 200);
 
   let rawLeft: number;
   let rawTop: number;
@@ -227,20 +266,20 @@ function TutorialOverlay({ step, stepIndex, total, rect, isPlaying, onNext, onSk
 
   if (placement === "top") {
     rawLeft = clampedLeft;
-    rawTop = holeTop - TOOLTIP_GAP;
+    rawTop = anchorTop - TOOLTIP_GAP;
     transform = "translateY(-100%)";
     arrowClassName = "absolute -bottom-[7px] left-6 h-3 w-3 rotate-45 border-b border-r border-border bg-background";
   } else if (placement === "left") {
-    rawLeft = holeLeft - TOOLTIP_GAP - TOOLTIP_WIDTH;
+    rawLeft = anchorLeft - TOOLTIP_GAP - TOOLTIP_WIDTH;
     rawTop = clampedSideTop;
     arrowClassName = "absolute top-6 -right-[7px] h-3 w-3 rotate-45 border-r border-t border-border bg-background";
   } else if (placement === "right") {
-    rawLeft = holeLeft + holeWidth + TOOLTIP_GAP;
+    rawLeft = anchorLeft + anchorWidth + TOOLTIP_GAP;
     rawTop = clampedSideTop;
     arrowClassName = "absolute top-6 -left-[7px] h-3 w-3 rotate-45 border-l border-b border-border bg-background";
   } else {
     rawLeft = clampedLeft;
-    rawTop = holeTop + holeHeight + TOOLTIP_GAP;
+    rawTop = anchorTop + anchorHeight + TOOLTIP_GAP;
     arrowClassName = "absolute -top-[7px] left-6 h-3 w-3 rotate-45 border-l border-t border-border bg-background";
   }
 
@@ -253,15 +292,16 @@ function TutorialOverlay({ step, stepIndex, total, rect, isPlaying, onNext, onSk
   return (
     <>
       {/* Blocks interaction with the board while the tutorial is active. */}
-      <div className="fixed inset-0 z-40" />
+      <div className="fixed inset-0 z-40 touch-none" />
       {/* Dark backdrop with a cutout over the highlighted (and possibly moving) element. */}
       <div
-        className="fixed z-40 rounded-lg transition-[top,left,width,height] duration-100 ease-out"
-        style={{ top: holeTop, left: holeLeft, width: holeWidth, height: holeHeight, boxShadow: "0 0 0 9999px rgba(0,0,0,0.65)" }}
+        className="fixed z-40 rounded-lg transition-[top,left,width,height] duration-75 ease-linear"
+        style={{ top: holeTop, left: holeLeft, width: holeWidth, height: holeHeight, boxShadow: "0 0 0 9999px rgba(0,0,0,0.65)", willChange: "top, left, width, height" }}
       />
       <div
-        className="fixed z-50 rounded-lg border border-border bg-background p-4 text-foreground shadow-2xl transition-[top,left] duration-150 ease-out"
-        style={{ width: TOOLTIP_WIDTH, ...tooltipStyle }}
+        data-tutorial-controls
+        className="fixed z-50 rounded-lg border border-border bg-background p-4 text-foreground shadow-2xl transition-[top,left] duration-300 ease-out"
+        style={{ width: TOOLTIP_WIDTH, willChange: "top, left", ...tooltipStyle }}
       >
         <div className={arrowClassName} />
         <div className="flex items-start justify-between gap-2">

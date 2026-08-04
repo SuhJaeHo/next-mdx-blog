@@ -17,10 +17,11 @@ export const createTutorialSteps = (t: TranslateStep): ITutorialStep[] => [
       if (tabs.length < 2) return tabs[0] ?? null;
 
       const tab = tabs[0];
+      const tabId = tab.id;
       const from = centerOf(tab);
       const to = centerOf(tabs[1]);
       await simulateDrag(tab, from, { x: to.x + 20, y: from.y }, { signal });
-      return document.querySelector("[data-tab-id]");
+      return document.getElementById(tabId) ?? tab;
     },
   },
   {
