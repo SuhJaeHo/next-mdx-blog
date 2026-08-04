@@ -1,7 +1,7 @@
 "use client";
 
-import Board from "group-tabs-layout";
-import { BoardDataState } from "group-tabs-layout/dist/types/Board/BoardDataProvider";
+import Board from "@components/board";
+import { BoardDataState } from "@components/board/board-data-provider";
 import CustomMDX from "@components/mdx/custom-mdx";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 

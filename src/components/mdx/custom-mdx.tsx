@@ -19,7 +19,7 @@ const components = {
 
 export default function CustomMDX({ className, mdxContent, groupId }: ICustomMDXProps) {
   return (
-    <div id={`markdown-body-${groupId}`} className={cn(`markdown-body text-inherit bg-inherit min-w-max px-2 pt-6 ${className} !important ${style.custom}`)}>
+    <div id={`markdown-body-${groupId}`} className={cn("markdown-body text-inherit bg-inherit min-w-max px-2 pt-6", className, style.custom)}>
       <MDXRemote {...(mdxContent as MDXRemoteSerializeResult)} components={components} />
     </div>
   );

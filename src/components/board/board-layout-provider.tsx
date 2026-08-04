@@ -94,9 +94,5 @@ export const BoardLayoutProvider: React.FC<React.PropsWithChildren<IBoardLayoutP
 };
 
 export const useBoardLayoutContext = () => {
-  const context = React.useContext(BoardLayoutContext);
-  if (!context) {
-    throw new Error("useBoardLayoutContext must be used within a BoardLayoutProvider");
-  }
-  return context;
+  return React.useContext(BoardLayoutContext);
 };

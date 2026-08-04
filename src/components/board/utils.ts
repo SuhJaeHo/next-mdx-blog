@@ -1,4 +1,30 @@
 import { TAB_MOVE_STATUS, TAB_TRANSLATE_STATUS, CUSTOM_ZINDEX } from "./constants";
+import { IGroupIndicate } from "./types";
+
+// Shared by "Move Group" and "Move Tab" (DIVIDED) drag handling: when the dragged
+// element is pushed past a container edge, returns the half-size drop-indicator
+// payload for that edge, or null if the pointer is still within the container's interior.
+const getContainerEdgeIndicator = (
+  e: MouseEvent,
+  containerBounds: { top: number; left: number; width: number; height: number },
+  minLeft: number
+): IGroupIndicate | null => {
+  const { top: containerTop, left: containerLeft, width: containerWidth, height: containerHeight } = containerBounds;
+
+  if (e.clientY <= containerTop) {
+    return { position: { x: minLeft, y: 0 }, size: { width: containerWidth, height: containerHeight / 2 } };
+  }
+  if (e.clientY >= containerTop + containerHeight) {
+    return { position: { x: minLeft, y: containerHeight / 2 }, size: { width: containerWidth, height: containerHeight / 2 } };
+  }
+  if (e.clientX <= containerLeft) {
+    return { position: { x: minLeft, y: 0 }, size: { width: containerWidth / 2, height: containerHeight } };
+  }
+  if (e.clientX >= containerLeft + containerWidth) {
+    return { position: { x: containerWidth / 2, y: 0 }, size: { width: containerWidth / 2, height: containerHeight } };
+  }
+  return null;
+};
 
 const getGroupElementBoundaryPositions = (containerRef: React.MutableRefObject<HTMLDivElement>, groupElement: HTMLElement) => {
   const minTop = 0;
@@ -16,12 +42,14 @@ const getTabMoveStatus = (currTabElement: HTMLElement) => {
   const { top: tabTop, left: tabLeft, width: tabWidth, height: tabHeight } = currTabElement.getBoundingClientRect();
   const { top: currGroupHeaderTop, left: currGroupHeaderLeft, width: currGroupHeaderWidth, height: currGroupHeaderHeight } = groupHeaderElement.getBoundingClientRect();
 
-  const dist = 0;
+  const TAB_OVERLAP_TOLERANCE_PX = 0;
 
   // default
   if (
-    ((currGroupHeaderLeft >= tabLeft && currGroupHeaderLeft - (tabLeft + tabWidth) <= dist) || (currGroupHeaderLeft <= tabLeft && tabLeft - (currGroupHeaderLeft + currGroupHeaderWidth) <= dist)) &&
-    ((currGroupHeaderTop >= tabTop && currGroupHeaderTop - (tabTop + tabHeight) <= dist) || (currGroupHeaderTop <= tabTop && tabTop - (currGroupHeaderTop + currGroupHeaderHeight) <= dist))
+    ((currGroupHeaderLeft >= tabLeft && currGroupHeaderLeft - (tabLeft + tabWidth) <= TAB_OVERLAP_TOLERANCE_PX) ||
+      (currGroupHeaderLeft <= tabLeft && tabLeft - (currGroupHeaderLeft + currGroupHeaderWidth) <= TAB_OVERLAP_TOLERANCE_PX)) &&
+    ((currGroupHeaderTop >= tabTop && currGroupHeaderTop - (tabTop + tabHeight) <= TAB_OVERLAP_TOLERANCE_PX) ||
+      (currGroupHeaderTop <= tabTop && tabTop - (currGroupHeaderTop + currGroupHeaderHeight) <= TAB_OVERLAP_TOLERANCE_PX))
   ) {
     return TAB_MOVE_STATUS.DEFAULT;
   }
@@ -36,8 +64,10 @@ const getTabMoveStatus = (currTabElement: HTMLElement) => {
       const { top: groupHeaderTop, left: groupHeaderLeft, width: groupHeaderWidth, height: groupHeaderHeight } = groupHeaderElement.getBoundingClientRect();
 
       if (
-        ((groupHeaderLeft >= tabLeft && groupHeaderLeft - (tabLeft + tabWidth) <= dist) || (groupHeaderLeft <= tabLeft && tabLeft - (groupHeaderLeft + groupHeaderWidth) <= dist)) &&
-        ((groupHeaderTop >= tabTop && groupHeaderTop - (tabTop + tabHeight) <= dist) || (groupHeaderTop <= tabTop && tabTop - (groupHeaderTop + groupHeaderHeight) <= dist))
+        ((groupHeaderLeft >= tabLeft && groupHeaderLeft - (tabLeft + tabWidth) <= TAB_OVERLAP_TOLERANCE_PX) ||
+          (groupHeaderLeft <= tabLeft && tabLeft - (groupHeaderLeft + groupHeaderWidth) <= TAB_OVERLAP_TOLERANCE_PX)) &&
+        ((groupHeaderTop >= tabTop && groupHeaderTop - (tabTop + tabHeight) <= TAB_OVERLAP_TOLERANCE_PX) ||
+          (groupHeaderTop <= tabTop && tabTop - (groupHeaderTop + groupHeaderHeight) <= TAB_OVERLAP_TOLERANCE_PX))
       ) {
         combineGroupId = dataGroupId;
         return;
@@ -106,9 +136,50 @@ const handleTabJoinGroup = (groupElement: HTMLElement, currTabElement: HTMLEleme
     } else {
       currTabNewIdx = Number(dataTabIdx) + 1;
     }
-
-    currTabElement.setAttribute("data-tab-idx", JSON.stringify(currTabNewIdx));
   });
+
+  currTabElement.setAttribute("data-tab-idx", JSON.stringify(currTabNewIdx));
+};
+
+// Shared by the COMBINE-branch reorder and the same-group reorder branch: shifts the
+// sibling tabs between `fromIdx` and `toIdx` out of the way of `currTabElement` as it
+// moves from one tab slot to another within `groupElement`.
+const shiftSiblingTabs = (groupElement: HTMLElement, currTabElement: HTMLElement, fromIdx: number, toIdx: number) => {
+  if (fromIdx > toIdx) {
+    // move left way
+    for (let i = fromIdx - 1; i >= toIdx; i--) {
+      const tabElement = groupElement.querySelector(`[data-tab-idx="${i}"]`);
+      if (tabElement instanceof HTMLElement) {
+        tabElement.setAttribute("data-tab-idx", JSON.stringify(i + 1));
+        const dataTabTranslateStatus = tabElement.getAttribute("data-tab-translate-status") as string;
+        if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.DEFAULT) {
+          tabElement.style.transform = `translate(${currTabElement.offsetWidth}px, 0px)`;
+          tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.RIGHT);
+        } else if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.LEFT) {
+          tabElement.style.transform = "translate(0px, 0px)";
+          tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.DEFAULT);
+        }
+      }
+    }
+  } else {
+    // move right way
+    for (let i = fromIdx + 1; i <= toIdx; i++) {
+      const tabElement = groupElement.querySelector(`[data-tab-idx="${i}"]`);
+      if (tabElement instanceof HTMLElement) {
+        tabElement.setAttribute("data-tab-idx", JSON.stringify(i - 1));
+        const dataTabTranslateStatus = tabElement.getAttribute("data-tab-translate-status") as string;
+        if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.DEFAULT) {
+          tabElement.style.transform = `translate(${-currTabElement.offsetWidth}px, 0px)`;
+          tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.LEFT);
+        } else if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.LEFT) {
+          //
+        } else {
+          tabElement.style.transform = "translate(0px, 0px)";
+          tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.DEFAULT);
+        }
+      }
+    }
+  }
 };
 
 const getGroupTabsNewIdList = (groupHeaderElement: HTMLElement, currTabElement: HTMLElement) => {
@@ -158,4 +229,14 @@ const setGroupElementForeground = (currGroupId: string) => {
   });
 };
 
-export { getGroupElementBoundaryPositions, getTabMoveStatus, getGroupTabsNewIdList, handleTabLeaveGroup, handleTabJoinGroup, resetGroupTabsTranslate, setGroupElementForeground };
+export {
+  getGroupElementBoundaryPositions,
+  getContainerEdgeIndicator,
+  getTabMoveStatus,
+  getGroupTabsNewIdList,
+  handleTabLeaveGroup,
+  handleTabJoinGroup,
+  resetGroupTabsTranslate,
+  setGroupElementForeground,
+  shiftSiblingTabs,
+};

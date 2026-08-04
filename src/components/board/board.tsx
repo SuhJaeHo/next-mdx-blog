@@ -1,8 +1,19 @@
 "use client";
 
-import React, { useRef, useEffect, useMemo } from "react";
-import { getGroupElementBoundaryPositions, getGroupTabsNewIdList, getTabMoveStatus, handleTabJoinGroup, handleTabLeaveGroup, resetGroupTabsTranslate, setGroupElementForeground } from "./utils";
-import { CUSTOM_ZINDEX, RESIZE_DIRECTIONS, TAB_MOVE_STATUS, TAB_TRANSLATE_STATUS } from "./constants";
+import React, { useRef, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+import {
+  getGroupElementBoundaryPositions,
+  getContainerEdgeIndicator,
+  getGroupTabsNewIdList,
+  getTabMoveStatus,
+  handleTabJoinGroup,
+  handleTabLeaveGroup,
+  resetGroupTabsTranslate,
+  setGroupElementForeground,
+  shiftSiblingTabs,
+} from "./utils";
+import { CUSTOM_ZINDEX, GROUP_RESIZE_SNAP_DURATION_MS, RESIZE_DIRECTIONS, TAB_MOVE_STATUS, TAB_TRANSLATE_STATUS } from "./constants";
 import { IGroup, IPosition, IGroupIndicate } from "./types";
 import { cn } from "@lib/utils";
 import { cva } from "class-variance-authority";
@@ -10,6 +21,41 @@ import { usePathname } from "next/navigation";
 import { BoardLayoutProvider, BoardLayoutConstants, useBoardLayoutContext } from "./board-layout-provider";
 import { BoardDataProvider, BoardDataState, useBoardDataContext } from "./board-data-provider";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
+
+// Only applied when a dragged group snaps into the half-size drop indicator on release.
+const GROUP_RESIZE_SNAP_TRANSITION = ["top", "left", "width", "height"]
+  .map((property) => `${property} ${GROUP_RESIZE_SNAP_DURATION_MS}ms ease-out`)
+  .join(", ");
+
+// Shared by the resize-handle math for TOP/LEFT (the "start" edge of an axis, which moves
+// as the group is resized) and BOTTOM/RIGHT (the "end" edge, which stays fixed) below.
+// These mirror the original per-direction closures' branches exactly (min-size clamp,
+// container-boundary clamp, normal drag) â€” see handleResizeXXXDirection call sites for
+// how each axis/edge maps onto these params.
+const computeResizeStartEdge = (params: { edge: number; size: number; delta: number; minSize: number; minBound: number; containerOffset: number; pointerCoord: number }) => {
+  const { edge, size, delta, minSize, minBound, containerOffset, pointerCoord } = params;
+
+  if (size - delta < minSize) {
+    const newEdge = edge + (size - minSize);
+    return { edge: newEdge, size: minSize, pos: containerOffset + newEdge };
+  }
+  if (edge + delta <= minBound) {
+    return { edge: minBound, size: size + (edge - minBound), pos: containerOffset + minBound };
+  }
+  return { edge: edge + delta, size: size - delta, pos: pointerCoord };
+};
+
+const computeResizeEndEdge = (params: { edge: number; size: number; delta: number; minSize: number; containerSize: number; containerOffset: number; pointerCoord: number }) => {
+  const { edge, size, delta, minSize, containerSize, containerOffset, pointerCoord } = params;
+
+  if (size + delta < minSize) {
+    return { size: minSize, pos: containerOffset + edge + minSize };
+  }
+  if (size + delta >= containerSize - edge) {
+    return { size: containerSize - edge, pos: containerOffset + containerSize };
+  }
+  return { size: size + delta, pos: pointerCoord };
+};
 
 /* -------------------------------------------------------------------------------------------------
  * Root
@@ -54,7 +100,7 @@ const NavList = React.forwardRef<React.ElementRef<"div">, INavListProps>(({ clas
   const pathname = usePathname();
   const currentPageId = pathname.replace("/", "");
 
-  const { boradDataState, boardDataDispatch } = useBoardDataContext();
+  const { boardDataState, boardDataDispatch } = useBoardDataContext();
 
   useEffect(() => {
     boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId: currentPageId } });
@@ -62,14 +108,14 @@ const NavList = React.forwardRef<React.ElementRef<"div">, INavListProps>(({ clas
 
   const handleClickNavItem = (pageId: string) => {
     boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId } });
-    history.pushState({}, "", `/${boradDataState.page[pageId].id}`);
+    history.pushState({}, "", `/${boardDataState.page[pageId].id}`);
   };
 
   return (
     <div>
-      {Object.keys(boradDataState.page).map((pageId) => (
+      {Object.keys(boardDataState.page).map((pageId) => (
         <div className={cn(className)} key={pageId} data-selected={pageId === currentPageId} onClick={() => handleClickNavItem(pageId)}>
-          {boradDataState.page[pageId].name}
+          {boardDataState.page[pageId].name}
         </div>
       ))}
     </div>
@@ -78,16 +124,16 @@ const NavList = React.forwardRef<React.ElementRef<"div">, INavListProps>(({ clas
 
 NavList.displayName = "NavList";
 
-interface IPanelProps extends React.HTMLAttributes<"div"> {}
+interface IPanelProps extends React.ComponentPropsWithoutRef<"div"> {}
 
 const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, children }) => {
-  const { boradDataState, boardDataDispatch } = useBoardDataContext();
+  const { boardDataState, boardDataDispatch } = useBoardDataContext();
   const { boardLayoutState, boardLayoutConstants, boardLayoutDispatch } = useBoardLayoutContext();
   const { GROUP_MINIMUM_SIZE } = boardLayoutConstants;
 
   const groupIndicateStatus = boardLayoutState.groupIndicate;
 
-  const boardDataContextRef = useRef(boradDataState);
+  const boardDataContextRef = useRef(boardDataState);
   const groupIndicateRef = useRef<null | IGroupIndicate>(null);
   const containerRef = useRef<React.ElementRef<"div"> | null>(null);
 
@@ -96,8 +142,8 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
   }, [groupIndicateStatus]);
 
   useEffect(() => {
-    boardDataContextRef.current = boradDataState;
-  }, [boradDataState]);
+    boardDataContextRef.current = boardDataState;
+  }, [boardDataState]);
 
   const handleMouseMoveContainer = (e: MouseEvent) => {
     if (!containerRef.current) return;
@@ -115,68 +161,70 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
 
         const groupElement = document.getElementById(dataGroupId);
         if (groupElement) {
+          groupElement.style.transition = "";
+
           const dx = e.clientX - pos.x;
           const dy = e.clientY - pos.y;
 
           const { offsetTop: groupTop, offsetLeft: groupLeft, offsetHeight: groupHeight, offsetWidth: groupWidth } = groupElement;
-          const { minTop, minLeft, maxLeft } = getGroupElementBoundaryPositions(containerRef as React.MutableRefObject<HTMLDivElement>, groupElement);
+          const { minTop, minLeft } = getGroupElementBoundaryPositions(containerRef as React.MutableRefObject<HTMLDivElement>, groupElement);
 
           const handleResizeTopDirection = () => {
-            if (groupHeight - dy < GROUP_MINIMUM_SIZE.HEIGHT) {
-              groupElement.style.top = `${groupTop + (groupHeight - GROUP_MINIMUM_SIZE.HEIGHT)}px`;
-              groupElement.style.height = `${GROUP_MINIMUM_SIZE.HEIGHT}px`;
-              pos.y = containerTop + groupTop + groupHeight - GROUP_MINIMUM_SIZE.HEIGHT;
-            } else if (groupTop + dy <= minTop) {
-              groupElement.style.top = `${minTop}px`;
-              groupElement.style.height = `${groupHeight + groupTop}px`;
-              pos.y = containerTop;
-            } else {
-              groupElement.style.top = `${groupTop + dy}px`;
-              groupElement.style.height = `${groupHeight - dy}px`;
-              pos.y = e.clientY;
-            }
+            const result = computeResizeStartEdge({
+              edge: groupTop,
+              size: groupHeight,
+              delta: dy,
+              minSize: GROUP_MINIMUM_SIZE.HEIGHT,
+              minBound: minTop,
+              containerOffset: containerTop,
+              pointerCoord: e.clientY,
+            });
+            groupElement.style.top = `${result.edge}px`;
+            groupElement.style.height = `${result.size}px`;
+            pos.y = result.pos;
           };
 
           const handleResizeBottomDirection = () => {
-            if (groupHeight + dy < GROUP_MINIMUM_SIZE.HEIGHT) {
-              groupElement.style.height = `${GROUP_MINIMUM_SIZE.HEIGHT}px`;
-              pos.y = containerTop + groupTop + GROUP_MINIMUM_SIZE.HEIGHT;
-            } else if (groupHeight + dy >= containerHeight - groupTop) {
-              groupElement.style.height = `${containerHeight - groupTop}px`;
-              pos.y = containerTop + containerHeight;
-            } else {
-              groupElement.style.height = `${groupHeight + dy}px`;
-              pos.y = e.clientY;
-            }
+            const result = computeResizeEndEdge({
+              edge: groupTop,
+              size: groupHeight,
+              delta: dy,
+              minSize: GROUP_MINIMUM_SIZE.HEIGHT,
+              containerSize: containerHeight,
+              containerOffset: containerTop,
+              pointerCoord: e.clientY,
+            });
+            groupElement.style.height = `${result.size}px`;
+            pos.y = result.pos;
           };
 
           const handleResizeLeftDirection = () => {
-            if (groupWidth - dx < GROUP_MINIMUM_SIZE.WIDTH) {
-              groupElement.style.left = `${groupLeft + (groupWidth - GROUP_MINIMUM_SIZE.WIDTH)}px`;
-              groupElement.style.width = `${GROUP_MINIMUM_SIZE.WIDTH}px`;
-              pos.x = containerLeft + groupLeft + groupWidth - GROUP_MINIMUM_SIZE.WIDTH;
-            } else if (groupLeft + dx <= minLeft) {
-              groupElement.style.left = `${minLeft}px`;
-              groupElement.style.width = `${groupLeft + groupWidth}px`;
-              pos.x = containerLeft;
-            } else {
-              groupElement.style.left = `${groupLeft + dx}px`;
-              groupElement.style.width = `${groupWidth - dx}px`;
-              pos.x = e.clientX;
-            }
+            const result = computeResizeStartEdge({
+              edge: groupLeft,
+              size: groupWidth,
+              delta: dx,
+              minSize: GROUP_MINIMUM_SIZE.WIDTH,
+              minBound: minLeft,
+              containerOffset: containerLeft,
+              pointerCoord: e.clientX,
+            });
+            groupElement.style.left = `${result.edge}px`;
+            groupElement.style.width = `${result.size}px`;
+            pos.x = result.pos;
           };
 
           const handleResizeRightDirection = () => {
-            if (groupWidth + dx < GROUP_MINIMUM_SIZE.WIDTH) {
-              groupElement.style.width = `${GROUP_MINIMUM_SIZE.WIDTH}px`;
-              pos.x = containerLeft + groupLeft + GROUP_MINIMUM_SIZE.WIDTH;
-            } else if (groupLeft + dx >= maxLeft) {
-              groupElement.style.width = `${containerWidth - groupLeft}px`;
-              pos.x = containerLeft + containerWidth;
-            } else {
-              groupElement.style.width = `${groupWidth + dx}px`;
-              pos.x = e.clientX;
-            }
+            const result = computeResizeEndEdge({
+              edge: groupLeft,
+              size: groupWidth,
+              delta: dx,
+              minSize: GROUP_MINIMUM_SIZE.WIDTH,
+              containerSize: containerWidth,
+              containerOffset: containerLeft,
+              pointerCoord: e.clientX,
+            });
+            groupElement.style.width = `${result.size}px`;
+            pos.x = result.pos;
           };
 
           if (dir === RESIZE_DIRECTIONS.TOP) {
@@ -240,50 +288,9 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
         const { minTop, maxTop, minLeft, maxLeft } = getGroupElementBoundaryPositions(containerRef as React.MutableRefObject<HTMLDivElement>, currGroupElement);
         const { offsetTop: containerTop, offsetWidth: containerWidth, offsetHeight: containerHeight } = containerRef.current;
 
-        if (e.clientY <= containerTop) {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: {
-              position: {
-                x: minLeft,
-                y: 0,
-              },
-              size: { width: containerWidth, height: containerHeight / 2 },
-            },
-          });
-        } else if (e.clientY >= containerTop + containerHeight) {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: {
-              position: {
-                x: minLeft,
-                y: containerHeight / 2,
-              },
-              size: { width: containerWidth, height: containerHeight / 2 },
-            },
-          });
-        } else if (e.clientX <= containerLeft) {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: {
-              position: {
-                x: minLeft,
-                y: 0,
-              },
-              size: { width: containerWidth / 2, height: containerHeight },
-            },
-          });
-        } else if (e.clientX >= containerLeft + containerWidth) {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: {
-              position: {
-                x: containerWidth / 2,
-                y: 0,
-              },
-              size: { width: containerWidth / 2, height: containerHeight },
-            },
-          });
+        const edgeIndicator = getContainerEdgeIndicator(e, { top: containerTop, left: containerLeft, width: containerWidth, height: containerHeight }, minLeft);
+        if (edgeIndicator) {
+          boardLayoutDispatch({ type: "UPDATE_GROUP_INDICATOR", payload: edgeIndicator });
         } else {
           let dx = e.clientX - containerLeft;
           let dy = e.clientY - containerTop;
@@ -353,7 +360,7 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
           }
 
           currTabElement.setAttribute("data-tab-prev-combine-group-id", combineGroupId);
-          setGroupElementForeground(combineGroupId);
+          setGroupElementForeground(currGroupId);
 
           const currTabIdx = currTabElement.getAttribute("data-tab-idx") as string;
           boardLayoutDispatch({
@@ -378,40 +385,7 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
           if (currTabNewIdx <= 0) currTabNewIdx = 0;
           if (currTabNewIdx === currTabIdx) return;
 
-          if (currTabIdx > currTabNewIdx) {
-            // move left way
-            for (let i = currTabIdx - 1; i >= currTabNewIdx; i--) {
-              const tabElement = combineGroupElement.querySelector(`[data-tab-idx="${i}"]`);
-              if (tabElement instanceof HTMLElement) {
-                tabElement.setAttribute("data-tab-idx", JSON.stringify(i + 1));
-                const dataTabTranslateStatus = tabElement.getAttribute("data-tab-translate-status") as string;
-                if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.DEFAULT) {
-                  tabElement.style.transform = `translate(${currTabElement.offsetWidth}px, 0px)`;
-                  tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.RIGHT);
-                } else if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.LEFT) {
-                  tabElement.style.transform = "translate(0px, 0px)";
-                  tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.DEFAULT);
-                }
-              }
-            }
-          } else {
-            // move right way
-            for (let i = currTabIdx + 1; i <= currTabNewIdx; i++) {
-              const tabElement = combineGroupElement.querySelector(`[data-tab-idx="${i}"]`);
-              if (tabElement instanceof HTMLElement) {
-                tabElement.setAttribute("data-tab-idx", JSON.stringify(i - 1));
-                const dataTabTranslateStatus = tabElement.getAttribute("data-tab-translate-status") as string;
-                if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.DEFAULT) {
-                  tabElement.style.transform = `translate(${-currTabElement.offsetWidth}px, 0px)`;
-                  tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.LEFT);
-                } else if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.LEFT) {
-                } else {
-                  tabElement.style.transform = "translate(0px, 0px)";
-                  tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.DEFAULT);
-                }
-              }
-            }
-          }
+          shiftSiblingTabs(combineGroupElement, currTabElement, currTabIdx, currTabNewIdx);
 
           currTabElement.setAttribute("data-tab-idx", JSON.stringify(currTabNewIdx));
           boardLayoutDispatch({
@@ -466,40 +440,7 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
           if (currTabNewIdx <= 0) currTabNewIdx = 0;
           if (currTabNewIdx === currTabIdx) return;
 
-          if (currTabIdx > currTabNewIdx) {
-            // move left way
-            for (let i = currTabIdx - 1; i >= currTabNewIdx; i--) {
-              const tabElement = currGroupElement.querySelector(`[data-tab-idx="${i}"]`);
-              if (tabElement instanceof HTMLElement) {
-                tabElement.setAttribute("data-tab-idx", JSON.stringify(i + 1));
-                const dataTabTranslateStatus = tabElement.getAttribute("data-tab-translate-status") as string;
-                if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.DEFAULT) {
-                  tabElement.style.transform = `translate(${currTabElement.offsetWidth}px, 0px)`;
-                  tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.RIGHT);
-                } else if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.LEFT) {
-                  tabElement.style.transform = "translate(0px, 0px)";
-                  tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.DEFAULT);
-                }
-              }
-            }
-          } else {
-            // move right way
-            for (let i = currTabIdx + 1; i <= currTabNewIdx; i++) {
-              const tabElement = currGroupElement.querySelector(`[data-tab-idx="${i}"]`);
-              if (tabElement instanceof HTMLElement) {
-                tabElement.setAttribute("data-tab-idx", JSON.stringify(i - 1));
-                const dataTabTranslateStatus = tabElement.getAttribute("data-tab-translate-status") as string;
-                if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.DEFAULT) {
-                  tabElement.style.transform = `translate(${-currTabElement.offsetWidth}px, 0px)`;
-                  tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.LEFT);
-                } else if (dataTabTranslateStatus === TAB_TRANSLATE_STATUS.LEFT) {
-                } else {
-                  tabElement.style.transform = "translate(0px, 0px)";
-                  tabElement.setAttribute("data-tab-translate-status", TAB_TRANSLATE_STATUS.DEFAULT);
-                }
-              }
-            }
-          }
+          shiftSiblingTabs(currGroupElement, currTabElement, currTabIdx, currTabNewIdx);
 
           currTabElement.setAttribute("data-tab-idx", JSON.stringify(currTabNewIdx));
           boardLayoutDispatch({
@@ -519,6 +460,8 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
     const groupHeaderElement = document.querySelector("[data-group-header-is-dragging=true]");
     const groupElement = groupHeaderElement?.parentElement;
     if (groupElement) {
+      groupElement.style.transition = "";
+
       const dataPos = groupElement.getAttribute("data-position");
       const dataMouseDownPos = groupHeaderElement.getAttribute("data-mouse-down-position");
       if (dataPos && dataMouseDownPos) {
@@ -545,61 +488,13 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
         groupElement.setAttribute("data-position", JSON.stringify(pos));
 
         // Group Indicate
-        if (e.clientY <= containerTop) {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: {
-              position: {
-                x: minLeft,
-                y: 0,
-              },
-              size: { width: containerWidth, height: containerHeight / 2 },
-            },
-          });
-        } else if (e.clientY >= containerTop + containerHeight) {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: {
-              position: {
-                x: minLeft,
-                y: containerHeight / 2,
-              },
-              size: { width: containerWidth, height: containerHeight / 2 },
-            },
-          });
-        } else if (e.clientX <= containerLeft) {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: {
-              position: {
-                x: minLeft,
-                y: 0,
-              },
-              size: { width: containerWidth / 2, height: containerHeight },
-            },
-          });
-        } else if (e.clientX >= containerLeft + containerWidth) {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: {
-              position: {
-                x: containerWidth / 2,
-                y: 0,
-              },
-              size: { width: containerWidth / 2, height: containerHeight },
-            },
-          });
-        } else {
-          boardLayoutDispatch({
-            type: "UPDATE_GROUP_INDICATOR",
-            payload: null,
-          });
-        }
+        const edgeIndicator = getContainerEdgeIndicator(e, { top: containerTop, left: containerLeft, width: containerWidth, height: containerHeight }, minLeft);
+        boardLayoutDispatch({ type: "UPDATE_GROUP_INDICATOR", payload: edgeIndicator });
       }
     }
   };
 
-  const handleMouseUpContainer = (e: MouseEvent) => {
+  const handleMouseUpContainer = (_e: MouseEvent) => {
     // Resize
     const resizeHandlerElement = document.querySelector("[data-resize-handler-is-dragging=true]");
     if (resizeHandlerElement) {
@@ -691,6 +586,7 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
         if (groupIndicateRef.current) {
           resetGroupTabsTranslate(currGroupHeaderElement, currTabElement);
 
+          const newGroupId = uuidv4();
           boardDataDispatch({
             type: "DIVIDE_GROUP",
             payload: {
@@ -699,18 +595,23 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
               tabId: currTabElement.id,
               position: groupIndicateRef.current.position,
               size: groupIndicateRef.current.size,
+              newGroupId,
             },
+          });
+
+          // The new group only exists in the DOM after this state update is committed,
+          // so defer bringing it to the foreground until the next paint.
+          requestAnimationFrame(() => setGroupElementForeground(newGroupId));
+        } else {
+          const groupElements = document.querySelectorAll("[data-group]");
+          groupElements.forEach((groupElement) => {
+            (groupElement as HTMLElement).style.zIndex = CUSTOM_ZINDEX.DEFAULT;
           });
         }
 
         boardLayoutDispatch({
           type: "UPDATE_GROUP_INDICATOR",
           payload: null,
-        });
-
-        const groupElements = document.querySelectorAll("[data-group]");
-        groupElements.forEach((groupElement) => {
-          (groupElement as HTMLElement).style.zIndex = CUSTOM_ZINDEX.DEFAULT;
         });
       }
 
@@ -728,6 +629,15 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
 
       if (groupIndicateRef.current) {
         const { position, size } = groupIndicateRef.current;
+
+        const clearSnapTransition = (event: TransitionEvent) => {
+          if (event.target !== groupElement) return;
+          groupElement.style.transition = "";
+          groupElement.removeEventListener("transitionend", clearSnapTransition);
+        };
+        groupElement.addEventListener("transitionend", clearSnapTransition);
+        groupElement.style.transition = GROUP_RESIZE_SNAP_TRANSITION;
+
         groupElement.style.left = `${position.x}px`;
         groupElement.style.top = `${position.y}px`;
         boardDataDispatch({
@@ -763,7 +673,7 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
     document.addEventListener("mouseup", handleMouseUpContainer);
 
     return () => {
-      document.removeEventListener("mousedown", handleMouseMoveContainer);
+      document.removeEventListener("mousemove", handleMouseMoveContainer);
       document.removeEventListener("mouseup", handleMouseUpContainer);
     };
   }, []);
@@ -812,12 +722,12 @@ const Groups = React.forwardRef<React.ElementRef<"div">, IGroupsProps>(({ childr
   const pathname = usePathname();
   const currentPageId = pathname.replace("/", "");
 
-  const { boradDataState } = useBoardDataContext();
-  const groupIds = boradDataState.page[currentPageId]?.groupIds || [];
+  const { boardDataState } = useBoardDataContext();
+  const groupIds = boardDataState.page[currentPageId]?.groupIds || [];
 
   return (
     <div ref={forwardedRef} className={className} {...props}>
-      {groupIds.map((groupId) => React.cloneElement(children, { key: groupId, groupData: boradDataState.group[groupId] }))}
+      {groupIds.map((groupId) => React.cloneElement(children, { key: groupId, groupData: boardDataState.group[groupId] }))}
     </div>
   );
 });
@@ -834,7 +744,7 @@ interface IGroupProps extends React.ComponentPropsWithoutRef<"div"> {
 }
 
 const Group = React.forwardRef<React.ElementRef<"div">, IGroupProps>(({ children, className, groupData, mdxSources, ...props }, forwardedRef) => {
-  const { boradDataState } = useBoardDataContext();
+  const { boardDataState } = useBoardDataContext();
 
   const handleMouseDown = (e: React.MouseEvent) => {
     setGroupElementForeground(e.currentTarget.id);
@@ -850,7 +760,7 @@ const Group = React.forwardRef<React.ElementRef<"div">, IGroupProps>(({ children
       onMouseDown={handleMouseDown}
       id={groupData.id}
       data-group
-      data-page-id={boradDataState.selectedPageId}
+      data-page-id={boardDataState.selectedPageId}
       data-position={JSON.stringify({ x: 0, y: 0 })}
       data-dragged={false}
       {...props}
@@ -953,12 +863,12 @@ interface ITabContentProps extends React.ComponentPropsWithoutRef<"div"> {
 }
 
 const TabContent = React.forwardRef<React.ElementRef<"div">, ITabContentProps>(({ children, className, groupData, mdxSources }, forwardedRef) => {
-  const { boradDataState } = useBoardDataContext();
+  const { boardDataState } = useBoardDataContext();
 
   if (!groupData) return null;
 
   const { id, selectedTabId } = groupData;
-  const mdxContent = mdxSources ? mdxSources[boradDataState.tab[selectedTabId].contentFile] : null;
+  const mdxContent = mdxSources ? mdxSources[boardDataState.tab[selectedTabId].contentFile] : null;
 
   return (
     <div ref={forwardedRef} className={cn("overflow-auto", className)}>
@@ -980,13 +890,13 @@ interface ITabProps extends React.ComponentPropsWithoutRef<"div"> {
 }
 
 const Tab = React.forwardRef<React.ElementRef<"div">, ITabProps>(({ className, groupId, tabId, tabIdx }, forwardedRef) => {
-  const { boradDataState, boardDataDispatch } = useBoardDataContext();
+  const { boardDataState, boardDataDispatch } = useBoardDataContext();
   const { boardLayoutConstants } = useBoardLayoutContext();
   const { TAB_SIZES } = boardLayoutConstants;
 
   if (!groupId || !tabId || tabIdx === undefined) return null;
 
-  const selectedTabId = boradDataState.group[groupId]?.selectedTabId;
+  const selectedTabId = boardDataState.group[groupId]?.selectedTabId;
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -1026,7 +936,7 @@ const Tab = React.forwardRef<React.ElementRef<"div">, ITabProps>(({ className, g
       data-position={JSON.stringify({ x: 0, y: 0 })}
       data-selected={tabId === selectedTabId}
     >
-      {boradDataState.tab[tabId].name}
+      {boardDataState.tab[tabId].name}
     </div>
   );
 });
@@ -1074,11 +984,10 @@ const resizeHandlerVariants = cva("absolute", {
 });
 
 const ResizeHandlers = ({ groupId }: { groupId: string }) => {
-  const resizeHandlerElementPosition = useMemo(() => ({ x: 0, y: 0 }), []);
+  const resizeHandlerElementPosition = useRef({ x: 0, y: 0 }).current;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     const resizeHandlerElement = e.target as HTMLElement;
-    console.log("resizeHandlerElement", resizeHandlerElement);
     resizeHandlerElement.setAttribute("data-resize-handler-is-dragging", "true");
     resizeHandlerElementPosition.x = e.clientX;
     resizeHandlerElementPosition.y = e.clientY;

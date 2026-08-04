@@ -7,7 +7,7 @@ import { serialize } from "next-mdx-remote/serialize";
 import remarkGfm from "remark-gfm";
 import rehypePrism from "rehype-prism-plus";
 
-import data from "../data.json";
+import data from "@app/data.json";
 import { ToggleTheme } from "@components/toggle-theme";
 
 import GroupTabsLayout from "./group-tabs-layout";
@@ -47,15 +47,12 @@ async function getMdxSources() {
     })
   );
 
-  const mdxContentsHm: { [key: string]: MDXRemoteSerializeResult } = {};
-  mdxContentsArr.forEach(({ fileName, content }) => {
-    mdxContentsHm[fileName] = content;
-  });
+  const mdxContentsByFile: { [key: string]: MDXRemoteSerializeResult } = Object.fromEntries(mdxContentsArr.map(({ fileName, content }) => [fileName, content]));
 
-  return mdxContentsHm;
+  return mdxContentsByFile;
 }
 
-export default async function Home({ params }: { params: { id: string } }) {
+export default async function Home({ params: _params }: { params: { id: string } }) {
   const mdxSources = await getMdxSources();
 
   return (

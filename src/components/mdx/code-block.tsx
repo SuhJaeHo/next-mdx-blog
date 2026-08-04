@@ -2,16 +2,16 @@
 
 import { useState, useRef } from "react";
 
-interface ICodeBlockProps extends React.HTMLAttributes<"div"> {}
+interface ICodeBlockProps extends React.HTMLAttributes<HTMLPreElement> {}
 
 const CodeBlock: React.FC<ICodeBlockProps> = ({ className, ...props }) => {
-  const preRef = useRef<any>(null);
+  const preRef = useRef<HTMLPreElement>(null);
   const [copied, setCopied] = useState(false);
 
   const onCopy = () => {
     if (preRef.current) {
       setCopied(true);
-      navigator.clipboard.writeText(preRef.current.textContent);
+      navigator.clipboard.writeText(preRef.current.textContent ?? "");
       setTimeout(() => {
         setCopied(false);
       }, 2000);

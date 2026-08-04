@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
-import { ThemeProvider } from "./provider/theme-provider";
+import { ThemeProvider } from "@app/provider/theme-provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",

@@ -26,3 +26,5 @@ export enum CUSTOM_ZINDEX {
   FOREGROUND = "10",
   OVERLAY = "20",
 }
+
+export const GROUP_RESIZE_SNAP_DURATION_MS = 200;
