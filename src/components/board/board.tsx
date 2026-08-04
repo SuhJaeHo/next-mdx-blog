@@ -17,10 +17,19 @@ import { CUSTOM_ZINDEX, GROUP_RESIZE_SNAP_DURATION_MS, RESIZE_DIRECTIONS, TAB_MO
 import { IGroup, IPosition, IGroupIndicate } from "./types";
 import { cn } from "@lib/utils";
 import { cva } from "class-variance-authority";
-import { usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import { BoardLayoutProvider, BoardLayoutConstants, useBoardLayoutContext } from "./board-layout-provider";
 import { BoardDataProvider, BoardDataState, useBoardDataContext } from "./board-data-provider";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { useTranslations } from "next-intl";
+import { useLocaleController } from "@app/[locale]/locale-provider";
+
+const tabMessageKeys = {
+  "npm-publish.mdx": "npmPublish",
+  "mdx.mdx": "mdx",
+  "npm-readme.mdx": "npmReadme",
+  "vite.mdx": "vite",
+} as const;
 
 // Only applied when a dragged group snaps into the half-size drop indicator on release.
 const GROUP_RESIZE_SNAP_TRANSITION = ["top", "left", "width", "height"]
@@ -97,25 +106,26 @@ Nav.displayName = "Nav";
 interface INavListProps extends React.HTMLAttributes<HTMLElement> {}
 
 const NavList = React.forwardRef<React.ElementRef<"div">, INavListProps>(({ className }, forwardedRef) => {
-  const pathname = usePathname();
-  const currentPageId = pathname.replace("/", "");
-
+  const params = useParams<{ locale: string; id: string }>();
   const { boardDataState, boardDataDispatch } = useBoardDataContext();
+  const { locale } = useLocaleController();
+  const t = useTranslations("Navigation");
+  const currentPageId = boardDataState.selectedPageId;
 
   useEffect(() => {
-    boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId: currentPageId } });
-  }, [boardDataDispatch, currentPageId]);
+    boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId: params.id } });
+  }, [boardDataDispatch, params.id]);
 
   const handleClickNavItem = (pageId: string) => {
     boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId } });
-    history.pushState({}, "", `/${boardDataState.page[pageId].id}`);
+    history.pushState({}, "", `/${locale}/${boardDataState.page[pageId].id}`);
   };
 
   return (
     <div>
       {Object.keys(boardDataState.page).map((pageId) => (
         <div className={cn(className)} key={pageId} data-selected={pageId === currentPageId} onClick={() => handleClickNavItem(pageId)}>
-          {boardDataState.page[pageId].name}
+          {t(pageId)}
         </div>
       ))}
     </div>
@@ -495,6 +505,11 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
   };
 
   const handleMouseUpContainer = (_e: MouseEvent) => {
+    // Every interaction ends with a clean visual state. This runs before the
+    // early-returning resize/tab/group branches so a preview can never leak into
+    // the next tutorial step (or the next manual interaction).
+    boardLayoutDispatch({ type: "RESET_INDICATORS" });
+
     // Resize
     const resizeHandlerElement = document.querySelector("[data-resize-handler-is-dragging=true]");
     if (resizeHandlerElement) {
@@ -521,16 +536,6 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ className, chil
 
     // Move Tab
     const currTabElement = document.querySelector("[data-tab-is-dragging=true]");
-    if (boardLayoutDispatch) {
-      boardLayoutDispatch({
-        type: "UPDATE_TAB_INDICATOR",
-        payload: {
-          groupId: "",
-          tabIdx: 0,
-        },
-      });
-    }
-
     if (currTabElement instanceof HTMLElement) {
       const currGroupHeaderElement = currTabElement.parentElement as HTMLElement;
       const currGroupId = currGroupHeaderElement.id;
@@ -722,10 +727,8 @@ interface IGroupsProps extends React.ComponentPropsWithoutRef<"div"> {
 }
 
 const Groups = React.forwardRef<React.ElementRef<"div">, IGroupsProps>(({ children, className, ...props }, forwardedRef) => {
-  const pathname = usePathname();
-  const currentPageId = pathname.replace("/", "");
-
   const { boardDataState } = useBoardDataContext();
+  const currentPageId = boardDataState.selectedPageId;
   const groupIds = boardDataState.page[currentPageId]?.groupIds || [];
 
   return (
@@ -908,6 +911,7 @@ interface ITabProps extends React.ComponentPropsWithoutRef<"div"> {
 const Tab = React.forwardRef<React.ElementRef<"div">, ITabProps>(({ className, groupId, tabId, tabIdx }, forwardedRef) => {
   const { boardDataState, boardDataDispatch } = useBoardDataContext();
   const { boardLayoutConstants } = useBoardLayoutContext();
+  const t = useTranslations("Tabs");
   const { TAB_SIZES } = boardLayoutConstants;
 
   if (!groupId || !tabId || tabIdx === undefined) return null;
@@ -952,7 +956,7 @@ const Tab = React.forwardRef<React.ElementRef<"div">, ITabProps>(({ className, g
       data-position={JSON.stringify({ x: 0, y: 0 })}
       data-selected={tabId === selectedTabId}
     >
-      {boardDataState.tab[tabId].name}
+      {t(tabMessageKeys[boardDataState.tab[tabId].contentFile as keyof typeof tabMessageKeys])}
     </div>
   );
 });

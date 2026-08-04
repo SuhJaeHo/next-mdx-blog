@@ -1,4 +1,5 @@
 import createMDX from "@next/mdx";
+import createNextIntlPlugin from "next-intl/plugin";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -8,17 +9,9 @@ const nextConfig = {
   sassOptions: {
     includePaths: ["styles"],
   },
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/start-blog",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 const withMDX = createMDX({});
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-export default withMDX(nextConfig);
+export default withNextIntl(withMDX(nextConfig));

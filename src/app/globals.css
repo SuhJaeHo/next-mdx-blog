@@ -73,3 +73,12 @@ div {
   -ms-user-select: none;
   user-select: none;
 }
+
+/* Board tabs/groups deliberately animate during drag and focus changes. Disable those
+   transitions only while the theme variables switch so the header does not flash through
+   intermediate background, border and shadow colors. */
+.theme-changing [data-group],
+.theme-changing [data-group-header],
+.theme-changing [data-tab-id] {
+  transition: none !important;
+}

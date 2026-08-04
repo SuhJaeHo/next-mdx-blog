@@ -33,7 +33,7 @@ export const centerOf = (el: Element): IPoint => {
  * mousemove/mouseup fire on `document`, matching board.tsx's global listeners.
  */
 export async function simulateDrag(target: Element, from: IPoint, to: IPoint, opts: { steps?: number; stepDelayMs?: number; signal?: AbortSignal } = {}) {
-  const { steps = 24, stepDelayMs = 22, signal } = opts;
+  const { steps = 36, stepDelayMs = 16, signal } = opts;
 
   dispatchMouse(target, "mousedown", from.x, from.y);
   await sleep(stepDelayMs, signal);
@@ -49,6 +49,9 @@ export async function simulateDrag(target: Element, from: IPoint, to: IPoint, op
   }
 
   dispatchMouse(document, "mouseup", to.x, to.y);
+  // Let React commit the board's mouseup reducer update before the tutorial enables
+  // navigation to the next step.
+  await sleep(80, signal);
 }
 
 export async function simulateDoubleClick(target: Element, at: IPoint) {

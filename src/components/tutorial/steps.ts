@@ -1,11 +1,14 @@
 import { ITutorialStep } from "./types";
 import { centerOf, simulateDrag, simulateDoubleClick, sleep } from "./simulate";
 
-export const TUTORIAL_STEPS: ITutorialStep[] = [
+type TutorialStepKey = "reorder" | "split" | "combine" | "resize" | "snap" | "fullscreen";
+type TranslateStep = (key: `${TutorialStepKey}.${"title" | "description"}`) => string;
+
+export const createTutorialSteps = (t: TranslateStep): ITutorialStep[] => [
   {
     selector: "[data-tab-id]",
-    title: "Reorder tabs",
-    description: "Drag a tab left or right to reorder it within its panel. Watch:",
+    title: t("reorder.title"),
+    description: t("reorder.description"),
     placement: "bottom",
     play: async (signal) => {
       const header = document.querySelector("[data-group-header]");
@@ -22,8 +25,8 @@ export const TUTORIAL_STEPS: ITutorialStep[] = [
   },
   {
     selector: "[data-tab-id]",
-    title: "Split into a new panel",
-    description: "Drag a tab all the way to the edge of the screen and it splits off into its own panel. Watch:",
+    title: t("split.title"),
+    description: t("split.description"),
     // The new panel spans the container's full height, so top/bottom placement has nowhere
     // to fit — anchor beside it instead.
     placement: "left",
@@ -43,8 +46,8 @@ export const TUTORIAL_STEPS: ITutorialStep[] = [
   },
   {
     selector: "[data-group-header]",
-    title: "Combine panels",
-    description: "Drop a tab onto another panel's header to merge them back together. Watch:",
+    title: t("combine.title"),
+    description: t("combine.description"),
     placement: "bottom",
     play: async (signal) => {
       const headers = Array.from(document.querySelectorAll("[data-group-header]"));
@@ -62,8 +65,8 @@ export const TUTORIAL_STEPS: ITutorialStep[] = [
   },
   {
     selector: '[data-direction="RIGHT"]',
-    title: "Resize panels",
-    description: "Drag any edge or corner of a panel to resize it. Watch:",
+    title: t("resize.title"),
+    description: t("resize.description"),
     placement: "left",
     play: async (signal) => {
       const handle = document.querySelector('[data-direction="RIGHT"]');
@@ -82,8 +85,8 @@ export const TUTORIAL_STEPS: ITutorialStep[] = [
   },
   {
     selector: "[data-group-header]",
-    title: "Snap to half size",
-    description: "Drag a panel's header to the edge of the screen and it resizes to fill that half. Watch:",
+    title: t("snap.title"),
+    description: t("snap.description"),
     placement: "bottom",
     play: async (signal) => {
       const header = document.querySelector("[data-group-header]");
@@ -100,8 +103,8 @@ export const TUTORIAL_STEPS: ITutorialStep[] = [
   },
   {
     selector: "[data-group-header]",
-    title: "Full screen",
-    description: "Double-click a panel's header to expand it full screen, and again to restore it. Watch:",
+    title: t("fullscreen.title"),
+    description: t("fullscreen.description"),
     placement: "bottom",
     play: async (signal) => {
       const header = document.querySelector("[data-group-header]");

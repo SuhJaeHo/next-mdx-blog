@@ -1,0 +1,35 @@
+{
+  "Metadata": {
+    "title": "パネルブログ",
+    "description": "ドラッグとサイズ変更ができるMDXパネルブログ"
+  },
+  "Navigation": {
+    "start-blog": "ブログを始める",
+    "build-tool": "ビルドツール"
+  },
+  "Tabs": {
+    "npmPublish": "NPM公開",
+    "mdx": "MDX",
+    "npmReadme": "README",
+    "vite": "Vite"
+  },
+  "Header": {
+    "language": "言語を選択",
+    "theme": "テーマを切り替え"
+  },
+  "Tutorial": {
+    "replay": "チュートリアルをもう一度見る",
+    "skip": "チュートリアルをスキップ",
+    "back": "戻る",
+    "next": "次へ",
+    "done": "完了",
+    "steps": {
+      "reorder": {"title": "タブの並べ替え", "description": "タブを左右にドラッグすると、パネル内で順番を変更できます。ご覧ください:"},
+      "split": {"title": "新しいパネルに分割", "description": "タブを画面の端までドラッグすると、別のパネルに分割されます。ご覧ください:"},
+      "combine": {"title": "パネルを結合", "description": "タブを別のパネルのヘッダーにドロップすると、パネルが再び結合されます。ご覧ください:"},
+      "resize": {"title": "パネルのサイズ変更", "description": "パネルの端や角をドラッグしてサイズを変更できます。ご覧ください:"},
+      "snap": {"title": "半分のサイズにスナップ", "description": "パネルのヘッダーを画面の端にドラッグすると、その半分を埋めるように配置されます。ご覧ください:"},
+      "fullscreen": {"title": "全画面表示", "description": "パネルのヘッダーをダブルクリックすると全画面になり、もう一度ダブルクリックすると元に戻ります。ご覧ください:"}
+    }
+  }
+}

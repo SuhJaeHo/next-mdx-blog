@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { HelpCircle, X, ArrowLeft, ArrowRight } from "lucide-react";
+import { HelpCircle, X, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@lib/utils";
-import { TUTORIAL_STEPS } from "./steps";
+import { createTutorialSteps } from "./steps";
 import { ITutorialStep } from "./types";
 import { forceMouseUp } from "./simulate";
 
@@ -32,6 +33,11 @@ interface ITutorialProps {
 }
 
 export default function Tutorial({ onFinish }: ITutorialProps) {
+  const t = useTranslations("Tutorial");
+  const tutorialSteps = React.useMemo(
+    () => createTutorialSteps((key) => t(`steps.${key}`)),
+    [t]
+  );
   const [mounted, setMounted] = React.useState(false);
   const [isActive, setIsActive] = React.useState(false);
   const [stepIndex, setStepIndex] = React.useState(0);
@@ -41,6 +47,7 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
   const abortRef = React.useRef<AbortController | null>(null);
   const rafRef = React.useRef<number | null>(null);
   const targetElRef = React.useRef<Element | null>(null);
+  const lastRectRef = React.useRef<IRect | null>(null);
 
   React.useEffect(() => {
     setMounted(true);
@@ -61,7 +68,21 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
     stopTracking();
     const loop = () => {
       const el = targetElRef.current;
-      if (el && el.isConnected) setRect(rectOf(el));
+      if (el && el.isConnected) {
+        const nextRect = rectOf(el);
+        const previousRect = lastRectRef.current;
+        const hasMoved =
+          !previousRect ||
+          Math.abs(nextRect.top - previousRect.top) > 0.25 ||
+          Math.abs(nextRect.left - previousRect.left) > 0.25 ||
+          Math.abs(nextRect.width - previousRect.width) > 0.25 ||
+          Math.abs(nextRect.height - previousRect.height) > 0.25;
+
+        if (hasMoved) {
+          lastRectRef.current = nextRect;
+          setRect(nextRect);
+        }
+      }
       rafRef.current = requestAnimationFrame(loop);
     };
     rafRef.current = requestAnimationFrame(loop);
@@ -79,10 +100,12 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
       const controller = new AbortController();
       abortRef.current = controller;
 
-      const step = TUTORIAL_STEPS[index];
+      const step = tutorialSteps[index];
       const initialEl = document.querySelector(step.selector);
       targetElRef.current = initialEl;
-      setRect(initialEl ? rectOf(initialEl) : null);
+      const initialRect = initialEl ? rectOf(initialEl) : null;
+      lastRectRef.current = initialRect;
+      setRect(initialRect);
 
       startTracking();
       setIsPlaying(true);
@@ -100,7 +123,7 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
           if (!controller.signal.aborted) setIsPlaying(false);
         });
     },
-    [abortCurrentStep, startTracking]
+    [abortCurrentStep, startTracking, tutorialSteps]
   );
 
   React.useEffect(() => {
@@ -124,14 +147,13 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
   }, [abortCurrentStep, onFinish, stopTracking]);
 
   const handleNext = () => {
-    if (stepIndex >= TUTORIAL_STEPS.length - 1) {
+    if (isPlaying) return;
+    if (stepIndex >= tutorialSteps.length - 1) {
       finish();
     } else {
       setStepIndex((i) => i + 1);
     }
   };
-
-  const handleBack = () => setStepIndex((i) => Math.max(0, i - 1));
 
   const handleReplay = () => {
     setStepIndex(0);
@@ -140,7 +162,7 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
 
   if (!mounted) return null;
 
-  const step = TUTORIAL_STEPS[stepIndex];
+  const step = tutorialSteps[stepIndex];
 
   return createPortal(
     <>
@@ -148,7 +170,7 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
         <button
           type="button"
           onClick={handleReplay}
-          aria-label="Replay tutorial"
+          aria-label={t("replay")}
           className="fixed bottom-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition-colors hover:bg-secondary"
         >
           <HelpCircle className="h-5 w-5" />
@@ -158,12 +180,12 @@ export default function Tutorial({ onFinish }: ITutorialProps) {
         <TutorialOverlay
           step={step}
           stepIndex={stepIndex}
-          total={TUTORIAL_STEPS.length}
+          total={tutorialSteps.length}
           rect={rect}
           isPlaying={isPlaying}
           onNext={handleNext}
-          onBack={handleBack}
           onSkip={finish}
+          labels={{ next: t("next"), done: t("done"), skip: t("skip") }}
         />
       )}
     </>,
@@ -178,11 +200,11 @@ interface ITutorialOverlayProps {
   rect: IRect;
   isPlaying: boolean;
   onNext: () => void;
-  onBack: () => void;
   onSkip: () => void;
+  labels: { next: string; done: string; skip: string };
 }
 
-function TutorialOverlay({ step, stepIndex, total, rect, isPlaying, onNext, onBack, onSkip }: ITutorialOverlayProps) {
+function TutorialOverlay({ step, stepIndex, total, rect, isPlaying, onNext, onSkip, labels }: ITutorialOverlayProps) {
   const holeTop = rect.top - SPOTLIGHT_PADDING;
   const holeLeft = rect.left - SPOTLIGHT_PADDING;
   const holeWidth = rect.width + SPOTLIGHT_PADDING * 2;
@@ -234,11 +256,11 @@ function TutorialOverlay({ step, stepIndex, total, rect, isPlaying, onNext, onBa
       <div className="fixed inset-0 z-40" />
       {/* Dark backdrop with a cutout over the highlighted (and possibly moving) element. */}
       <div
-        className="fixed z-40 rounded-lg"
+        className="fixed z-40 rounded-lg transition-[top,left,width,height] duration-100 ease-out"
         style={{ top: holeTop, left: holeLeft, width: holeWidth, height: holeHeight, boxShadow: "0 0 0 9999px rgba(0,0,0,0.65)" }}
       />
       <div
-        className="fixed z-50 rounded-lg border border-border bg-background p-4 text-foreground shadow-2xl transition-[top,left] duration-200 ease-out"
+        className="fixed z-50 rounded-lg border border-border bg-background p-4 text-foreground shadow-2xl transition-[top,left] duration-150 ease-out"
         style={{ width: TOOLTIP_WIDTH, ...tooltipStyle }}
       >
         <div className={arrowClassName} />
@@ -247,7 +269,7 @@ function TutorialOverlay({ step, stepIndex, total, rect, isPlaying, onNext, onBa
             {step.title}
             {isPlaying && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" aria-hidden />}
           </h3>
-          <button type="button" onClick={onSkip} aria-label="Skip tutorial" className="text-muted-foreground transition-colors hover:text-foreground">
+          <button type="button" onClick={onSkip} aria-label={labels.skip} className="text-muted-foreground transition-colors hover:text-foreground">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -262,18 +284,13 @@ function TutorialOverlay({ step, stepIndex, total, rect, isPlaying, onNext, onBa
             <span className="mr-1 text-muted-foreground">
               {stepIndex + 1} / {total}
             </span>
-            {stepIndex > 0 && (
-              <button type="button" onClick={onBack} className="flex items-center gap-1 rounded-md px-2 py-1 transition-colors hover:bg-secondary">
-                <ArrowLeft className="h-3 w-3" />
-                Back
-              </button>
-            )}
             <button
               type="button"
               onClick={onNext}
-              className="flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-primary-foreground transition-opacity hover:opacity-90"
+              disabled={isPlaying}
+              className="flex min-w-[58px] items-center justify-center gap-1 rounded-md bg-primary px-2 py-1 text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-45"
             >
-              {stepIndex === total - 1 ? "Done" : "Next"}
+              {stepIndex === total - 1 ? labels.done : labels.next}
               {stepIndex < total - 1 && <ArrowRight className="h-3 w-3" />}
             </button>
           </div>

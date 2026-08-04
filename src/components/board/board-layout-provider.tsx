@@ -3,6 +3,9 @@ import { IGroupIndicate, ITabIndicate, IPosition, ISize } from "./types";
 
 type BoardLayoutStateAction =
   | {
+      type: "RESET_INDICATORS";
+    }
+  | {
       type: "UPDATE_GROUP_INDICATOR";
       payload: {
         position: IPosition;
@@ -66,13 +69,19 @@ const boardLayoutStateReducer = (state: BoardLayoutState, action: BoardLayoutSta
     case "UPDATE_GROUP_INDICATOR": {
       if (action.payload) {
         const { position, size } = action.payload;
-        return { ...state, groupIndicate: { position, size } };
+        // A group drop preview and a tab insertion preview describe mutually
+        // exclusive operations, so never allow both to survive the same update.
+        return { ...state, groupIndicate: { position, size }, tabIndicate: null };
       }
       return { ...state, groupIndicate: null };
     }
     case "UPDATE_TAB_INDICATOR": {
       const { groupId, tabIdx } = action.payload;
-      return { ...state, tabIndicate: { groupId, tabIdx } };
+      if (!groupId) return { ...state, tabIndicate: null };
+      return { ...state, groupIndicate: null, tabIndicate: { groupId, tabIdx } };
+    }
+    case "RESET_INDICATORS": {
+      return initialBoardLayoutState;
     }
     default:
       return state;

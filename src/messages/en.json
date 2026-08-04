@@ -1,0 +1,35 @@
+{
+  "Metadata": {
+    "title": "Panel Blog",
+    "description": "An MDX panel blog with draggable and resizable windows"
+  },
+  "Navigation": {
+    "start-blog": "Start blog",
+    "build-tool": "Build tool"
+  },
+  "Tabs": {
+    "npmPublish": "NPM Publish",
+    "mdx": "MDX",
+    "npmReadme": "README",
+    "vite": "Vite"
+  },
+  "Header": {
+    "language": "Select language",
+    "theme": "Toggle theme"
+  },
+  "Tutorial": {
+    "replay": "Replay tutorial",
+    "skip": "Skip tutorial",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "steps": {
+      "reorder": {"title": "Reorder tabs", "description": "Drag a tab left or right to reorder it within its panel. Watch:"},
+      "split": {"title": "Split into a new panel", "description": "Drag a tab all the way to the edge of the screen and it splits off into its own panel. Watch:"},
+      "combine": {"title": "Combine panels", "description": "Drop a tab onto another panel's header to merge them back together. Watch:"},
+      "resize": {"title": "Resize panels", "description": "Drag any edge or corner of a panel to resize it. Watch:"},
+      "snap": {"title": "Snap to half size", "description": "Drag a panel's header to the edge of the screen and it resizes to fill that half. Watch:"},
+      "fullscreen": {"title": "Full screen", "description": "Double-click a panel's header to expand it full screen, and again to restore it. Watch:"}
+    }
+  }
+}
