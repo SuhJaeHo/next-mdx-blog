@@ -20,7 +20,11 @@ export const ToggleTheme = () => {
   };
 
   return (
-    <button onClick={handleToggleTheme} aria-label={t("theme")} className="relative flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground">
+    <button
+      onClick={handleToggleTheme}
+      aria-label={t("theme")}
+      className="relative flex size-7 items-center justify-center rounded-full border border-border/70 bg-background text-muted-foreground shadow-sm transition-all hover:border-foreground/25 hover:bg-secondary/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/10"
+    >
       <>
         <Sun className="h-[1rem] w-[1rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
         <Moon className="absolute h-[1rem] w-[1rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

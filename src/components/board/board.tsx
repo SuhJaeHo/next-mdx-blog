@@ -23,6 +23,7 @@ import { BoardDataProvider, BoardDataState, useBoardDataContext } from "./board-
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { useTranslations } from "next-intl";
 import { useLocaleController } from "@app/[locale]/locale-provider";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const tabMessageKeys = {
   "portfolio-overview.mdx": "portfolioOverview",
@@ -31,7 +32,6 @@ const tabMessageKeys = {
   "npm-publish.mdx": "npmPublish",
   "mdx.mdx": "mdx",
   "npm-readme.mdx": "npmReadme",
-  "vite.mdx": "vite",
 } as const;
 
 // Only applied when a dragged group snaps into the half-size drop indicator on release.
@@ -55,6 +55,39 @@ const computeResizeStartEdge = (params: { edge: number; size: number; delta: num
     return { edge: minBound, size: size + (edge - minBound), pos: containerOffset + minBound };
   }
   return { edge: edge + delta, size: size - delta, pos: pointerCoord };
+};
+
+const syncTabDragPreview = (tab: HTMLElement) => {
+  const preview = document.querySelector<HTMLElement>("[data-tab-drag-preview]");
+  if (!preview) return;
+
+  const rect = tab.getBoundingClientRect();
+  preview.style.setProperty("left", `${rect.left}px`, "important");
+  preview.style.setProperty("top", `${rect.top}px`, "important");
+};
+
+const createTabDragPreview = (tab: HTMLElement) => {
+  document.querySelector("[data-tab-drag-preview]")?.remove();
+
+  const rect = tab.getBoundingClientRect();
+  const preview = tab.cloneNode(true) as HTMLElement;
+  preview.removeAttribute("id");
+  Array.from(preview.attributes).forEach(({ name }) => {
+    if (name.startsWith("data-")) preview.removeAttribute(name);
+  });
+  preview.setAttribute("data-tab-drag-preview", "");
+  preview.setAttribute("data-selected", "true");
+  preview.setAttribute("aria-hidden", "true");
+  preview.style.setProperty("position", "fixed", "important");
+  preview.style.setProperty("left", `${rect.left}px`, "important");
+  preview.style.setProperty("top", `${rect.top}px`, "important");
+  preview.style.setProperty("width", `${rect.width}px`, "important");
+  preview.style.setProperty("height", `${rect.height}px`, "important");
+  preview.style.setProperty("transform", "none", "important");
+  preview.style.setProperty("transition", "none", "important");
+  preview.style.setProperty("pointer-events", "none", "important");
+  preview.style.setProperty("z-index", CUSTOM_ZINDEX.OVERLAY, "important");
+  document.body.appendChild(preview);
 };
 
 const computeResizeEndEdge = (params: { edge: number; size: number; delta: number; minSize: number; containerSize: number; containerOffset: number; pointerCoord: number }) => {
@@ -233,6 +266,74 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
     };
   }, [autoFitIntroduce, boardDataDispatch]);
 
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!container || !("ResizeObserver" in window)) return;
+
+    let previousContainerSize: { width: number; height: number } | null = null;
+    let correctionTimer: number | null = null;
+    const fullScreenGroupIds = new Set<string>();
+
+    const hasActiveInteraction = () =>
+      !!document.querySelector(
+        '[data-tutorial-active], [data-tab-is-dragging="true"], [data-resize-handler-is-dragging="true"], [data-group-header-is-dragging="true"]'
+      );
+
+    const scheduleCorrection = (width: number, height: number) => {
+      if (correctionTimer !== null) window.clearTimeout(correctionTimer);
+
+      correctionTimer = window.setTimeout(() => {
+        if (hasActiveInteraction()) {
+          scheduleCorrection(width, height);
+          return;
+        }
+
+        container.querySelectorAll<HTMLElement>("[data-group]").forEach((groupElement) => {
+          boardDataDispatch({
+            type: "CLAMP_GROUP_TO_CONTAINER",
+            payload: {
+              groupId: groupElement.id,
+              containerWidth: width,
+              containerHeight: height,
+              isFullScreen: fullScreenGroupIds.has(groupElement.id),
+            },
+          });
+        });
+
+        fullScreenGroupIds.clear();
+        correctionTimer = null;
+      }, 140);
+    };
+
+    const observer = new ResizeObserver(([entry]) => {
+      if (!entry) return;
+
+      const width = Math.round(entry.contentRect.width);
+      const height = Math.round(entry.contentRect.height);
+      if (width <= 0 || height <= 0) return;
+
+      if (previousContainerSize) {
+        container.querySelectorAll<HTMLElement>("[data-group]").forEach((groupElement) => {
+          const wasFullScreen =
+            groupElement.offsetLeft === 0 &&
+            groupElement.offsetTop === 0 &&
+            groupElement.offsetWidth === previousContainerSize?.width &&
+            groupElement.offsetHeight === previousContainerSize?.height;
+          if (wasFullScreen) fullScreenGroupIds.add(groupElement.id);
+        });
+      }
+
+      previousContainerSize = { width, height };
+      scheduleCorrection(width, height);
+    });
+
+    observer.observe(container);
+    return () => {
+      observer.disconnect();
+      if (correctionTimer !== null) window.clearTimeout(correctionTimer);
+    };
+  }, [boardDataDispatch]);
+
   const handleMouseMoveContainer = (e: MouseEvent) => {
     if (!containerRef.current) return;
     const { offsetTop: containerTop, offsetLeft: containerLeft, offsetHeight: containerHeight, offsetWidth: containerWidth } = containerRef.current;
@@ -360,6 +461,7 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
 
       currTabElement.style.top = `${currTabElement.offsetTop + dy}px`;
       currTabElement.style.left = `${currTabElement.offsetLeft + dx}px`;
+      syncTabDragPreview(currTabElement);
 
       const tabMoveStatus = getTabMoveStatus(currTabElement);
       currTabElement.setAttribute("data-tab-move-status", tabMoveStatus);
@@ -546,8 +648,8 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
 
     // Move Group
     const groupHeaderElement = document.querySelector("[data-group-header-is-dragging=true]");
-    const groupElement = groupHeaderElement?.parentElement;
-    if (groupElement) {
+    const groupElement = groupHeaderElement?.closest<HTMLElement>("[data-group]");
+    if (groupElement && groupHeaderElement) {
       groupElement.style.transition = "";
 
       const dataPos = groupElement.getAttribute("data-position");
@@ -700,14 +802,15 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
 
       currTabElement.setAttribute("data-tab-move-status", TAB_MOVE_STATUS.DEFAULT);
       currTabElement.style.zIndex = CUSTOM_ZINDEX.DEFAULT;
+      document.querySelector("[data-tab-drag-preview]")?.remove();
       return;
     }
 
     // Move Group
     const groupHeaderElement = document.querySelector("[data-group-header-is-dragging=true]");
-    const groupElement = groupHeaderElement?.parentElement;
+    const groupElement = groupHeaderElement?.closest<HTMLElement>("[data-group]");
     const dataGroupId = groupHeaderElement?.getAttribute("data-group-id");
-    if (groupElement && dataGroupId) {
+    if (groupElement && groupHeaderElement && dataGroupId) {
       groupHeaderElement.setAttribute("data-group-header-is-dragging", "false");
 
       if (groupIndicateRef.current) {
@@ -765,7 +868,7 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
   }, []);
 
   return (
-    <div id="container" ref={containerRef} className={cn("w-[inherit] h-[inherit] relative", className)} data-container>
+    <div id="container" ref={containerRef} className={cn("relative h-full min-h-0 w-full min-w-0", className)} data-container>
       {children}
     </div>
   );
@@ -871,13 +974,54 @@ const GroupHeader = React.forwardRef<React.ElementRef<"div">, IGroupHeaderProps>
   const { boardDataDispatch } = useBoardDataContext();
   const { boardLayoutConstants } = useBoardLayoutContext();
   const { TAB_SIZES } = boardLayoutConstants;
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+  const [canScrollRight, setCanScrollRight] = React.useState(false);
+
+  const setHeaderRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      scrollRef.current = node;
+      if (typeof forwardedRef === "function") forwardedRef(node);
+      else if (forwardedRef) forwardedRef.current = node;
+    },
+    [forwardedRef]
+  );
+
+  const updateScrollIndicators = React.useCallback(() => {
+    const header = scrollRef.current;
+    if (!header) return;
+
+    const maxScrollLeft = Math.max(header.scrollWidth - header.clientWidth, 0);
+    setCanScrollLeft(header.scrollLeft > 1);
+    setCanScrollRight(header.scrollLeft < maxScrollLeft - 1);
+  }, []);
+
+  useLayoutEffect(() => {
+    const header = scrollRef.current;
+    if (!header || !("ResizeObserver" in window)) return;
+
+    const animationFrame = requestAnimationFrame(updateScrollIndicators);
+    const observer = new ResizeObserver(updateScrollIndicators);
+    observer.observe(header);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      observer.disconnect();
+    };
+  }, [groupData?.tabIds.length, TAB_SIZES.WIDTH, updateScrollIndicators]);
+
+  const scrollToEdge = (edge: "start" | "end") => {
+    const header = scrollRef.current;
+    if (!header) return;
+    header.scrollTo({ left: edge === "start" ? 0 : header.scrollWidth, behavior: "smooth" });
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     const groupHeaderElement = e.currentTarget;
     groupHeaderElement.setAttribute("data-group-header-is-dragging", "true");
 
     const containerElement = document.getElementById("container") as HTMLDivElement;
-    groupHeaderElement.parentElement?.setAttribute(
+    groupHeaderElement.closest<HTMLElement>("[data-group]")?.setAttribute(
       "data-position",
       JSON.stringify({ x: e.clientX - containerElement.getBoundingClientRect().x, y: e.clientY - containerElement.getBoundingClientRect().y })
     );
@@ -892,7 +1036,7 @@ const GroupHeader = React.forwardRef<React.ElementRef<"div">, IGroupHeaderProps>
     if (!groupData) return;
 
     const groupHeaderElement = e.currentTarget;
-    const groupElement = groupHeaderElement.parentElement;
+    const groupElement = groupHeaderElement.closest<HTMLElement>("[data-group]");
     const containerElement = document.querySelector("[data-container]") as HTMLDivElement;
 
     if (containerElement && groupElement) {
@@ -926,23 +1070,49 @@ const GroupHeader = React.forwardRef<React.ElementRef<"div">, IGroupHeaderProps>
   if (!groupData) return null;
 
   return (
-    <div
-      ref={forwardedRef}
-      className={cn("relative", className)}
-      style={{ height: TAB_SIZES.HEIGHT }}
-      onMouseDown={handleMouseDown}
-      onDoubleClick={handleDoubleClick}
-      id={groupData.id}
-      data-group-header
-      data-group-id={groupData.id}
-      data-group-header-is-dragging={false}
-      data-mouse-down-position={JSON.stringify({ x: 0, y: 0 })}
-      {...props}
-    >
-      {groupData.tabIds.map((tabId, idx) =>
-        React.Children.map(children, (child) =>
-          React.isValidElement(child) ? React.cloneElement(child as React.ReactElement, { key: tabId, groupId: groupData.id, tabId, tabIdx: idx, mdxSources, groupData }) : child
-        )
+    <div className={cn("relative min-w-0 w-full", className)} style={{ height: TAB_SIZES.HEIGHT }}>
+      <div
+        ref={setHeaderRef}
+        className="relative h-full min-w-0 w-full overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: "none" }}
+        onMouseDown={handleMouseDown}
+        onDoubleClick={handleDoubleClick}
+        onScroll={updateScrollIndicators}
+        id={groupData.id}
+        data-group-header
+        data-group-id={groupData.id}
+        data-group-header-is-dragging={false}
+        data-mouse-down-position={JSON.stringify({ x: 0, y: 0 })}
+        {...props}
+      >
+        <div aria-hidden className="pointer-events-none h-px" style={{ width: groupData.tabIds.length * TAB_SIZES.WIDTH }} />
+        {groupData.tabIds.map((tabId, idx) =>
+          React.Children.map(children, (child) =>
+            React.isValidElement(child) ? React.cloneElement(child as React.ReactElement, { key: tabId, groupId: groupData.id, tabId, tabIdx: idx, mdxSources, groupData }) : child
+          )
+        )}
+      </div>
+      {canScrollLeft && (
+        <button
+          type="button"
+          aria-label="Scroll to first tab"
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={() => scrollToEdge("start")}
+          className="absolute inset-y-0 left-0 z-30 flex w-9 items-center justify-start bg-gradient-to-r from-background via-background/95 to-transparent pl-1 text-foreground transition-opacity hover:opacity-80"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+      )}
+      {canScrollRight && (
+        <button
+          type="button"
+          aria-label="Scroll to last tab"
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={() => scrollToEdge("end")}
+          className="absolute inset-y-0 right-0 z-30 flex w-9 items-center justify-end bg-gradient-to-l from-background via-background/95 to-transparent pr-1 text-foreground transition-opacity hover:opacity-80"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
       )}
     </div>
   );
@@ -1008,6 +1178,7 @@ const Tab = React.forwardRef<React.ElementRef<"div">, ITabProps>(({ className, g
     });
 
     const tabElement = e.currentTarget as HTMLElement;
+    createTabDragPreview(tabElement);
     tabElement.style.zIndex = CUSTOM_ZINDEX.OVERLAY;
     setGroupElementForeground(groupId);
 
@@ -1059,7 +1230,11 @@ const TabIndicate = React.forwardRef<React.ElementRef<"div">, ITabIndicateProps>
   return (
     <>
       {boardLayoutState.tabIndicate.groupId === groupData.id && (
-        <div ref={forwardedRef} className={cn("absolute z-20 h-[100%]", className)} style={{ left: boardLayoutState.tabIndicate.tabIdx * TAB_SIZES.WIDTH, width: TAB_SIZES.WIDTH }} />
+        <div
+          ref={forwardedRef}
+          className={cn("absolute inset-y-px z-20", className)}
+          style={{ left: boardLayoutState.tabIndicate.tabIdx * TAB_SIZES.WIDTH, width: TAB_SIZES.WIDTH }}
+        />
       )}
     </>
   );

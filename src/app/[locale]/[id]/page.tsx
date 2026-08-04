@@ -43,7 +43,7 @@ async function getMdxSources(locale: Locale) {
         mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypePrism], format: "mdx" },
       });
       return [fileName, serialized] as const;
-    })
+    }),
   );
 
   return Object.fromEntries(entries) as Record<string, MDXRemoteSerializeResult>;
@@ -53,9 +53,7 @@ export default async function Page({ params }: IPageProps) {
   if (!hasLocale(routing.locales, params.locale) || !(params.id in data.blog.page)) notFound();
 
   setRequestLocale(params.locale);
-  const localizedSources = await Promise.all(
-    routing.locales.map(async (sourceLocale) => [sourceLocale, await getMdxSources(sourceLocale)] as const)
-  );
+  const localizedSources = await Promise.all(routing.locales.map(async (sourceLocale) => [sourceLocale, await getMdxSources(sourceLocale)] as const));
   const mdxSourcesByLocale = Object.fromEntries(localizedSources) as Record<Locale, Record<string, MDXRemoteSerializeResult>>;
   const boardData: BoardDataState = {
     ...data.blog,
@@ -63,16 +61,16 @@ export default async function Page({ params }: IPageProps) {
   };
 
   return (
-    <main className="size-full grid grid-rows-[auto_1fr_auto]">
-      <header className="flex h-[36px] w-full items-center justify-between border-b px-2">
+    <main className="size-full grid grid-rows-[auto_1fr_auto] bg-secondary/20 dark:bg-background">
+      <header className="relative z-50 flex h-11 w-full items-center justify-between border-b border-border/60 bg-background/90 px-3 shadow-[0_1px_10px_-7px_rgba(0,0,0,0.45)] backdrop-blur-md">
         <ToggleTheme />
         <LanguageSwitcher />
       </header>
-      <div className="grid grid-cols-[auto_1fr_auto]">
+      <div className="grid min-h-0 grid-cols-[auto_1fr_auto] max-md:grid-cols-1 max-md:grid-rows-[auto_minmax(0,1fr)]">
         <GroupTabsLayout data={boardData} mdxSourcesByLocale={mdxSourcesByLocale} />
-        <aside className="h-full w-[30px] border-l" />
+        <aside className="h-full w-6 border-l border-border/50 bg-background/65 max-md:hidden" />
       </div>
-      <footer className="h-[30px] w-full border-t" />
+      <footer className="h-6 w-full border-t border-border/60 bg-background/80" />
     </main>
   );
 }

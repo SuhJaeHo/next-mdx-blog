@@ -32,19 +32,19 @@ export default function GroupTabsLayout({ data, mdxSourcesByLocale }: IGroupTabs
   return (
     <>
       <Board.Root key={resetKey} boardData={data} customConstants={{ TAB_SIZES: { WIDTH: 100, HEIGHT: 50 }, GROUP_MINIMUM_SIZE: { WIDTH: 400, HEIGHT: 300 } }}>
-        <Board.Nav className="p-3 flex flex-col gap-[10px] h-full w-[200px] bg-background border-r">
-          <Board.NavList className="mb-2 text-foreground hover:bg-secondary data-[selected=true]:bg-secondary cursor-pointer text-sm p-1" />
+        <Board.Nav className="flex h-full w-[210px] flex-col border-r border-border/60 bg-background/80 p-3.5 shadow-[4px_0_18px_-18px_rgba(0,0,0,0.55)] max-md:h-auto max-md:w-full max-md:flex-row max-md:border-b max-md:border-r-0 max-md:p-2 max-md:shadow-none max-md:[&>div]:flex max-md:[&>div]:w-full max-md:[&>div]:gap-1 max-md:[&>div]:overflow-x-auto">
+          <Board.NavList className="relative mb-1.5 cursor-pointer rounded-lg px-3 py-2.5 text-[13px] text-muted-foreground transition-colors before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-foreground before:opacity-0 hover:bg-secondary/55 hover:text-foreground data-[selected=true]:bg-secondary/80 data-[selected=true]:text-foreground data-[selected=true]:before:opacity-100 max-md:mb-0 max-md:shrink-0 max-md:whitespace-nowrap max-md:px-3 max-md:py-2 max-md:before:hidden" />
         </Board.Nav>
-        <Board.Panel autoFitIntroduce={isTutorialSeen} className="bg-background">
-          <Board.GroupIndicate className="bg-indicator/30 border-[1px] border-indicator" />
+        <Board.Panel autoFitIntroduce={isTutorialSeen} className="bg-[radial-gradient(circle_at_50%_0%,hsl(var(--secondary)/0.45),transparent_52%)] dark:bg-[radial-gradient(circle_at_50%_0%,hsl(var(--secondary)/0.18),transparent_48%)]">
+          <Board.GroupIndicate className="border border-indicator bg-indicator/20 shadow-[0_0_0_3px_hsl(var(--indicator)/0.08)]" />
           <Board.Groups>
             <Board.Group
               mdxSources={mdxSources}
-              className="bg-background border border-border/55 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.16)] transition-group duration-200 grid grid-rows-[auto_1fr] data-[foreground=true]:border-border/80 data-[foreground=true]:shadow-[0_16px_38px_-18px_rgba(0,0,0,0.34)] dark:border-foreground/15 dark:shadow-[0_2px_10px_-4px_rgba(0,0,0,0.65)] dark:data-[foreground=true]:border-foreground/30 dark:data-[foreground=true]:ring-1 dark:data-[foreground=true]:ring-foreground/[0.06] dark:data-[foreground=true]:shadow-[0_18px_42px_-20px_rgba(0,0,0,0.8)]"
+              className="grid grid-rows-[auto_1fr] border border-border/60 bg-background shadow-[0_8px_28px_-20px_rgba(0,0,0,0.34)] ring-1 ring-foreground/[0.025] transition-group duration-200 data-[foreground=true]:border-border/90 data-[foreground=true]:shadow-[0_22px_48px_-24px_rgba(0,0,0,0.46)] dark:border-foreground/15 dark:shadow-[0_10px_34px_-24px_rgba(0,0,0,0.9)] dark:data-[foreground=true]:border-foreground/30 dark:data-[foreground=true]:ring-foreground/[0.07] dark:data-[foreground=true]:shadow-[0_24px_52px_-26px_rgba(0,0,0,0.95)]"
             >
-              <Board.GroupHeader className="cursor-pointer border-b border-border/30 dark:border-foreground/10">
-                <Board.Tab className="flex justify-center items-center px-3 text-center whitespace-normal cursor-pointer text-sm text-muted-foreground border-r border-border/25 last:border-r-0 transition-tab duration-300 hover:bg-secondary/40 hover:text-foreground data-[selected=true]:bg-secondary/70 data-[selected=true]:text-foreground dark:border-foreground/10" />
-                <Board.TabIndicate className="bg-indicator/30 border-[1px] border-indicator" />
+              <Board.GroupHeader className="cursor-pointer border-b border-border/40 bg-secondary/20 dark:border-foreground/10 dark:bg-secondary/10">
+                <Board.Tab className="flex cursor-pointer items-center justify-center whitespace-normal border-r border-border/25 px-3 text-center text-sm text-muted-foreground transition-tab duration-300 hover:bg-secondary/45 hover:text-foreground data-[selected=true]:bg-background data-[selected=true]:text-foreground dark:border-foreground/10 dark:data-[selected=true]:bg-secondary/35" />
+                <Board.TabIndicate className="border border-indicator bg-indicator/20" />
               </Board.GroupHeader>
               <Board.TabContent className="bg-background text-foreground">
                 <CustomMDX />

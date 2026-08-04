@@ -5,17 +5,15 @@
   },
   "Navigation": {
     "introduce": "Introduce",
-    "start-blog": "Building This Portfolio",
-    "build-tool": "Technical Notes"
+    "making": "Building This Portfolio"
   },
   "Tabs": {
     "portfolioOverview": "Overview",
     "introduce": "About Me",
     "career": "Experience",
-    "npmPublish": "Board Package",
-    "mdx": "MDX Integration",
-    "npmReadme": "Documentation",
-    "vite": "Vite"
+    "npmPublish": "Packaging",
+    "mdx": "Content Setup",
+    "npmReadme": "DOCS"
   },
   "Header": {
     "language": "Select language",

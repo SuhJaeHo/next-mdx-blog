@@ -292,7 +292,7 @@ function TutorialOverlay({ step, stepIndex, total, rect, tooltipAnchorRect, isPl
   return (
     <>
       {/* Blocks interaction with the board while the tutorial is active. */}
-      <div className="fixed inset-0 z-40 touch-none" />
+      <div className="fixed inset-0 z-40 touch-none" data-tutorial-active />
       {/* Dark backdrop with a cutout over the highlighted (and possibly moving) element. */}
       <div
         className="fixed z-40 rounded-lg transition-[top,left,width,height] duration-75 ease-linear"

@@ -5,17 +5,15 @@
   },
   "Navigation": {
     "introduce": "紹介",
-    "start-blog": "このポートフォリオの作り方",
-    "build-tool": "技術学習ノート"
+    "making": "このポートフォリオの作り方"
   },
   "Tabs": {
     "portfolioOverview": "概要",
     "introduce": "自己紹介書",
     "career": "職務経歴",
-    "npmPublish": "Boardパッケージ",
-    "mdx": "MDX統合",
-    "npmReadme": "ドキュメント",
-    "vite": "Vite"
+    "npmPublish": "パッケージ化",
+    "mdx": "コンテンツ構成",
+    "npmReadme": "ドキュメント"
   },
   "Header": {
     "language": "言語を選択",

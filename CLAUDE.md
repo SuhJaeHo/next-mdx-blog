@@ -33,7 +33,7 @@ This used to be a thin wrapper around a published npm package, `group-tabs-layou
 
 - `src/app/[id]/page.tsx` reads `src/app/data.json` for the board structure, and separately reads every `.mdx` file in `src/markdown/` at build/request time, serializing each with `next-mdx-remote/serialize` (`remark-gfm` + `rehype-prism-plus`). Every group's tab renders the *same* serialized MDX map — the tab-to-file relationship is resolved client-side inside `src/components/board/*` (`TabContent`, keyed by each tab's `contentFile`), not in `page.tsx`.
 - `src/components/mdx/custom-mdx.tsx` is the MDX renderer used inside each tab's content pane; it overrides `pre` with `src/components/mdx/code-block.tsx` for syntax highlighting (Prism, via `@app/prism-custom.css` and `rehype-prism-plus`).
-- Route `/` redirects (permanently) to `/start-blog` (see `next.config.mjs`).
+- Locale index routes open `/[locale]/introduce`; the portfolio build log is available at `/[locale]/making`.
 
 ### Path aliases (`tsconfig.json`)
 

@@ -20,7 +20,7 @@ const components = {
 
 export default function CustomMDX({ className, mdxContent, groupId, contentFile }: ICustomMDXProps) {
   const isProfile = contentFile === "introduce.mdx" || contentFile === "career.mdx" || contentFile === "portfolio-overview.mdx";
-  const isTechnicalArticle = contentFile === "npm-publish.mdx" || contentFile === "mdx.mdx" || contentFile === "npm-readme.mdx" || contentFile === "vite.mdx";
+  const isTechnicalArticle = contentFile === "npm-publish.mdx" || contentFile === "mdx.mdx" || contentFile === "npm-readme.mdx";
 
   return (
     <div

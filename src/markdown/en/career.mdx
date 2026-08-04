@@ -19,6 +19,8 @@ A frontend engineer who identifies operational problems and drives them through 
 
 ### Cross Public Sale
 
+<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Zustand</span><span>Framer Motion</span></div>
+
 - Delivered project setup, design requirements, wallet integration, RPC, KYC, and smart-contract calls within one week
 - Diagnosed data delays caused by public RPC rate limits and migrated to a JWT-authenticated private RPC
 - Completed a public sale worth approximately **KRW 20 billion without a critical incident**
@@ -26,27 +28,37 @@ A frontend engineer who identifies operational problems and drives them through 
 
 ### CrossX · WebView Hybrid Wallet
 
+<div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Rive</span><span>Framer Motion</span><span>Turborepo</span></div>
+
 - Designed a Web–Native bridge that standardized RN WebView messaging as Promise-based functions
 - Made the RN Bridge compatible with TanStack Query's QueryFn, unifying bridge communication and server APIs under the same asynchronous state-management model
 - Built a virtual history stack for a single-route SPA and connected screen state to Android hardware back events
 - Synchronized current and previous screen offsets with drawer drag progress for native-quality navigation gestures
+- Applied tag-based deployment to a Turborepo monorepo, enabling branch-independent builds and deployments per environment and service while improving maintainability and development efficiency through shared-module packaging
 - Released on both iOS and Android, reaching **more than 100,000 cumulative downloads**
 
 ### Cross Exchange · Game-Token Exchange
 
+<div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Monorepo</span></div>
+
 - Unified duplicated transaction flows through an adapter injected into the SDK
 - Led migration from a monorepo to an independent project
+- Introduced Feature-Sliced Design (FSD) across the project, organizing it into app, pages, widgets, features, entities, and shared layers to strengthen feature-level cohesion and minimize file conflicts during team collaboration
 - Built automatic generation of DTOs, entities, and repositories from Swagger specifications
 - Preserved existing features while **reducing the total codebase by approximately 30%**
 - Externalized market configuration to S3, eliminating code changes and redeployment for new markets
 
 ### Cross STAKING · Token Staking Service
 
+<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>Rive</span><span>Zod</span></div>
+
 - Rebuilt an internal AI-generated prototype to match Figma designs and production requirements
 - Added configurable date and time controls for validating operational phase transitions in advance
 - Fixed layout, wallet integration, and core features within five days of handoff and launched on schedule
 
 ### Cross Points · Points Service (Discontinued)
+
+<div className="project-tech"><span>Next.js</span><span>Rive</span><span>shadcn/ui</span><span>Tailwind CSS</span></div>
 
 - Used EIP-1193 wallet detection to reduce the wallet connection flow from three steps to two and improve the connection UX
 - Designed a cookie-based JWT architecture and consolidated authentication behind a single API entry point by handling token extraction, refresh, and header injection in a middleware proxy
@@ -58,6 +70,8 @@ A frontend engineer who identifies operational problems and drives them through 
 
 ### Pnix Exchange · Multi-Market Order-Book DEX
 
+<div className="project-tech"><span>React</span><span>TypeScript</span><span>React Router</span><span>Redux Toolkit</span><span>TanStack Query</span><span>styled-components</span></div>
+
 - Owned the web frontend in a two-person team from initial DEX architecture through launch and maintenance
 - Integrated historical market APIs and live WebSocket streams through the TradingView DataFeed interface
 - Applied ref-based buffering and batched updates to high-frequency order-book traffic, preventing frame drops
@@ -65,6 +79,7 @@ A frontend engineer who identifies operational problems and drives them through 
 - Designed React keys around price levels so animations ran only for quantity changes at the same price, minimizing unnecessary re-renders
 - Traced skipped CSS transitions to style changes accumulating within the same frame and moved the interaction to rAF-based animation for reliable state transitions
 - Used `useDeferredValue` to separate rendering priorities and preserve tab responsiveness during rapid trades
+- Reduced reliance on heavyweight UI frameworks such as MUI by designing a reusable, custom-hook-based table header component, optimizing bundle size and increasing styling flexibility
 - Maintained stable order-book rendering under bot tests simulating large-scale traffic
 
 ### 40 Wonders

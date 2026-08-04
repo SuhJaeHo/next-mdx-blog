@@ -19,6 +19,8 @@
 
 ### Cross Public Sale
 
+<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Zustand</span><span>Framer Motion</span></div>
+
 - 1週間でプロジェクト設定、デザイン要件、ウォレット連携、RPC、KYC、スマートコントラクト呼び出しを実装
 - パブリックRPCのRate Limitによる遅延を分析し、JWT認証のプライベートRPCへ移行
 - 約**200億ウォン規模のPublic Saleを重大な障害なく完了**
@@ -26,27 +28,37 @@
 
 ### CrossX · WebViewハイブリッドウォレット
 
+<div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Rive</span><span>Framer Motion</span><span>Turborepo</span></div>
+
 - RN WebViewのメッセージ通信をPromiseベースの関数に標準化したWeb–Nativeブリッジを設計
 - RNブリッジをTanStack QueryのQueryFnと互換性のある形で設計し、ブリッジ通信をサーバーAPIと同じ非同期状態管理モデルへ統合
 - 単一ルートSPAに仮想履歴スタックを構築し、Androidのハードウェア戻る操作と画面状態を連携
 - ドロワーのドラッグ進捗に合わせて現在・前画面の位置を同期し、ネイティブ品質の画面遷移ジェスチャーを実現
+- TurborepoベースのモノレポにTag-Based Deployを導入し、ブランチに依存しない環境別・サービス別のビルド／デプロイ基盤を構築。共通モジュールのパッケージ化により保守性と開発効率を改善
 - iOS・Androidの両ストアでリリースし、**累計10万ダウンロード以上**を達成
 
 ### Cross Exchange · ゲームトークン取引所
 
+<div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Monorepo</span></div>
+
 - 重複していたトランザクション処理をSDK注入型アダプターで統合
 - モノレポから独立プロジェクトへの移行を主導
+- Feature-Sliced Design（FSD）を全面導入し、プロジェクトをapp・pages・widgets・features・entities・sharedレイヤーに分割。機能単位の凝集度を高め、チーム開発時のファイル競合を最小化
 - Swagger仕様に基づくDTO・Entity・Repositoryの自動生成を構築
 - 既存機能を維持しながら**コード量を約30%削減**
 - マーケット設定をS3で外部管理し、新規マーケット追加時のコード修正と再デプロイを不要化
 
 ### Cross STAKING · トークンステーキング
 
+<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>Rive</span><span>Zod</span></div>
+
 - 社内AIエージェントのプロトタイプをFigmaとサービス要件に合わせて再実装
 - 運用フェーズの画面・機能切り替えを事前検証できる日時設定機能を構築
 - 引き継ぎ後5日以内にレイアウト、ウォレット連携、主要機能を改善し、期限内にリリース
 
 ### Cross Points · ポイントサービス（サービス終了）
+
+<div className="project-tech"><span>Next.js</span><span>Rive</span><span>shadcn/ui</span><span>Tailwind CSS</span></div>
 
 - EIP-1193によるウォレット検出で接続フローを3段階から2段階へ短縮し、接続UXを改善
 - CookieベースのJWT認証基盤を設計し、ミドルウェアプロキシでトークン抽出・更新・ヘッダー注入を一括処理することで認証APIを単一の入口に統合
@@ -58,6 +70,8 @@
 
 ### Pnix Exchange · オーダーブック型マルチマーケットDEX
 
+<div className="project-tech"><span>React</span><span>TypeScript</span><span>React Router</span><span>Redux Toolkit</span><span>TanStack Query</span><span>styled-components</span></div>
+
 - 2名チームでDEXの初期設計からリリース、運用保守までWebフロントエンドを担当
 - TradingView DataFeedに過去価格APIとリアルタイムWebSocketを連携した価格ストリーミングチャートを実装
 - 高頻度オーダーブックにrefベースのバッファリングとバッチ更新を適用し、フレームドロップを防止
@@ -65,6 +79,7 @@
 - 価格帯単位でReact keyを設計し、同一価格帯の数量変更時のみアニメーションを実行することで不要な再レンダリングを最小化
 - 同一フレーム内にスタイル変更が蓄積してCSSトランジションが無視される原因を分析し、rAFベースのアニメーションへ移行して安定した状態変化を実現
 - `useDeferredValue`でレンダリング優先度を分離し、取引更新中もタブ操作の応答性を維持
+- MUIなど重量級UIフレームワークへの依存を減らすため、カスタムフックベースの再利用可能なテーブルヘッダーコンポーネントを独自設計し、バンドルサイズの最適化とスタイリングの柔軟性向上を実現
 - 大規模トラフィックを想定したボットテストでも安定したレンダリングを維持
 
 ### 40 Wonders

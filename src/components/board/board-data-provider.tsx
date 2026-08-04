@@ -53,6 +53,15 @@ type BoardDataStateActionType =
       };
     }
   | {
+      type: "CLAMP_GROUP_TO_CONTAINER";
+      payload: {
+        groupId: string;
+        containerWidth: number;
+        containerHeight: number;
+        isFullScreen: boolean;
+      };
+    }
+  | {
       type: "UPDATE_GROUP_POSITION";
       payload: {
         groupId: string;
@@ -144,6 +153,43 @@ const boardDataReducer = (state: BoardDataState, action: BoardDataStateActionTyp
     case "UPDATE_GROUP_SIZE": {
       const { groupId, x, y, width, height } = action.payload;
       return updateGroup(state, groupId, { position: { x, y }, size: { width, height } });
+    }
+    case "CLAMP_GROUP_TO_CONTAINER": {
+      const { groupId, containerWidth, containerHeight, isFullScreen } = action.payload;
+      const group = state.group[groupId];
+      if (!group || containerWidth <= 0 || containerHeight <= 0) return state;
+
+      const clampGeometry = (position: IPosition, size: ISize) => {
+        const width = Math.min(size.width, containerWidth);
+        const height = Math.min(size.height, containerHeight);
+        const x = Math.min(Math.max(position.x, 0), Math.max(containerWidth - width, 0));
+        const y = Math.min(Math.max(position.y, 0), Math.max(containerHeight - height, 0));
+        return { position: { x, y }, size: { width, height } };
+      };
+
+      const current = isFullScreen
+        ? { position: { x: 0, y: 0 }, size: { width: containerWidth, height: containerHeight } }
+        : clampGeometry(group.position, group.size);
+      const previous = clampGeometry(group.prevPosition, group.prevSize);
+
+      const isUnchanged =
+        current.position.x === group.position.x &&
+        current.position.y === group.position.y &&
+        current.size.width === group.size.width &&
+        current.size.height === group.size.height &&
+        previous.position.x === group.prevPosition.x &&
+        previous.position.y === group.prevPosition.y &&
+        previous.size.width === group.prevSize.width &&
+        previous.size.height === group.prevSize.height;
+
+      if (isUnchanged) return state;
+
+      return updateGroup(state, groupId, {
+        position: current.position,
+        size: current.size,
+        prevPosition: previous.position,
+        prevSize: previous.size,
+      });
     }
     case "UPDATE_GROUP_FULL_SCREEN": {
       const { groupId, x, y, width, height, isFullScreen } = action.payload;

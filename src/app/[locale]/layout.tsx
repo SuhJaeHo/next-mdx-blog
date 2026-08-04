@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP, Noto_Sans_KR } from "next/font/google";
+import { Andika, IBM_Plex_Sans_JP, IBM_Plex_Sans_KR } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -9,18 +9,26 @@ import { routing, type Locale } from "@/i18n/routing";
 import { LocaleProvider } from "./locale-provider";
 import "../globals.css";
 
-const notoSansKR = Noto_Sans_KR({
-  weight: "variable",
+const ibmPlexSansKR = IBM_Plex_Sans_KR({
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   preload: false,
   variable: "--font-mdx-ko",
 });
 
-const notoSansJP = Noto_Sans_JP({
-  weight: "variable",
+const ibmPlexSansJP = IBM_Plex_Sans_JP({
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   preload: false,
   variable: "--font-mdx-ja",
+});
+
+const andika = Andika({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  preload: false,
+  variable: "--font-mdx-latin",
 });
 
 interface ILocaleLayoutProps {
@@ -48,7 +56,7 @@ export default async function LocaleLayout({ children, params }: ILocaleLayoutPr
   setRequestLocale(params.locale);
   return (
     <html lang={params.locale} suppressHydrationWarning>
-      <body className={`${notoSansKR.variable} ${notoSansJP.variable}`}>
+      <body className={`${andika.variable} ${ibmPlexSansKR.variable} ${ibmPlexSansJP.variable}`}>
         <LocaleProvider initialLocale={params.locale as Locale}>
           <ThemeProvider attribute="class">
             {children}

@@ -50,11 +50,13 @@
 
 :global(html[lang="ko"]) .custom,
 :global(html[lang="en"]) .custom {
-  font-family: var(--font-mdx-ko), "Noto Sans", sans-serif;
+  font-family: var(--font-mdx-latin), var(--font-mdx-ko), "IBM Plex Sans", sans-serif;
+  font-feature-settings: "cv39" 0, "cv56" 1;
 }
 
 :global(html[lang="ja"]) .custom {
-  font-family: var(--font-mdx-ja), "Noto Sans JP", sans-serif;
+  font-family: var(--font-mdx-latin), var(--font-mdx-ja), "IBM Plex Sans JP", sans-serif;
+  font-feature-settings: "cv39" 0, "cv56" 1;
 }
 
 .custom code,
@@ -326,6 +328,8 @@
 }
 
 .career {
+  container-name: career-content;
+  container-type: inline-size;
   max-width: 1040px;
   margin: 0 auto;
 
@@ -427,7 +431,8 @@
     }
   }
 
-  h3 + ul {
+  h3 + ul,
+  :global(.project-tech) + ul {
     margin: 0 0 26px 14px;
     padding: 2px 18px 4px 38px;
     border: 0;
@@ -437,6 +442,28 @@
 
     li::marker {
       color: hsl(var(--muted-foreground) / 0.7);
+    }
+  }
+
+  :global(.project-tech) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 2px 0 12px 38px;
+
+    > span {
+      display: inline-flex;
+      min-height: 30px;
+      align-items: center;
+      padding: 5px 13px;
+      border: 1px solid hsl(var(--border) / 0.35);
+      border-radius: 999px;
+      background: hsl(var(--secondary) / 0.72);
+      color: hsl(var(--muted-foreground));
+      font-size: 0.78rem;
+      font-weight: 550;
+      line-height: 1;
+      white-space: nowrap;
     }
   }
 
@@ -504,6 +531,8 @@
 
   :global(.portfolio-grid) {
     display: grid;
+    width: 100%;
+    min-width: 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
     margin: 8px 0 34px;
@@ -511,6 +540,8 @@
 
   :global(.portfolio-card) {
     display: flex;
+    width: 100%;
+    max-width: 100%;
     height: 172px;
     min-width: 0;
     overflow: hidden;
@@ -560,6 +591,7 @@
       color: hsl(var(--muted-foreground));
       font-size: 0.78rem;
       line-height: 1.55;
+      overflow-wrap: anywhere;
       word-break: keep-all;
     }
   }
@@ -593,19 +625,18 @@
   }
 
   h2 + ul {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 10px;
-    padding: 0;
-    list-style: none;
+    display: block;
+    margin: 10px 0 22px;
+    padding-left: 22px;
+    list-style: disc;
 
     li {
-      min-height: 72px;
-      margin: 0;
-      padding: 13px 15px;
-      border: 1px solid hsl(var(--border) / 0.5);
-      border-radius: 10px;
-      background: hsl(var(--secondary) / 0.3);
+      min-height: 0;
+      margin: 6px 0;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
     }
   }
 
@@ -617,11 +648,20 @@
     overflow: hidden;
     border: 1px solid hsl(var(--border) / 0.5);
     border-radius: 10px;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+
+    tr,
+    tr:nth-child(2n) {
+      background: hsl(var(--background));
+    }
 
     th,
     td {
       padding: 12px 14px;
       border-color: hsl(var(--border) / 0.45);
+      background: transparent;
+      color: hsl(var(--foreground));
     }
 
     th {
@@ -674,18 +714,6 @@
       }
     }
 
-    :global(.portfolio-grid) {
-      grid-template-columns: 1fr;
-    }
-
-    :global(.portfolio-card) {
-      height: 148px;
-      grid-column: auto;
-
-      > img {
-        width: 40%;
-      }
-    }
   }
 
   .introduce {
@@ -696,5 +724,38 @@
     h2 {
       margin-top: 32px;
     }
+  }
+}
+
+@container career-content (max-width: 720px) {
+  .career :global(.portfolio-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .career :global(.portfolio-card) {
+    height: 148px;
+    grid-column: auto;
+
+    > img {
+      width: 40%;
+    }
+  }
+}
+
+@container career-content (max-width: 480px) {
+  .career :global(.portfolio-card) {
+    height: auto;
+    flex-direction: column;
+
+    > img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  .career :global(.portfolio-card-body) {
+    min-height: 88px;
+    padding: 14px 16px 16px;
   }
 }

@@ -4,6 +4,15 @@ import createNextIntlPlugin from "next-intl/plugin";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: "/:locale(ko|en|ja)/start-blog",
+        destination: "/:locale/making",
+        permanent: true,
+      },
+    ];
+  },
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
   transpilePackages: ["next-mdx-remote"],
   sassOptions: {
