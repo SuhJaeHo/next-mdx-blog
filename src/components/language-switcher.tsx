@@ -51,7 +51,7 @@ export function LanguageSwitcher() {
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
-        className="group flex h-7 min-w-[92px] items-center gap-1.5 rounded-full border border-border/70 bg-background pl-2.5 pr-2 text-muted-foreground shadow-sm transition-colors hover:border-foreground/30 hover:text-foreground focus-visible:border-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/10"
+        className="group flex h-7 min-w-[92px] items-center gap-1.5 rounded-full border border-border/70 bg-background pl-2.5 pr-2 text-muted-foreground shadow-sm transition-colors duration-150 ease-out hover:border-foreground/30 hover:text-foreground focus-visible:border-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/10"
       >
         <Languages className="h-3.5 w-3.5 shrink-0" aria-hidden />
         <span className="flex-1 text-left font-medium text-foreground">{languageNames[locale]}</span>
@@ -62,7 +62,7 @@ export function LanguageSwitcher() {
         <div
           role="listbox"
           aria-label={t("language")}
-          className="absolute right-0 top-[calc(100%+6px)] z-[60] w-36 overflow-hidden rounded-xl border border-border/80 bg-popover p-1.5 text-popover-foreground shadow-xl ring-1 ring-foreground/5"
+          className="absolute right-0 top-[calc(100%+6px)] z-[60] w-36 overflow-hidden rounded-xl border border-border/80 bg-popover p-1.5 text-popover-foreground shadow-xl ring-1 ring-foreground/5 transition-colors duration-150 ease-out"
         >
           {Object.entries(languageNames).map(([value, label]) => {
             const optionLocale = value as Locale;
@@ -75,7 +75,7 @@ export function LanguageSwitcher() {
                 role="option"
                 aria-selected={isSelected}
                 onClick={() => changeLocale(optionLocale)}
-                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left font-medium transition-colors hover:bg-secondary focus-visible:bg-secondary focus-visible:outline-none data-[selected=true]:bg-secondary/70"
+                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left font-medium transition-colors duration-150 ease-out hover:bg-secondary focus-visible:bg-secondary focus-visible:outline-none data-[selected=true]:bg-secondary/70"
                 data-selected={isSelected}
               >
                 <span className="flex-1">{label}</span>

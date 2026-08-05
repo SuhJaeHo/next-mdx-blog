@@ -74,11 +74,23 @@ div {
   user-select: none;
 }
 
-/* Board tabs/groups deliberately animate during drag and focus changes. Disable those
-   transitions only while the theme variables switch so the header does not flash through
-   intermediate background, border and shadow colors. */
+/* Theme changes only interpolate visual colors. Position, size and transform remain under
+   the Board interaction logic, so switching themes cannot disturb a drag or resize. */
+.theme-changing body,
+.theme-changing main,
+.theme-changing header,
+.theme-changing footer,
+.theme-changing nav,
+.theme-changing aside,
+.theme-changing button,
+.theme-changing [role="listbox"],
+.theme-changing [role="option"],
+.theme-changing [data-container],
 .theme-changing [data-group],
 .theme-changing [data-group-header],
-.theme-changing [data-tab-id] {
-  transition: none !important;
+.theme-changing [data-tab-id],
+.theme-changing [data-tab-content] {
+  transition-property: background-color, border-color, color, fill, stroke !important;
+  transition-duration: 140ms !important;
+  transition-timing-function: ease-out !important;
 }

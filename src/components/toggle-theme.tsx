@@ -13,10 +13,9 @@ export const ToggleTheme = () => {
     root.classList.add("theme-changing");
     setTheme(theme === "dark" ? "light" : "dark");
 
-    // Keep board color transitions disabled until next-themes has applied the new
-    // class and the browser has painted it. Interaction transitions work normally
-    // again immediately afterward.
-    window.setTimeout(() => root.classList.remove("theme-changing"), 100);
+    // Keep the transition scope alive until the color interpolation has completed.
+    // Board position, size and transform properties are intentionally excluded.
+    window.setTimeout(() => root.classList.remove("theme-changing"), 180);
   };
 
   return (

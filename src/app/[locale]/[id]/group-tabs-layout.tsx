@@ -21,12 +21,13 @@ const CAREER_TAB_ID = "introduce-career-tab";
 
 function IntroSplitEntrance() {
   const { boardDataState } = useBoardDataContext();
+  const initialPageIdRef = useRef(boardDataState.selectedPageId);
   const startedRef = useRef(false);
   const playedRef = useRef(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    if (boardDataState.selectedPageId !== "introduce" || startedRef.current || playedRef.current) return;
+    if (initialPageIdRef.current !== "introduce" || boardDataState.selectedPageId !== "introduce" || startedRef.current || playedRef.current) return;
 
     const controller = new AbortController();
     startedRef.current = true;
