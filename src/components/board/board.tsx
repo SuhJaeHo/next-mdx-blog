@@ -890,12 +890,60 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
   };
 
   useEffect(() => {
+    let activeTouchPointerId: number | null = null;
+
+    const dispatchTouchAsMouse = (type: "mousedown" | "mousemove" | "mouseup", event: PointerEvent, target: EventTarget = document) => {
+      target.dispatchEvent(
+        new MouseEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          clientX: event.clientX,
+          clientY: event.clientY,
+          button: 0,
+        })
+      );
+    };
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.pointerType === "mouse" || !(event.target instanceof Element)) return;
+      if (event.target.closest("button, a, input, select, textarea")) return;
+
+      const interactionTarget = event.target.closest<HTMLElement>("[data-tab-id], [data-group-header], [data-resize-handler-is-dragging]");
+      if (!interactionTarget) return;
+
+      activeTouchPointerId = event.pointerId;
+      event.preventDefault();
+      dispatchTouchAsMouse("mousedown", event, event.target);
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (event.pointerId !== activeTouchPointerId) return;
+      event.preventDefault();
+      dispatchTouchAsMouse("mousemove", event);
+    };
+
+    const finishTouchPointer = (event: PointerEvent) => {
+      if (event.pointerId !== activeTouchPointerId) return;
+      event.preventDefault();
+      dispatchTouchAsMouse("mouseup", event);
+      activeTouchPointerId = null;
+    };
+
     document.addEventListener("mousemove", handleMouseMoveContainer);
     document.addEventListener("mouseup", handleMouseUpContainer);
+    document.addEventListener("pointerdown", handlePointerDown, { passive: false });
+    document.addEventListener("pointermove", handlePointerMove, { passive: false });
+    document.addEventListener("pointerup", finishTouchPointer, { passive: false });
+    document.addEventListener("pointercancel", finishTouchPointer, { passive: false });
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMoveContainer);
       document.removeEventListener("mouseup", handleMouseUpContainer);
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("pointerup", finishTouchPointer);
+      document.removeEventListener("pointercancel", finishTouchPointer);
     };
   }, []);
 
@@ -1105,8 +1153,8 @@ const GroupHeader = React.forwardRef<React.ElementRef<"div">, IGroupHeaderProps>
     <div className={cn("relative min-w-0 w-full", className)} style={{ height: TAB_SIZES.HEIGHT }}>
       <div
         ref={setHeaderRef}
-        className="relative h-full min-w-0 w-full overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden"
-        style={{ scrollbarWidth: "none" }}
+        className="relative h-full min-w-0 w-full touch-none overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: "none", touchAction: "none" }}
         onMouseDown={handleMouseDown}
         onDoubleClick={handleDoubleClick}
         onScroll={updateScrollIndicators}
@@ -1221,8 +1269,8 @@ const Tab = React.forwardRef<React.ElementRef<"div">, ITabProps>(({ className, g
   return (
     <div
       ref={forwardedRef}
-      className={cn("absolute", className)}
-      style={{ width: TAB_SIZES.WIDTH, height: TAB_SIZES.HEIGHT, left: tabIdx * TAB_SIZES.WIDTH }}
+      className={cn("absolute touch-none", className)}
+      style={{ width: TAB_SIZES.WIDTH, height: TAB_SIZES.HEIGHT, left: tabIdx * TAB_SIZES.WIDTH, touchAction: "none" }}
       onMouseDown={handleMouseDown}
       id={tabId}
       data-group-id={groupId}
@@ -1307,7 +1355,8 @@ const ResizeHandlers = ({ groupId }: { groupId: string }) => {
         .map((direction) => (
           <div
             key={direction}
-            className={cn(resizeHandlerVariants({ direction }))}
+            className={cn("touch-none", resizeHandlerVariants({ direction }))}
+            style={{ touchAction: "none" }}
             onMouseDown={handleMouseDown}
             data-group-id={groupId}
             data-direction={RESIZE_DIRECTIONS[direction]}
