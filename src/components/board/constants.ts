@@ -24,7 +24,7 @@ export enum TAB_MOVE_STATUS {
 export enum CUSTOM_ZINDEX {
   DEFAULT = "initial",
   FOREGROUND = "10",
-  OVERLAY = "20",
+  OVERLAY = "60",
 }
 
 export const GROUP_RESIZE_SNAP_DURATION_MS = 200;

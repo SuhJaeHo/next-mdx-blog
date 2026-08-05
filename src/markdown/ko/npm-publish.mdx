@@ -2,7 +2,7 @@
 
 Board는 이동과 크기 조절이 가능한 패널 안에서 탭을 재정렬하는 이 포트폴리오의 인터랙션 모델로 시작했습니다. 포트폴리오 콘텐츠와 재사용 가능한 기반을 분리한 뒤 NPM 패키지로 배포했습니다.
 
-[`group-tabs-layout` NPM 페이지 보기](https://www.npmjs.com/package/group-tabs-layout)
+[`group-tabs-layout` NPM 페이지](https://www.npmjs.com/package/group-tabs-layout)
 
 ## Rollup을 선택한 이유
 
@@ -30,7 +30,7 @@ CommonJS 모듈을 Rollup이 분석할 수 있는 ES Module로 변환합니다.
 
 ### Peer dependency와 `external`
 
-React 컴포넌트 라이브러리의 React와 React DOM은 peer dependency로 선언해야 합니다. 사용하는 애플리케이션이 런타임을 제공하므로 React가 중복 번들링되는 것을 방지할 수 있습니다.
+React 컴포넌트 라이브러리의 React와 React DOM은 peer dependency로 선언해야 합니다. 사용하는 어플리케이션이 런타임을 제공하므로 React가 중복 번들링되는 것을 방지할 수 있습니다.
 
 peer dependency 선언만으로 Rollup의 제외가 보장되지는 않으므로 빌드 설정에서도 `external`로 지정해야 합니다.
 

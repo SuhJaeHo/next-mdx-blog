@@ -15,27 +15,28 @@ A frontend engineer who identifies operational problems and drives them through 
 
 ## [NEXUS](https://www.homepage.nexus/) · Frontend Engineer
 
-**Feb 2025 – May 2026**
+Feb 2025 – May 2026
 
-### Cross Public Sale
+### Cross Public Sale · Token Sale Service
 
 <div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Zustand</span><span>Framer Motion</span></div>
 
 - Delivered project setup, design requirements, wallet integration, RPC, KYC, and smart-contract calls within one week
-- Diagnosed data delays caused by public RPC rate limits and migrated to a JWT-authenticated private RPC
-- Completed a public sale worth approximately **KRW 20 billion without a critical incident**
-- Recorded zero data-retrieval delays after the RPC migration
+- Built a validation layer with React Hook Form and Zod, separating base input rules into schemas and ensuring data consistency through dynamic validation against live balance and remaining-sale data plus final validation before submission
+- Diagnosed blockchain query delays caused by public RPC rate limits and migrated to a JWT-authenticated private RPC, improving the reliability of balance and token queries
+- Completed a public sale worth approximately KRW 20 billion without a critical incident
 
 ### CrossX · WebView Hybrid Wallet
 
 <div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Rive</span><span>Framer Motion</span><span>Turborepo</span></div>
 
-- Designed a Web–Native bridge that standardized RN WebView messaging as Promise-based functions
+- Led implementation of the wallet's core user flows and developed key screens for asset and token lookup, transfers, receiving, transaction history and details, and settings
+- Message-based bridge communication
 - Made the RN Bridge compatible with TanStack Query's QueryFn, unifying bridge communication and server APIs under the same asynchronous state-management model
-- Built a virtual history stack for a single-route SPA and connected screen state to Android hardware back events
-- Synchronized current and previous screen offsets with drawer drag progress for native-quality navigation gestures
+- Designed a History API-based virtual history stack for a single-route SPA, connecting Android hardware back navigation with per-screen state
+- Synchronized lower Drawer offsets with the upper Drawer's drag progress in a stacked Drawer UI to create natural screen-transition gestures
 - Applied tag-based deployment to a Turborepo monorepo, enabling branch-independent builds and deployments per environment and service while improving maintainability and development efficiency through shared-module packaging
-- Released on both iOS and Android, reaching **more than 100,000 cumulative downloads**
+- Released on both iOS and Android, reaching more than 100,000 cumulative downloads
 
 ### Cross Exchange · Game-Token Exchange
 
@@ -44,19 +45,27 @@ A frontend engineer who identifies operational problems and drives them through 
 - Unified duplicated transaction flows through an adapter injected into the SDK
 - Led migration from a monorepo to an independent project
 - Introduced Feature-Sliced Design (FSD) across the project, organizing it into app, pages, widgets, features, entities, and shared layers to strengthen feature-level cohesion and minimize file conflicts during team collaboration
-- Built automatic generation of DTOs, entities, and repositories from Swagger specifications
-- Preserved existing features while **reducing the total codebase by approximately 30%**
-- Externalized market configuration to S3, eliminating code changes and redeployment for new markets
+- Built a structure that analyzes Swagger specifications to generate baseline DTO, Entity, and Repository code, and encapsulated API response mapping in the Repository layer to minimize the propagation of server schema changes into UI components
+- Unified mobile- and desktop-specific components and business logic, and redefined the responsibilities of local and global state to reduce the codebase by approximately 30% while preserving existing functionality
+- Migrated per-market API and WebSocket endpoints from environment variables to S3-hosted external configuration, eliminating code changes and redeployment when adding a market
 
 ### Cross STAKING · Token Staking Service
 
 <div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>Rive</span><span>Zod</span></div>
 
-- Rebuilt an internal AI-generated prototype to match Figma designs and production requirements
-- Added configurable date and time controls for validating operational phase transitions in advance
-- Fixed layout, wallet integration, and core features within five days of handoff and launched on schedule
+- Enhanced the key screens and features of an internal AI-generated prototype to match Figma designs and service requirements
+- Built date and time controls in the test environment to validate screen and feature transitions for each operational period
+- Resolved layout defects and wallet-integration issues within five days of handoff, completed the core features, and launched on schedule
 
-### Cross Points · Points Service (Discontinued)
+### Cross Forge · Bonding-Curve Token Platform
+
+<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Wagmi</span><span>Viem</span><span>Privy</span><span>Lightweight Charts</span><span>TanStack Query</span><span>Zod</span></div>
+
+- Abstracted five wallet SDKs—including CROSS Embedded SDK, MetaMask, Privy, and Reown AppKit—behind a unified interface, providing consistent signing and transaction flows regardless of connection method
+- Compensated for indexer update latency with Optimistic UI and API polling, showing the expected state immediately after a transaction and safely reconciling it with the actual query result
+- Introduced Feature-Sliced Design and reorganized the project into app, pages, widgets, features, entities, and shared layers, clarifying feature ownership and dependency boundaries to improve maintainability and collaboration
+
+### Cross Points · Points Service
 
 <div className="project-tech"><span>Next.js</span><span>Rive</span><span>shadcn/ui</span><span>Tailwind CSS</span></div>
 
@@ -66,7 +75,7 @@ A frontend engineer who identifies operational problems and drives them through 
 
 ## [Wemade](https://www.wemade.com/en) · Frontend Engineer
 
-**Sep 2022 – Feb 2025**
+Sep 2022 – Feb 2025
 
 ### Pnix Exchange · Multi-Market Order-Book DEX
 
@@ -74,13 +83,12 @@ A frontend engineer who identifies operational problems and drives them through 
 
 - Owned the web frontend in a two-person team from initial DEX architecture through launch and maintenance
 - Integrated historical market APIs and live WebSocket streams through the TradingView DataFeed interface
-- Applied ref-based buffering and batched updates to high-frequency order-book traffic, preventing frame drops
-- Controlled event subscriptions with the Page Visibility API, reducing frame drops caused by processing messages accumulated while the page was in the background
-- Designed React keys around price levels so animations ran only for quantity changes at the same price, minimizing unnecessary re-renders
-- Traced skipped CSS transitions to style changes accumulating within the same frame and moved the interaction to rAF-based animation for reliable state transitions
-- Used `useDeferredValue` to separate rendering priorities and preserve tab responsiveness during rapid trades
+- Buffered high-frequency WebSocket order-book data in refs and applied it in 500ms batches, reducing frame drops and render latency during large-scale traffic bot tests
+- Used the Page Visibility API to control real-time subscriptions and UI updates in inactive tabs, reducing frame drops caused by accumulated-message processing when returning to the tab
+- Designed React keys around order prices and updated only changed rows, preserving quantity-change animations while minimizing unnecessary component recreation and re-renders
+- Diagnosed CSS transitions skipped by style changes accumulating within the same frame and moved to requestAnimationFrame-based animation for reliable state transitions
+- Used useDeferredValue to separate rendering priorities and preserve tab responsiveness during rapid trades
 - Reduced reliance on heavyweight UI frameworks such as MUI by designing a reusable, custom-hook-based table header component, optimizing bundle size and increasing styling flexibility
-- Maintained stable order-book rendering under bot tests simulating large-scale traffic
 
 ### 40 Wonders
 
@@ -99,23 +107,27 @@ A frontend engineer who identifies operational problems and drives them through 
 <div className="portfolio-grid">
   <a className="portfolio-card" href="https://www.crosstoken.sale" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/cross-public-sale.jpg" alt="Cross Public Sale" />
-    <span className="portfolio-card-body"><strong>Cross Public Sale</strong><span>Web3 public sale · KYC · RPC · smart-contract integration</span></span>
+    <span className="portfolio-card-body"><span>Cross Public Sale</span><span>Web3 public sale · KYC · RPC · smart-contract integration</span></span>
   </a>
   <a className="portfolio-card" href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=en" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/crossx.png" alt="CrossX" />
-    <span className="portfolio-card-body"><strong>CrossX</strong><span>WebView hybrid wallet · over 100K downloads</span></span>
+    <span className="portfolio-card-body"><span>CrossX</span><span>WebView hybrid wallet · over 100K downloads</span></span>
   </a>
   <a className="portfolio-card" href="https://x.crosstoken.io" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/cross-exchange.png" alt="Cross Exchange" />
-    <span className="portfolio-card-body"><strong>Cross Exchange</strong><span>Game-token exchange · transaction architecture and market automation</span></span>
+    <span className="portfolio-card-body"><span>Cross Exchange</span><span>Game-token exchange · transaction architecture and market automation</span></span>
   </a>
   <a className="portfolio-card" href="https://stake.ogfcorp.com" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/cross-staking.png" alt="Cross STAKING" />
-    <span className="portfolio-card-body"><strong>Cross STAKING</strong><span>Token staking · scheduled operational feature transitions</span></span>
+    <span className="portfolio-card-body"><span>Cross STAKING</span><span>Token staking · scheduled operational feature transitions</span></span>
+  </a>
+  <a className="portfolio-card" href="https://www.onechain.nexus/forge" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/cross-forge.png" alt="Cross Forge" />
+    <span className="portfolio-card-body"><span>Cross Forge</span><span>Bonding-curve token platform</span></span>
   </a>
   <a className="portfolio-card" href="https://pnix.exchange" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/pnix-exchange.png" alt="Pnix Exchange" />
-    <span className="portfolio-card-body"><strong>Pnix Exchange</strong><span>Multi-market order-book DEX · real-time data optimization</span></span>
+    <span className="portfolio-card-body"><span>Pnix Exchange</span><span>Multi-market order-book DEX · real-time data optimization</span></span>
   </a>
 </div>
 

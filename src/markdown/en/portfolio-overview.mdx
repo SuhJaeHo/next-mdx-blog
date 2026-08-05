@@ -1,38 +1,37 @@
 # Building This Portfolio
 
-This is not a portfolio assembled from a fixed template. I designed and built the Board interface myself, published its reusable foundation as an NPM package, and combined it with MDX to create a portfolio that can continue to grow with my career.
+This is not a portfolio assembled from a fixed template. Inspired by Chrome-style tabs, I designed an **interactive workspace** where documents can be arranged and compared freely. I call the core component responsible for the entire layout and its interactions the **Board**.
 
-> The portfolio itself demonstrates how I define a problem, design interactions, build reusable architecture, ship it, and improve it through real use.
+> This project presents not only the finished interface, but also how I designed its browser interactions, built and shipped a reusable foundation, and continued improving it through use.
 
 ## What I Built
 
-- **Interactive Board UI** — movable and resizable panels inspired by browser tabs and tiling window managers
-- **Advanced interactions** — tab reordering, panel splitting and merging, edge snapping, and fullscreen restoration
+- **Chrome-style tab interactions** — implemented tab reordering, splitting into independent panels, and merging them back together
+- **Layout engine built with Vanilla DOM APIs** — implemented eight-direction resizing, group movement, and tab reorder, split, and merge without an external drag library
+- **Boundary-aware layout** — panels and tabs snap to half-screen regions at viewport edges, with fullscreen and previous-state restoration
 - **Reusable package** — isolated the Board foundation and published it through NPM for use beyond this site
 - **MDX content system** — separated content from interface logic so new writing can be added without rebuilding the Board
 - **Localized portfolio** — presents my profile, professional experience, and portfolio implementation notes in English, Korean, and Japanese
 
 ## Why This Format
 
-A conventional portfolio presents every visitor with the same fixed sequence. I wanted a format that better reflects how I work: explore several contexts, reorganize information, and focus on the part that matters now.
+An introduction, professional experience, and implementation notes carry different priorities depending on the visitor. I decided that opening and arranging the relevant documents would serve this portfolio better than a single, fixed scrolling sequence.
 
-The Board treats each document as a tab. A recruiter can keep my introduction and experience side by side, while an engineer can open the implementation notes behind the portfolio itself.
+Each document opens as an independent tab. Visitors can compare my introduction and experience side by side or split an implementation note into its own panel. The Board is the **layout and interaction engine** that enables this way of exploring the content.
 
 ## How the Pieces Connect
 
 | Layer | Responsibility |
 | --- | --- |
-| Board | Manages panels, tabs, drag, resize, split, merge, and focus |
-| NPM package | Makes the interaction model reusable outside this portfolio |
+| Board | Manages the full-screen layout, tab and panel movement, eight-direction resizing, split, merge, and focus |
+| NPM package | Makes the Chrome-style tab and panel interaction model reusable in other projects |
 | MDX | Stores career documents and technical writing independently from UI code |
 | Locale content | Provides English, Korean, and Japanese versions without resetting Board state |
 | Next.js | Pre-renders routes and delivers the portfolio as an actual maintained product |
 
-## The Story in This Section
+## Document Structure
 
 1. **Overview** explains why this portfolio exists and what it demonstrates.
 2. **Board Package** covers how the reusable UI was packaged and published.
 3. **MDX Integration** explains how documents are connected to tabs.
 4. **DOCS** shows how another developer can install and use the package.
-
-I use this portfolio as both a career presentation and a living record of what I learn. The format is therefore not decoration around the content—it is one of the projects I want to present.

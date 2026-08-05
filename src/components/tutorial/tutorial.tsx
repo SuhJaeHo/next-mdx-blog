@@ -300,7 +300,7 @@ function TutorialOverlay({ step, stepIndex, total, rect, tooltipAnchorRect, isPl
       />
       <div
         data-tutorial-controls
-        className="fixed z-50 rounded-lg border border-border bg-background p-4 text-foreground shadow-2xl transition-[top,left] duration-300 ease-out"
+        className="fixed z-[80] rounded-lg border border-border bg-background p-4 text-foreground shadow-2xl transition-[top,left] duration-300 ease-out"
         style={{ width: TOOLTIP_WIDTH, willChange: "top, left", ...tooltipStyle }}
       >
         <div className={arrowClassName} />

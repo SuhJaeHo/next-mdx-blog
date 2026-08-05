@@ -15,27 +15,28 @@
 
 ## [NEXUS](https://www.homepage.nexus/) · フロントエンドエンジニア
 
-**2025年2月 – 2026年5月**
+2025年2月 – 2026年5月
 
-### Cross Public Sale
+### Cross Public Sale · トークンセールサービス
 
 <div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Zustand</span><span>Framer Motion</span></div>
 
 - 1週間でプロジェクト設定、デザイン要件、ウォレット連携、RPC、KYC、スマートコントラクト呼び出しを実装
-- パブリックRPCのRate Limitによる遅延を分析し、JWT認証のプライベートRPCへ移行
-- 約**200億ウォン規模のPublic Saleを重大な障害なく完了**
-- RPC移行後のデータ取得遅延は0件
+- React Hook FormとZodによる検証レイヤーを構築し、基本入力ルールをスキーマへ分離。残高・販売残量などのリアルタイムデータを反映した動的検証と送信直前の再検証によりデータ整合性を確保
+- パブリックRPCのRate Limitによるブロックチェーン照会遅延の原因を分析し、JWT認証のプライベートRPCへ移行することで、残高・トークン照会の安定性を改善
+- 約200億ウォン規模のPublic Saleを重大な障害なく完了
 
 ### CrossX · WebViewハイブリッドウォレット
 
 <div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Rive</span><span>Framer Motion</span><span>Turborepo</span></div>
 
-- RN WebViewのメッセージ通信をPromiseベースの関数に標準化したWeb–Nativeブリッジを設計
+- ウォレットサービスの主要ユーザーフロー実装を主導し、資産・トークン照会、送受信、トランザクション履歴・詳細、設定などの主要画面を担当
+- メッセージベースのブリッジ通信
 - RNブリッジをTanStack QueryのQueryFnと互換性のある形で設計し、ブリッジ通信をサーバーAPIと同じ非同期状態管理モデルへ統合
-- 単一ルートSPAに仮想履歴スタックを構築し、Androidのハードウェア戻る操作と画面状態を連携
-- ドロワーのドラッグ進捗に合わせて現在・前画面の位置を同期し、ネイティブ品質の画面遷移ジェスチャーを実現
+- 単一ルートSPAにHistory APIベースの仮想履歴スタックを設計し、Androidのハードウェア戻る操作と画面別状態を連携
+- スタック型Drawer UIで上位Drawerのドラッグ進捗に合わせて下位Drawerのオフセットを同期し、自然な画面遷移ジェスチャーを実現
 - TurborepoベースのモノレポにTag-Based Deployを導入し、ブランチに依存しない環境別・サービス別のビルド／デプロイ基盤を構築。共通モジュールのパッケージ化により保守性と開発効率を改善
-- iOS・Androidの両ストアでリリースし、**累計10万ダウンロード以上**を達成
+- iOS・Androidの両ストアでリリースし、累計10万ダウンロード以上を達成
 
 ### Cross Exchange · ゲームトークン取引所
 
@@ -44,19 +45,27 @@
 - 重複していたトランザクション処理をSDK注入型アダプターで統合
 - モノレポから独立プロジェクトへの移行を主導
 - Feature-Sliced Design（FSD）を全面導入し、プロジェクトをapp・pages・widgets・features・entities・sharedレイヤーに分割。機能単位の凝集度を高め、チーム開発時のファイル競合を最小化
-- Swagger仕様に基づくDTO・Entity・Repositoryの自動生成を構築
-- 既存機能を維持しながら**コード量を約30%削減**
-- マーケット設定をS3で外部管理し、新規マーケット追加時のコード修正と再デプロイを不要化
+- Swagger仕様を解析してDTO・Entity・Repositoryの基本コードを自動生成する仕組みを構築し、APIレスポンス変換をRepository層にカプセル化することで、サーバースキーマ変更がUIコンポーネントまで波及する範囲を最小化
+- モバイル・PC向けに分かれていたコンポーネントとビジネスロジックを統合し、ローカル・グローバル状態の責務を再定義することで、既存機能を維持しながらコード量を約30%削減
+- 環境変数で管理していたマーケット別のAPI・WebSocketアドレスをS3ベースの外部設定へ移行し、新規マーケット追加時のコード修正と再デプロイを不要化
 
 ### Cross STAKING · トークンステーキング
 
 <div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>Rive</span><span>Zod</span></div>
 
-- 社内AIエージェントのプロトタイプをFigmaとサービス要件に合わせて再実装
-- 運用フェーズの画面・機能切り替えを事前検証できる日時設定機能を構築
-- 引き継ぎ後5日以内にレイアウト、ウォレット連携、主要機能を改善し、期限内にリリース
+- 社内AIエージェントが生成した初期プロトタイプを基に、Figmaデザインとサービス要件に合わせて主要画面・機能を高度化
+- 運営期間別の画面・機能切り替えを検証できるよう、テスト環境に日時設定機能を構築
+- プロトタイプ引き継ぎ後5日以内にレイアウト不具合とウォレット連携の課題を解決し、主要機能を補完して期限内にリリース
 
-### Cross Points · ポイントサービス（サービス終了）
+### Cross Forge · ボンディングカーブ型トークンプラットフォーム
+
+<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Wagmi</span><span>Viem</span><span>Privy</span><span>Lightweight Charts</span><span>TanStack Query</span><span>Zod</span></div>
+
+- CROSS Embedded SDK、MetaMask、Privy、Reown AppKitなど5種類のウォレットSDKを統一インターフェースへ抽象化し、接続方式にかかわらず一貫した署名・トランザクションフローを提供
+- インデクサーの反映遅延をOptimistic UIとAPIポーリングで補い、トランザクション直後に予測状態を表示したうえで、実際の照会結果と安全に同期
+- Feature-Sliced Designを導入してプロジェクトをapp・pages・widgets・features・entities・sharedレイヤーへ再構成し、機能ごとの責務と依存境界を明確化して保守性と協業効率を改善
+
+### Cross Points · ポイントサービス
 
 <div className="project-tech"><span>Next.js</span><span>Rive</span><span>shadcn/ui</span><span>Tailwind CSS</span></div>
 
@@ -66,7 +75,7 @@
 
 ## [Wemade](https://www.wemade.com/en) · フロントエンドエンジニア
 
-**2022年9月 – 2025年2月**
+2022年9月 – 2025年2月
 
 ### Pnix Exchange · オーダーブック型マルチマーケットDEX
 
@@ -74,13 +83,12 @@
 
 - 2名チームでDEXの初期設計からリリース、運用保守までWebフロントエンドを担当
 - TradingView DataFeedに過去価格APIとリアルタイムWebSocketを連携した価格ストリーミングチャートを実装
-- 高頻度オーダーブックにrefベースのバッファリングとバッチ更新を適用し、フレームドロップを防止
-- Page Visibility APIでイベント購読を制御し、バックグラウンドで蓄積されたメッセージ処理によるフレームドロップを改善
-- 価格帯単位でReact keyを設計し、同一価格帯の数量変更時のみアニメーションを実行することで不要な再レンダリングを最小化
-- 同一フレーム内にスタイル変更が蓄積してCSSトランジションが無視される原因を分析し、rAFベースのアニメーションへ移行して安定した状態変化を実現
-- `useDeferredValue`でレンダリング優先度を分離し、取引更新中もタブ操作の応答性を維持
+- 高頻度WebSocketオーダーブックデータをrefベースのバッファに蓄積し、500ms単位でバッチ反映することで、大規模トラフィックのボットテストにおけるフレームドロップとレンダリング遅延を改善
+- Page Visibility APIを活用して非アクティブタブでのリアルタイムイベント購読とUI更新を制御し、タブ復帰時の蓄積メッセージ処理によるフレームドロップを改善
+- 注文価格を基準にReact keyを設計し、変更された注文行のみ更新することで、数量変更アニメーションを維持しながら不要なコンポーネント再生成と再レンダリングを最小化
+- 同一フレーム内にスタイル変更が蓄積してCSS Transitionが省略される原因を分析し、requestAnimationFrameベースのアニメーションへ移行して安定した状態遷移を実現
+- useDeferredValueでレンダリング優先度を分離し、取引更新中もタブ操作の応答性を維持
 - MUIなど重量級UIフレームワークへの依存を減らすため、カスタムフックベースの再利用可能なテーブルヘッダーコンポーネントを独自設計し、バンドルサイズの最適化とスタイリングの柔軟性向上を実現
-- 大規模トラフィックを想定したボットテストでも安定したレンダリングを維持
 
 ### 40 Wonders
 
@@ -99,23 +107,27 @@
 <div className="portfolio-grid">
   <a className="portfolio-card" href="https://www.crosstoken.sale" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/cross-public-sale.jpg" alt="Cross Public Sale" />
-    <span className="portfolio-card-body"><strong>Cross Public Sale</strong><span>Web3パブリックセール · KYC · RPC · コントラクト連携</span></span>
+    <span className="portfolio-card-body"><span>Cross Public Sale</span><span>Web3パブリックセール · KYC · RPC · コントラクト連携</span></span>
   </a>
   <a className="portfolio-card" href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ja" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/crossx.png" alt="CrossX" />
-    <span className="portfolio-card-body"><strong>CrossX</strong><span>WebViewハイブリッドウォレット · 累計10万ダウンロード</span></span>
+    <span className="portfolio-card-body"><span>CrossX</span><span>WebViewハイブリッドウォレット · 累計10万ダウンロード</span></span>
   </a>
   <a className="portfolio-card" href="https://x.crosstoken.io" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/cross-exchange.png" alt="Cross Exchange" />
-    <span className="portfolio-card-body"><strong>Cross Exchange</strong><span>ゲームトークン取引所 · トランザクション設計とマーケット自動化</span></span>
+    <span className="portfolio-card-body"><span>Cross Exchange</span><span>ゲームトークン取引所 · トランザクション設計とマーケット自動化</span></span>
   </a>
   <a className="portfolio-card" href="https://stake.ogfcorp.com" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/cross-staking.png" alt="Cross STAKING" />
-    <span className="portfolio-card-body"><strong>Cross STAKING</strong><span>トークンステーキング · 運用スケジュール別の機能切り替え</span></span>
+    <span className="portfolio-card-body"><span>Cross STAKING</span><span>トークンステーキング · 運用スケジュール別の機能切り替え</span></span>
+  </a>
+  <a className="portfolio-card" href="https://www.onechain.nexus/forge" target="_blank" rel="noreferrer">
+    <img src="/images/portfolio/cross-forge.png" alt="Cross Forge" />
+    <span className="portfolio-card-body"><span>Cross Forge</span><span>ボンディングカーブ型トークンプラットフォーム</span></span>
   </a>
   <a className="portfolio-card" href="https://pnix.exchange" target="_blank" rel="noreferrer">
     <img src="/images/portfolio/pnix-exchange.png" alt="Pnix Exchange" />
-    <span className="portfolio-card-body"><strong>Pnix Exchange</strong><span>オーダーブック型マルチマーケットDEX · リアルタイムデータ最適化</span></span>
+    <span className="portfolio-card-body"><span>Pnix Exchange</span><span>オーダーブック型マルチマーケットDEX · リアルタイムデータ最適化</span></span>
   </a>
 </div>
 
