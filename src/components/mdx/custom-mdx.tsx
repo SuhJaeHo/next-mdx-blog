@@ -16,6 +16,10 @@ interface ICustomMDXProps extends React.ComponentPropsWithoutRef<"div"> {
 
 const components = {
   pre: (props: any) => <CodeBlock {...props} />,
+  a: ({ href, rel, target, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+    const isExternal = typeof href === "string" && /^https?:\/\//.test(href);
+    return <a href={href} target={isExternal ? "_blank" : target} rel={isExternal ? "noreferrer noopener" : rel} {...props} />;
+  },
 };
 
 export default function CustomMDX({ className, mdxContent, groupId, contentFile }: ICustomMDXProps) {

@@ -219,10 +219,18 @@ const resetGroupTabsTranslate = (groupHeaderElement: HTMLElement, currTabElement
 };
 
 const setGroupElementForeground = (currGroupId: string) => {
-  const groupElements = document.querySelectorAll("[data-group]");
+  const groupElements = Array.from(document.querySelectorAll<HTMLElement>("[data-group]"));
+  const currentGroupElement = groupElements.find((groupElement) => groupElement.id === currGroupId);
+  if (!currentGroupElement || currentGroupElement.getAttribute("data-foreground") === "true") return;
+
+  const maxZIndex = groupElements.reduce((max, groupElement) => {
+    const zIndex = Number.parseInt(groupElement.style.zIndex, 10);
+    return Number.isFinite(zIndex) ? Math.max(max, zIndex) : max;
+  }, Number(CUSTOM_ZINDEX.FOREGROUND) - 1);
+
   groupElements.forEach((groupElement) => {
     const isForeground = groupElement.id === currGroupId;
-    (groupElement as HTMLElement).style.zIndex = isForeground ? CUSTOM_ZINDEX.FOREGROUND : CUSTOM_ZINDEX.DEFAULT;
+    if (isForeground) groupElement.style.zIndex = String(maxZIndex + 1);
     // Drives the subtle foreground styling (border/shadow) in group-tabs-layout.tsx via a data-attribute selector,
     // since zIndex itself is only ever set imperatively and isn't otherwise observable from CSS.
     groupElement.setAttribute("data-foreground", String(isForeground));

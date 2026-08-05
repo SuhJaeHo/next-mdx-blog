@@ -824,11 +824,6 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
               window.setTimeout(clearSnapTransition, GROUP_RESIZE_SNAP_DURATION_MS + 100);
             });
           });
-        } else {
-          const groupElements = document.querySelectorAll("[data-group]");
-          groupElements.forEach((groupElement) => {
-            (groupElement as HTMLElement).style.zIndex = CUSTOM_ZINDEX.DEFAULT;
-          });
         }
 
         boardLayoutDispatch({
