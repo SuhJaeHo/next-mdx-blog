@@ -17,7 +17,7 @@ import { CUSTOM_ZINDEX, GROUP_RESIZE_SNAP_DURATION_MS, RESIZE_DIRECTIONS, TAB_MO
 import { IGroup, IPosition, IGroupIndicate } from "./types";
 import { cn } from "@lib/utils";
 import { cva } from "class-variance-authority";
-import { useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { BoardLayoutProvider, BoardLayoutConstants, useBoardLayoutContext } from "./board-layout-provider";
 import { BoardDataProvider, BoardDataState, useBoardDataContext } from "./board-data-provider";
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
@@ -142,15 +142,18 @@ Nav.displayName = "Nav";
 interface INavListProps extends React.HTMLAttributes<HTMLElement> {}
 
 const NavList = React.forwardRef<React.ElementRef<"div">, INavListProps>(({ className }, forwardedRef) => {
-  const params = useParams<{ locale: string; id: string }>();
+  const pathname = usePathname();
   const { boardDataState, boardDataDispatch } = useBoardDataContext();
   const { locale } = useLocaleController();
   const t = useTranslations("Navigation");
   const currentPageId = boardDataState.selectedPageId;
+  const pathnamePageId = pathname.split("/").filter(Boolean).at(-1);
 
   useEffect(() => {
-    boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId: params.id } });
-  }, [boardDataDispatch, params.id]);
+    if (pathnamePageId && boardDataState.page[pathnamePageId]) {
+      boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId: pathnamePageId } });
+    }
+  }, [boardDataDispatch, boardDataState.page, pathnamePageId]);
 
   const handleClickNavItem = (pageId: string) => {
     boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId } });
@@ -276,7 +279,7 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
 
     const hasActiveInteraction = () =>
       !!document.querySelector(
-        '[data-tutorial-active], [data-tab-is-dragging="true"], [data-resize-handler-is-dragging="true"], [data-group-header-is-dragging="true"]'
+        '[data-tutorial-active], [data-intro-split-active], [data-tab-is-dragging="true"], [data-resize-handler-is-dragging="true"], [data-group-header-is-dragging="true"]'
       );
 
     const scheduleCorrection = (width: number, height: number) => {
@@ -772,21 +775,55 @@ const Panel: React.FC<React.PropsWithChildren<IPanelProps>> = ({ autoFitIntroduc
           resetGroupTabsTranslate(currGroupHeaderElement, currTabElement);
 
           const newGroupId = uuidv4();
+          const targetIndicator = groupIndicateRef.current;
+          const sourceBounds = {
+            x: currGroupElement.offsetLeft,
+            y: currGroupElement.offsetTop,
+            width: currGroupElement.offsetWidth,
+            height: currGroupElement.offsetHeight,
+          };
           boardDataDispatch({
             type: "DIVIDE_GROUP",
             payload: {
               pageId: groupPageId,
               groupId: currGroupId,
               tabId: currTabElement.id,
-              position: groupIndicateRef.current.position,
-              size: groupIndicateRef.current.size,
+              position: targetIndicator.position,
+              size: targetIndicator.size,
               newGroupId,
             },
           });
 
-          // The new group only exists in the DOM after this state update is committed,
-          // so defer bringing it to the foreground until the next paint.
-          requestAnimationFrame(() => setGroupElementForeground(newGroupId));
+          // The divided group is mounted at its final half-panel bounds. Rewind it
+          // to the source bounds before the next paint, then animate the resize to
+          // the edge indicator just like a group snap.
+          requestAnimationFrame(() => {
+            const newGroupElement = document.getElementById(newGroupId);
+            if (!newGroupElement) return;
+
+            setGroupElementForeground(newGroupId);
+            newGroupElement.style.setProperty("transition", "none", "important");
+            newGroupElement.style.left = `${sourceBounds.x}px`;
+            newGroupElement.style.top = `${sourceBounds.y}px`;
+            newGroupElement.style.width = `${sourceBounds.width}px`;
+            newGroupElement.style.height = `${sourceBounds.height}px`;
+
+            requestAnimationFrame(() => {
+              const clearSnapTransition = (event?: TransitionEvent) => {
+                if (event && event.target !== newGroupElement) return;
+                newGroupElement.style.transition = "";
+                newGroupElement.removeEventListener("transitionend", clearSnapTransition);
+              };
+
+              newGroupElement.addEventListener("transitionend", clearSnapTransition);
+              newGroupElement.style.setProperty("transition", GROUP_RESIZE_SNAP_TRANSITION, "important");
+              newGroupElement.style.left = `${targetIndicator.position.x}px`;
+              newGroupElement.style.top = `${targetIndicator.position.y}px`;
+              newGroupElement.style.width = `${targetIndicator.size.width}px`;
+              newGroupElement.style.height = `${targetIndicator.size.height}px`;
+              window.setTimeout(clearSnapTransition, GROUP_RESIZE_SNAP_DURATION_MS + 100);
+            });
+          });
         } else {
           const groupElements = document.querySelectorAll("[data-group]");
           groupElements.forEach((groupElement) => {
