@@ -67,11 +67,32 @@ body {
   }
 }
 
-div {
+[data-tab-id],
+[data-group-header],
+[data-resize-handler-is-dragging],
+[data-tab-drag-preview] {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+::selection {
+  background-color: hsla(var(--indicator), 0.38);
+  color: inherit;
+}
+
+::-moz-selection {
+  background-color: hsla(var(--indicator), 0.38);
+  color: inherit;
+}
+
+.markdown-body,
+.markdown-body * {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
 }
 
 /* Theme changes only interpolate visual colors. Position, size and transform remain under

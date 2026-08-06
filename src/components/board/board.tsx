@@ -1231,7 +1231,12 @@ const TabContent = React.forwardRef<React.ElementRef<"div">, ITabContentProps>((
   const mdxContent = mdxSources ? mdxSources[contentFile] : null;
 
   return (
-    <div ref={forwardedRef} className={cn("overflow-auto", className)}>
+    <div
+      ref={forwardedRef}
+      className={cn("overflow-auto", className)}
+      style={{ userSelect: "text", WebkitUserSelect: "text" }}
+      onMouseDown={(event) => event.stopPropagation()}
+    >
       {!mdxContent ? <div>{children}</div> : React.cloneElement(children as React.ReactElement, { groupId: id, mdxContent, contentFile })}
     </div>
   );
