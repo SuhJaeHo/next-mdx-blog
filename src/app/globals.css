@@ -95,6 +95,35 @@ body {
   user-select: text !important;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsla(var(--indicator), 0.38) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  min-width: 36px;
+  min-height: 36px;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: hsla(var(--indicator), 0.34);
+  background-clip: padding-box;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background: hsla(var(--indicator), 0.58);
+  background-clip: padding-box;
+}
+
 /* Theme changes only interpolate visual colors. Position, size and transform remain under
    the Board interaction logic, so switching themes cannot disturb a drag or resize. */
 .theme-changing body,
