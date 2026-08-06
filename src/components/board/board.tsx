@@ -964,12 +964,24 @@ const GroupIndicate = React.forwardRef<React.ElementRef<"div">, IGroupIndicatePr
   const { boardLayoutState } = useBoardLayoutContext();
   const groupIndicateStatus = boardLayoutState.groupIndicate;
   const { position, size } = groupIndicateStatus || {};
+  const [indicatorZIndex, setIndicatorZIndex] = React.useState(Number(CUSTOM_ZINDEX.FOREGROUND) + 1);
+
+  useLayoutEffect(() => {
+    if (!groupIndicateStatus) return;
+
+    const maxGroupZIndex = Array.from(document.querySelectorAll<HTMLElement>("[data-group]")).reduce((max, groupElement) => {
+      const zIndex = Number.parseInt(groupElement.style.zIndex, 10);
+      return Number.isFinite(zIndex) ? Math.max(max, zIndex) : max;
+    }, Number(CUSTOM_ZINDEX.FOREGROUND));
+
+    setIndicatorZIndex(maxGroupZIndex + 1);
+  }, [groupIndicateStatus]);
 
   return (
     <div
       ref={forwardedRef}
-      className={cn("absolute z-20", className, !groupIndicateStatus && "hidden")}
-      style={{ top: position?.y, left: position?.x, width: size?.width, height: size?.height }}
+      className={cn("pointer-events-none absolute", className, !groupIndicateStatus && "hidden")}
+      style={{ top: position?.y, left: position?.x, width: size?.width, height: size?.height, zIndex: indicatorZIndex }}
       {...props}
     >
       {children}
