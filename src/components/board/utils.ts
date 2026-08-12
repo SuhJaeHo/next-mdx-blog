@@ -221,12 +221,20 @@ const resetGroupTabsTranslate = (groupHeaderElement: HTMLElement, currTabElement
 const setGroupElementForeground = (currGroupId: string) => {
   const groupElements = Array.from(document.querySelectorAll<HTMLElement>("[data-group]"));
   const currentGroupElement = groupElements.find((groupElement) => groupElement.id === currGroupId);
-  if (!currentGroupElement || currentGroupElement.getAttribute("data-foreground") === "true") return;
+  if (!currentGroupElement) return;
 
   const maxZIndex = groupElements.reduce((max, groupElement) => {
     const zIndex = Number.parseInt(groupElement.style.zIndex, 10);
     return Number.isFinite(zIndex) ? Math.max(max, zIndex) : max;
   }, Number(CUSTOM_ZINDEX.FOREGROUND) - 1);
+
+  const currentZIndex = Number.parseInt(currentGroupElement.style.zIndex, 10);
+  const isActuallyForeground =
+    currentGroupElement.getAttribute("data-foreground") === "true" &&
+    Number.isFinite(currentZIndex) &&
+    currentZIndex === maxZIndex;
+
+  if (isActuallyForeground) return;
 
   groupElements.forEach((groupElement) => {
     const isForeground = groupElement.id === currGroupId;

@@ -1,158 +1,628 @@
-# 직무경력
+<header className="resume-hero">
+  <div className="resume-identity">
+    <strong>서재호</strong>
+    <span>프론트엔드 엔지니어</span>
+  </div>
+  <div className="resume-contact">
+    <span>Phone : <a href="tel:+821050606277">+82 10-5060-6277</a></span>
+    <span>Email : <a href="mailto:seojaeho118@gmail.com">seojaeho118@gmail.com</a></span>
+    <span>Links : <a href="https://github.com/SuhJaeHo" target="_blank" rel="noreferrer">GITHUB</a></span>
+  </div>
+</header>
 
-## 서재호 · 프론트엔드 엔지니어
+<p className="resume-summary">
+  <strong>확장성과 유지보수성을 고려한 프론트엔드 구조 설계하고자 노력합니다.</strong><br />
+  환경 변수로 관리하던 마켓별 API·WS 주소를 S3 기반 외부 설정으로 이전해, 마켓 추가 및 삭제 시 재배포 없이 설정 변경만으로 즉시 적용 가능한 구조로 개선했습니다. 또한 서비스별로 분산된 App Launcher를 공통 컴포넌트 패키지와 S3 기반 단일 설정으로 통합해 12개 서비스에 일관되게 적용했습니다.
+</p>
 
-고빈도 실시간 데이터와 Web3 트랜잭션 환경에서 운영 이슈를 스스로 정의하고 끝까지 해결하는 프론트엔드 엔지니어입니다. 약 4년간 블록체인 기반 웹 서비스와 WebView 어플리케이션을 개발하며 설계부터 출시와 운영까지 경험했습니다.
+<p className="resume-summary">
+  <strong>사용자 경험을 고려하며 비즈니스 성장을 위해 개선할 수 있는 것에 대해 고민합니다.</strong><br />
+  앱 지갑 주문 시 서명 응답 유실로 Pending 상태가 지속되는 문제를 TX Hash와 WS 주문 데이터 동기화 로직으로 해결했습니다. 이를 통해 모바일 지갑 환경의 주문 경험을 개선했으며, DAU 약 78% 증가 및 거래량 약 3배 성장에 기여했습니다.
+</p>
 
-## 기술
+## PROFESSIONAL EXPERIENCE
 
-- **언어** TypeScript, JavaScript, Python
-- **프론트엔드** React, Next.js, Zustand, Redux Toolkit, TanStack Query
-- **Web3** Wagmi, Ethers.js, Viem, WalletConnect, Reown AppKit
-- **실시간 처리 및 시각화** WebSocket, TradingView, Canvas API, Rive
-- **UI 및 스타일링** Tailwind CSS, Emotion, MUI, Framer Motion
-- **도구 및 인프라** Jira, Confluence, Slack, Figma, GitHub Actions
+<section className="professional-experience">
 
-## [넥써쓰](https://www.homepage.nexus/) · 프론트엔드 개발
+### [넥써쓰](https://www.homepage.nexus/)（2025.02 ～ 2026.05） 팀원 • 웹 프론트엔드 개발팀
 
-2025.02 – 2026.05
+#### 서비스 아키텍처 및 운영 안정성 개선
 
-### [Cross Public Sale](https://www.crosstoken.sale) · 토큰 세일 서비스
+- FSD(Feature-Sliced Design) 아키텍처를 도입하여 기능 단위 응집도를 높여 팀 협업 시 파일 충돌 최소화
+- 환경 변수로 관리하던 마켓별 API·WS 주소를 S3 기반 외부 설정으로 이전하여 마켓 추가 시 재배포 없이 설정 변경만으로 즉시 적용 가능한 구조로 개선
+- 서비스별 분산된 App Launcher를 공통 컴포넌트 패키지와 S3 기반 단일 설정 구조로 통합해 12개 서비스에 공통 적용
 
-<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Zustand</span><span>Framer Motion</span></div>
+#### [Cross Public Sales](https://www.crosstoken.sale) · 토큰 세일 서비스
 
-- 일주일 안에 프로젝트 셋업, 디자인 요구사항, 지갑 연동, RPC, KYC, 컨트랙트 호출 로직 구현
-- React Hook Form과 Zod 기반 검증 계층을 구성해 기본 입력 규칙을 스키마로 분리하고, 잔액·잔여 판매량 등 실시간 조회값을 반영한 동적 검증과 제출 직전 재검증으로 데이터 정합성 확보
-- 퍼블릭 RPC Rate Limit으로 발생한 블록체인 조회 지연의 원인을 분석하고, JWT 인증 기반 프라이빗 RPC로 전환해 잔액·토큰 조회 안정성 개선
-- 약 200억 원 규모의 Public Sale을 중대한 장애 없이 완료
+- EIP-4361(SIWE) 기반 지갑 서명 인증 플로우를 구현해 지갑 소유권 검증 및 인증 세션 구성
+- 쿠키 기반 지갑 연결 상태를 SSR에 반영해 하이드레이션 불일치를 제거하고 지갑 주소 즉시 복구 및 CLS 0 달성
+- 초기 로드에 불필요한 모듈을 코드 스플리팅하여 초기 JS 번들을 약 35%(330KB → 216KB) 축소
+- 퍼블릭 RPC RATE LIMIT 원인을 분석하고 프라이빗 RPC로 전환해 Sale 진행 중 잔액·토큰 조회 오류 0건으로 유지
+- 일주일간 진행된 Public Sales에서 약 250억 원 규모의 판매를 안정적으로 운영하는 데 기여
 
-### [CrossX](https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko) · WebView 기반 하이브리드 지갑
+#### [CrossX](https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko) · RN WebView 기반 자사 지갑 어플리케이션
 
-<div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Rive</span><span>Framer Motion</span><span>Turborepo</span></div>
+- 웹뷰 기반의 하이브리드 앱을 iOS·Android 양대 마켓에 출시하여 누적 다운로드 10만+ 달성
+- RN 브릿지를 TanStack Query의 QueryFn과 호환되도록 설계해 브릿지 통신을 API와 동일한 비동기 상태 관리 모델로 통합
+- Drawer 드래그 진행률에 easing을 적용해 현재·이전 Drawer 오프셋을 동기화하고 네이티브와 유사한 화면 전환 제스처 구현
+- 공통 Pull-To-Refresh 컴포넌트를 구현해 스크롤 최상단 제스처 판별·당김 거리별 저항·햅틱 피드백을 통합하고 iOS 네이티브와 유사한 새로고침 인터랙션 구현
+- Turborepo 모노레포에 Tag-Based Deploy를 적용해 브랜치 종속 없이 환경별·서비스별 독립 배포 체계 구축
 
-- 지갑 서비스의 핵심 사용자 플로우 구현을 주도하고, 자산·토큰 조회, 전송·수신, 트랜잭션 내역·상세 조회 및 설정 등 주요 화면 개발 담당
-- 메세지 기반 브릿지 통신
-- RN 브릿지를 TanStack Query의 QueryFn과 호환되도록 설계해 브릿지 통신을 서버 API와 동일한 비동기 상태 관리 모델로 통합
-- 단일 라우트 SPA에 History API 기반 가상 히스토리 스택을 설계해 Android 하드웨어 뒤로가기와 화면별 상태를 연동
-- 스택형 Drawer UI에서 상위 Drawer의 드래그 진행률에 따라 하위 Drawer 오프셋을 동기화해 자연스러운 화면 전환 제스처 구현
-- Turborepo 기반 모노레포에 Tag-Based Deploy를 적용해 브랜치에 종속되지 않는 환경별·서비스별 빌드 및 배포 체계를 구축하고, 공통 모듈 패키징으로 유지보수성과 개발 효율 개선
-- iOS·Android 양대 마켓 출시, 누적 다운로드 10만 건 이상
+#### [Cross Exchange](https://x.crosstoken.io) · 게임 토큰 거래소
 
-### [Cross Exchange](https://x.crosstoken.io) · 게임 토큰 거래소
+- 이중화된 트랜잭션 처리 로직을 분석해 SDK에 adapter를 주입하는 구조로 개선하여 하나의 인터페이스로 통합
+- Parallel Routes 기반 모바일·PC 슬롯 구조를 레이아웃 레벨 분기로 단순화해 중복 컴포넌트를 통합하고 코드량 약 30% 절감
+- 마켓 변경 시 Axios 인스턴스의 엔드포인트 갱신 시점을 개선하여 중복 호출 3회 → 1회로 감소 및 이전 마켓 URL 요청 오류 해결
+- TanStack Query와 Zustand 간 중복 상태 관리 구조를 개선해 불필요한 전역 상태를 제거하고 전역 상태 변수 약 50% 절감
+- API 명세 기반 자동 생성 스크립트를 구축하여 업무 소요 시간 약 97%(30분 → 1분) 단축 및 휴먼 에러 방지
 
-<div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Monorepo</span></div>
-
-- 이중화된 트랜잭션 처리 로직을 분석하고 SDK에 어댑터를 주입하는 구조로 인터페이스 통합
-- 모노레포에서 독립 프로젝트로 마이그레이션 주도
-- Feature-Sliced Design(FSD)을 전면 도입해 프로젝트를 app·pages·widgets·features·entities·shared 레이어로 분리하고, 기능 단위 응집도를 높여 팀 협업 시 파일 충돌 최소화
-- Swagger 명세를 분석해 DTO·Entity·Repository 기본 코드를 자동 생성하는 구조를 구축하고, API 응답 변환을 Repository 계층에 캡슐화해 서버 스키마 변경이 UI 컴포넌트까지 전파되는 범위를 최소화
-- 모바일·PC로 분리된 컴포넌트와 비즈니스 로직을 통합하고, 로컬·글로벌 상태의 책임을 재정의해 기존 기능을 유지하면서 코드량을 약 30% 절감
-- 기존 환경 변수로 관리하던 마켓별 API·WebSocket 주소를 S3 기반 외부 설정으로 이전하여 신규 마켓 추가 시 코드 수정과 재배포 제거
-
-### [Cross STAKING](https://stake.ogfcorp.com) · 토큰 스테이킹
-
-<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>Rive</span><span>Zod</span></div>
-
-- 사내 AI 에이전트가 생성한 초기 프로토타입을 기반으로 Figma 디자인과 서비스 요구사항에 맞게 주요 화면·기능을 고도화
-- 운영 기간별 화면·기능 전환을 검증할 수 있도록 테스트 환경에 날짜·시간 설정 기능 구축
-- 프로토타입 인계 후 5일 내 레이아웃 오류와 지갑 연동 이슈를 해결하고 핵심 기능을 보완해 기한 내 출시
-
-### [Cross Forge](https://www.onechain.nexus/forge) · 본딩 커브 토큰 플랫폼
-
-<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Wagmi</span><span>Viem</span><span>Privy</span><span>Lightweight Charts</span><span>TanStack Query</span><span>Zod</span></div>
-
-- CROSS Embedded SDK, MetaMask, Privy, Reown AppKit 등 5종 지갑 SDK를 통합 인터페이스로 추상화해 연결 방식과 관계없이 동일한 서명·트랜잭션 흐름 제공
-- 인덱서 반영 지연을 Optimistic UI와 API 폴링으로 보완해 트랜잭션 직후 예상 상태를 즉시 표시하고, 실제 조회 결과로 안전하게 동기화
-- Feature-Sliced Design을 도입해 프로젝트를 app·pages·widgets·features·entities·shared 레이어로 재구성하고, 기능별 책임과 의존성 경계를 명확히 해 유지보수성과 협업 효율을 개선
-
-### Cross Points · 포인트 서비스
-
-<div className="project-tech"><span>Next.js</span><span>Rive</span><span>shadcn/ui</span><span>Tailwind CSS</span></div>
+#### Cross Points · 포인트 서비스
 
 - EIP-1193 기반으로 지갑 설치 여부를 판별해 지갑 연결 과정을 3단계에서 2단계로 단축하고 연결 UX 개선
 - 쿠키 기반 JWT 인증 체계를 설계하고, 미들웨어 프록시에서 토큰 추출·갱신·헤더 주입을 일괄 처리해 인증 API를 단일 진입점으로 통합
 - PKCE 기반 Twitter OAuth 2.0 인증을 구현하고, iOS 인앱 브라우저에서 발생하던 인증 세션 유실을 딥링크 기반 콜백 리다이렉트로 해결
 
-## [위메이드](https://www.wemade.com/kr) · 프론트엔드 개발
+### [위메이드](https://www.wemade.com/kr)（2022.09 ～ 2025.02） 팀원 • 웹 프론트엔드 개발팀
 
-2022.09 – 2025.02
+#### 알고리즘적 사고를 통한 프론트엔드 영역 시간복잡도 및 확장성 개선
 
-### [Pnix Exchange](https://pnix.exchange) · 오더북 기반 멀티마켓 게임 토큰 거래소
+- 주문 가격에 대응하는 오더북 내의 인디케이터 위치 탐색을 이분 탐색으로 구현해 탐색 복잡도를 O(n)에서 O(log n)으로 개선
+- 깊이가 가변적인 중첩 API 응답을 재귀 순회 방식으로 처리해 특정 깊이에 종속되지 않는 데이터 파싱 구조 구현
 
-<div className="project-tech"><span>React</span><span>TypeScript</span><span>React Router</span><span>Redux Toolkit</span><span>TanStack Query</span><span>styled-components</span></div>
+#### [PNIX Exchange](https://pnix.exchange) · 오더북 기반 실시간 멀티마켓 게임 토큰 거래소
 
-- 2인 팀에서 DEX의 초기 설계부터 출시 및 운영 유지보수까지 웹 프론트엔드 담당
-- TradingView DataFeed에 과거 시세 API와 실시간 WebSocket을 연동한 가격 스트리밍 차트 구현
-- 고빈도 WebSocket 오더북 데이터를 ref 기반 버퍼에 누적하고 500ms 단위로 배칭 반영해, 대규모 트래픽 봇 테스트에서 프레임 드롭과 렌더링 지연을 개선
-- Page Visibility API를 활용해 비활성 탭에서 실시간 이벤트 구독 및 UI 갱신을 제어하고, 탭 복귀 시 누적 메시지 처리로 발생하던 프레임 드롭을 개선
-- 호가 가격을 기준으로 React key를 설계하고 변경된 호가 행만 갱신하도록 구현해, 수량 변경 애니메이션을 유지하면서 불필요한 컴포넌트 재생성과 리렌더링을 최소화
-- 동일 프레임 내 스타일 변경이 누적되며 CSS Transition이 생략되는 원인을 분석하고, requestAnimationFrame 기반 애니메이션으로 전환해 안정적인 상태 전환 구현
-- useDeferredValue로 렌더링 우선순위를 분리해 고빈도 체결 중에도 탭 전환 응답성 유지
-- MUI 등 무거운 UI 프레임워크 의존성을 줄이기 위해 커스텀 훅 기반의 재사용 가능한 테이블 헤더 컴포넌트를 자체 설계하여 번들 크기를 최적화하고 스타일링 유연성 향상
+- TradingView DataFeed 인터페이스에 과거 시세 API와 실시간 거래 체결 웹소켓 데이터를 연동하여 실시간 스트림 차트 구현
+- WS 오더북 데이터를 버퍼에 누적하고 500ms 배칭 처리를 통해 스트레스 봇 테스트에서 프레임 드랍 문제 해결
+- Page Visibility API를 활용하여 비활성 탭에서 WS 연결을 해제하여 버퍼 축적과 프레임 드랍 방지
+- 오더북 호가 주문 수량 연속 갱신 시, 애니메이션이 중첩 및 누락되는 문제를 Framer Motion 기반의 명시적 제어로 해결
+- MUI 테이블 의존성을 제거하고 공통 테이블 로직을 커스텀 훅·컴포넌트로 자체 구현해 번들 사이즈를 절감하고 스타일링 유연성 향상
 
-### 40 Wonders
+</section>
 
-- AzCopy로 랜딩 페이지 JSON을 Azure Storage로 이전
-- 콘텐츠 업데이트와 웹 어플리케이션 배포를 분리하여 운영 효율 개선
+## SIDE PROJECT
 
-## 사이드 프로젝트
+### Chrome-like 탭 리사이징 UI - Chrome 탭 UX 재현 NPM 배포
 
-### Chrome형 탭 크기 조절 UI
+- Vanilla DOM API로 8방향 리사이즈, 그룹 이동, 탭 리오더링, 분리, 병합 인터랙션 구현
+- NPM 배포 후 MDX 기반 포트폴리오의 그룹·탭 UI 컴포넌트 및 포맷으로 활용
 
-- Vanilla DOM API로 8방향 크기 조절, 그룹 이동, 탭 재정렬·분리·병합 인터랙션 구현
-- Chrome 탭 UX를 재현해 NPM 패키지로 배포
+## SKILL
 
-## 포트폴리오
-
-<div className="portfolio-grid">
-  <a className="portfolio-card" href="https://www.crosstoken.sale" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/cross-public-sale.jpg" alt="Cross Public Sale" />
-    <span className="portfolio-card-body"><span>Cross Public Sale</span><span>Web3 퍼블릭 세일 · KYC · RPC · 컨트랙트 연동</span></span>
-  </a>
-  <a className="portfolio-card" href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/crossx.png" alt="CrossX" />
-    <span className="portfolio-card-body"><span>CrossX</span><span>WebView 기반 하이브리드 지갑 · 누적 10만 다운로드</span></span>
-  </a>
-  <a className="portfolio-card" href="https://x.crosstoken.io" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/cross-exchange.png" alt="Cross Exchange" />
-    <span className="portfolio-card-body"><span>Cross Exchange</span><span>게임 토큰 거래소 · 트랜잭션 구조 및 마켓 자동화</span></span>
-  </a>
-  <a className="portfolio-card" href="https://stake.ogfcorp.com" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/cross-staking.png" alt="Cross STAKING" />
-    <span className="portfolio-card-body"><span>Cross STAKING</span><span>토큰 스테이킹 · 운영 일정별 기능 전환</span></span>
-  </a>
-  <a className="portfolio-card" href="https://www.onechain.nexus/forge" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/cross-forge.png" alt="Cross Forge" />
-    <span className="portfolio-card-body"><span>Cross Forge</span><span>본딩 커브 토큰 플랫폼</span></span>
-  </a>
-  <a className="portfolio-card" href="https://pnix.exchange" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/pnix-exchange.png" alt="Pnix Exchange" />
-    <span className="portfolio-card-body"><span>Pnix Exchange</span><span>오더북 기반 멀티마켓 DEX · 실시간 데이터 최적화</span></span>
-  </a>
+<div className="skill-list">
+  <div className="skill-row">
+    <strong>Languages</strong>
+    <span><span>TypeScript</span><span>JavaScript</span></span>
+  </div>
+  <div className="skill-row">
+    <strong>Frontend</strong>
+    <span><span>React</span><span>Next.js</span><span>Zustand</span><span>Redux Toolkit</span><span>TanStack Query</span></span>
+  </div>
+  <div className="skill-row">
+    <strong>UI &amp; Styling</strong>
+    <span><span>Tailwind CSS</span><span>Emotion</span><span>MUI</span><span>Framer Motion</span></span>
+  </div>
 </div>
 
-## 자격
+<section className="technical-portfolio-section">
 
-- 컴퓨터활용능력 1급, 2019.03
-- TOEIC 825, 2019.08
+## TECHNICAL PORTFOLIO
 
-## 학력
+<div className="case-study-intro">
+  실제 서비스를 개발하고 운영하며 해결한 문제를 정리했습니다.
+</div>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>01</span><span>Pnix Exchange</span><span>Rendering</span></div>
+
+### 실시간 오더북 렌더링 최적화 및 애니메이션 안정화
+
+웹소켓 실시간 수신 데이터의 트래픽이 증가하면서 상태 갱신과 렌더링이 과도하게 발생하여 프레임 드롭이 생겼습니다. 이를 해결하기 위해 수신 데이터에 버퍼링과 500ms 단위의 배치 업데이트를 적용해 상태 갱신 횟수를 줄였고, 극한의 트래픽 상황을 가정한 스트레스 봇 테스트에서도 실시간 데이터 업데이트를 유지하면서 끊김 없이 서비스를 이용할 수 있었습니다.
+
+또한 Page Visibility API로 탭 비활성화를 감지하여 웹소켓 연결을 해제하고, 탭이 다시 활성화되면 재연결 하도록 구현하였습니다. 백그라운드에 있는 동안 데이터가 버퍼에 쌓였다가 복귀 시점에 한 번에 처리되면서 프레임 드롭이 간헐적으로 발생하였는데, 웹소켓 연결 후 첫 수신 데이터가 최신 스냅샷 전체 데이터로 들어오는 구조였기 때문에 연결을 끊어 불필요한 버퍼 축적을 방지하고 복귀 시 재연결하는 방식으로 해결하였습니다.
+
+각 오더북 행의 key에는 호가 값을 사용해, 정렬 순서가 변경되거나 해당 호가의 주문 수량이 갱신되더라도 동일한 호가의 컴포넌트 인스턴스가 유지되도록 구성했습니다. 이를 통해 이전 주문 수량과 현재 주문 수량을 비교해 변경 여부를 감지하고, 별도의 상태값 없이 블링크 애니메이션을 실행할 수 있었습니다.
+
+블링크 애니메이션은 CSS Transition 대신 Framer Motion을 사용해 구현하였습니다. 호가창처럼 주문 수량이 짧은 간격으로 연속해서 변경되는 경우, CSS 상태 변경에 의존하는 방식은 진행 중인 애니메이션을 원하는 시점에 중단하고 처음부터 다시 시작하도록 제어하기가 까다로웠습니다. 그래서 Framer Motion을 사용해 애니메이션의 실행 상태를 직접 관리했습니다. 새로운 주문 수량이 들어오면 진행 중인 블링크 애니메이션을 즉시 중단하고, 초기화한 뒤 처음부터 재생하도록 처리하였습니다.
+
+<figure className="case-image case-image-compact">
+  <img src="/images/portfolio/pnix-orderbook.png" alt="Pnix Exchange 실시간 오더북과 차트 화면" />
+</figure>
+
+<CaseCodeDetails>
+  <summary><span>실시간 데이터 버퍼링 및 배치 업데이트</span></summary>
+
+```tsx
+const diffOrderbookRef = React.useRef<OrderbookDiff[]>([]);
+
+React.useEffect(() => {
+  const response = getLastJsonMessage(WS_FEED_ENUM.ORDERBOOK);
+  if (!response) return;
+
+  const previousOrders = response.order_book?.bid?.order_list ?? [];
+  const changedOrders = response.diff_order_book?.bid?.order_list ?? [];
+
+  diffOrderbookRef.current.push(
+    getDiffByCompareOrders(previousOrders, changedOrders)
+  );
+}, [getLastJsonMessage, pairAddress]);
+
+React.useEffect(() => {
+  const intervalId = window.setInterval(() => {
+    const pendingDiffs = diffOrderbookRef.current;
+    if (pendingDiffs.length === 0) return;
+
+    // 현재 처리할 diff와 이후 수신될 diff를 분리
+    diffOrderbookRef.current = [];
+
+    setOrderBookLevels((currentLevels) =>
+      pendingDiffs.reduce(
+        (levels, diff) => updateOrderbook(levels, diff),
+        currentLevels
+      )
+    );
+  }, 500);
+
+  return () => {
+    window.clearInterval(intervalId);
+    diffOrderbookRef.current = [];
+  };
+}, [pairAddress, selectedTickSize]);
+```
+
+</CaseCodeDetails>
+
+<CaseCodeDetails>
+  <summary><span>호가 블링크 애니메이션</span></summary>
+
+```tsx
+const backgroundAlpha = useMotionValue(0);
+
+React.useEffect(() => {
+  if (disableAnimation || prevAmount === undefined) return;
+  if (prevAmount === order.amount) return;
+
+  backgroundAlpha.set(0.15);
+
+  let controls: ReturnType<typeof animate> | undefined;
+
+  const frameId = requestAnimationFrame(() => {
+    controls = animate(backgroundAlpha, 0, {
+      duration: 0.7,
+      ease: "linear"
+    });
+  });
+
+  return () => {
+    cancelAnimationFrame(frameId);
+    controls?.stop();
+  };
+}, [backgroundAlpha, disableAnimation, order.amount, prevAmount]);
+
+const backgroundColor = useTransform(backgroundAlpha, (alpha) =>
+  side === "ask"
+    ? `rgba(243, 88, 91, ${alpha})`
+    : `rgba(71, 225, 122, ${alpha})`
+);
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>02</span><span>Pnix Exchange</span><span>Real-time Chart</span></div>
+
+### TradingView 기반 실시간 차트 데이터 연동
+
+Pnix Exchange의 실시간 차트는 TradingView를 기반으로 구현했습니다. 마켓 리스트에서 토큰을 선택하면 해당 종목의 초기 시세 및 거래량 데이터를 API로 조회하고, TradingView DataFeed 어댑터에서 서버 응답을 차트가 요구하는 OHLCV 형식과 시간 단위에 맞게 가공하여 전달했습니다. 이후 실시간 체결 데이터는 WebSocket으로 수신하여 선택된 시간봉 기준으로 현재 캔들에 반영하거나, 새로운 시간 구간에 진입한 경우 새 캔들을 생성하도록 처리했습니다.
+
+또한 종목이나 시간봉이 변경될 때마다 차트 인스턴스를 새로 생성하지 않고 기존 인스턴스를 유지한 채 데이터 소스와 구독만 교체하도록 구현했습니다. 이를 통해 불필요한 차트 재초기화와 렌더링 비용을 줄이고, 종목 전환 시 화면이 끊기거나 차트가 다시 로드되는 느낌을 최소화해 사용자 경험을 개선했습니다.
+
+<figure className="case-image case-image-wide">
+  <img src="/images/portfolio/pnix-tradingview-chart.png" alt="Pnix Exchange TradingView 실시간 캔들 차트" />
+</figure>
+
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>03</span><span>CrossX</span><span>Web–Native Architecture</span></div>
+
+### RN WebView Bridge의 비동기 API 추상화
+
+React Native WebView 환경에서는 WebView와 React Native 앱 간 메세지 기반 Bridge를 통해 요청을 전달하고, 처리 결과는 메세지 이벤트를 통해 비동기적으로 수신하는 구조였습니다. 이 때문에 요청 코드와 응답 처리 코드가 분리되어 있어, 호출한 곳에서 응답값을 직접 받아 후속 로직을 이어가거나 일반적인 비동기 API처럼 요청 상태를 관리하기 어려웠습니다.
+
+이를 개선하기 위해 WebView-Native 간 Bridge 통신을 Promise를 반환하는 공통 함수로 추상화하였습니다. 메세지별 요청 파라미터와 응답 형식을 타입으로 정의하고, 요청 시 메세지 id를 기준으로 Promise의 resolve를 저장하였습니다. 이후 응답이 도착하면 공통 이벤트 핸들러에서 응답 id에 대응하는 Promise의 resolve를 찾아 호출하도록 구성해, 메세지 기반 Bridge 통신을 일반적인 비동기 API처럼 사용할 수 있도록 하였습니다.
+
+이를 통해 호출부에서는 내부의 메세지 처리 방식을 알 필요 없이 응답값을 받아 후속 로직을 처리할 수 있었고, TanStack Query의 queryFn과 연결해 Bridge 통신도 서버 API와 유사한 방식으로 로딩·에러·응답 데이터를 관리할 수 있었습니다.
+
+<CaseCodeDetails>
+  <summary><span>Bridge 요청·응답의 Promise 변환</span></summary>
+
+```tsx
+type RNBridgeMessageMap = {
+  "get-is-use-biometric": {
+    params: null;
+    response: BridgeResponse;
+  };
+};
+
+const pendingRequestsRef = useRef<
+  Record<
+    keyof RNBridgeMessageMap,
+    {
+      resolve: (response: BridgeResponse) => void;
+      reject: (error: unknown) => void;
+    }
+  >
+>({});
+
+const callRN = useCallback(
+  <K extends keyof RNBridgeMessageMap>(
+    message: {
+      id: K;
+      params: RNBridgeMessageMap[K]["params"];
+    }
+  ): Promise<RNBridgeMessageMap[K]["response"]> => {
+    return new Promise((resolve, reject) => {
+      // 메세지 id와 해당 요청의 Promise를 연결
+      pendingRequestsRef.current[message.id] = {
+        resolve,
+        reject,
+      };
+
+      window.ReactNativeWebView?.postMessage(
+        JSON.stringify(message)
+      );
+    });
+  },
+  []
+);
+
+const handleMessage = useCallback((event: MessageEvent) => {
+  const response = JSON.parse(event.data) as BridgeResponse;
+
+  // Native 응답의 id로 대응되는 Promise 탐색
+  const pendingRequest =
+    pendingRequestsRef.current[response.id];
+
+  if (!pendingRequest) return;
+
+  pendingRequest.resolve(response);
+  delete pendingRequestsRef.current[response.id];
+}, []);
+```
+
+</CaseCodeDetails>
+
+<CaseCodeDetails>
+  <summary><span>TanStack Query를 통한 Native API 호출</span></summary>
+
+```tsx
+const getUseIsBiometricAuth = async () => {
+  const response = await callRN({
+    id: "get-is-use-biometric",
+    params: null,
+  });
+
+  return response.data;
+};
+
+const { data: useIsBiometricAuthState } = useQuery({
+  queryKey: ["useIsBiometricAuthState"],
+  queryFn: getUseIsBiometricAuth,
+});
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>04</span><span>CrossX</span><span>Interaction</span></div>
+
+### 이벤트 위임 기반 햅틱 피드백 공통화
+
+WebView에서 버튼마다 햅틱 처리를 직접 구현하면 UI 컴포넌트와 Native Bridge 호출 로직 간의 결합도가 높아지고, 동일한 이벤트 처리 코드가 반복되는 문제가 있었습니다. 이를 개선하기 위해 햅틱이 필요한 요소에는 data-haptic 속성만 선언하고, 공통 터치 이벤트 리스너를 등록하여 해당 속성을 기준으로 햅틱을 처리하는 이벤트 위임 구조로 변경했습니다.
+
+공통 핸들러에서는 터치가 종료된 요소에서 data-haptic 속성을 탐색해 필요한 햅틱 타입을 확인하고 Native Bridge를 호출하도록 구성했습니다. 이를 통해 개별 컴포넌트에서는 Bridge 호출이나 이벤트 리스너를 직접 관리할 필요 없이 HTML 속성만으로 햅틱 동작을 선언할 수 있게 했으며, 동적으로 추가되는 요소에도 동일한 규칙을 적용할 수 있었습니다.
+
+또한 터치 시작 시점의 좌표를 저장하고, 이동 과정에서 거리를 계산해 일정 임계값을 초과하면 스크롤 또는 드래그로 판단했습니다. 이 경우 터치가 종료되더라도 햅틱을 실행하지 않도록 하여 스크롤 과정에서 의도하지 않은 햅틱이 발생하는 것을 방지했습니다.
+
+- 이벤트 위임과 data-haptic 속성을 활용해 Native Bridge 호출을 공통화하고, UI 컴포넌트와 햅틱 구현 로직의 결합도를 낮춤
+- 터치 이동 임계값을 기준으로 탭과 스크롤·드래그를 구분하여 의도하지 않은 햅틱 실행 방지
+
+<CaseCodeDetails>
+  <summary>구현 코드</summary>
+
+```tsx
+export default function useHapticFeedback() {
+  const { needHapticFeedback } = useRNBridgeFetchers();
+
+  const startPositionRef = useRef<{ x: number; y: number } | null>(null);
+  const isDraggingRef = useRef(false);
+
+  useEffect(() => {
+    const handleTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!touch) return;
+
+      startPositionRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+      };
+
+      isDraggingRef.current = false;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const startPosition = startPositionRef.current;
+      const touch = event.touches[0];
+
+      if (!startPosition || !touch) return;
+
+      const dx = Math.abs(touch.clientX - startPosition.x);
+      const dy = Math.abs(touch.clientY - startPosition.y);
+
+      // 일정 거리 이상 이동하면 탭이 아닌 스크롤·드래그로 판단
+      if (dx > 10 || dy > 10) {
+        isDraggingRef.current = true;
+      }
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      if (isDraggingRef.current) return;
+
+      // 실제 터치된 요소 또는 상위 요소에서 햅틱 설정 탐색
+      const element = (event.target as HTMLElement).closest<HTMLElement>(
+        "[data-haptic]"
+      );
+
+      const type = element?.dataset.haptic as
+        | HapticFeedbackTypes
+        | undefined;
+
+      if (!type) return;
+
+      needHapticFeedback({ type });
+    };
+
+    document.addEventListener("touchstart", handleTouchStart, {
+      capture: true,
+    });
+    document.addEventListener("touchmove", handleTouchMove, {
+      capture: true,
+    });
+    document.addEventListener("touchend", handleTouchEnd, {
+      capture: true,
+    });
+
+    return () => {
+      document.removeEventListener("touchstart", handleTouchStart, true);
+      document.removeEventListener("touchmove", handleTouchMove, true);
+      document.removeEventListener("touchend", handleTouchEnd, true);
+    };
+  }, [needHapticFeedback]);
+}
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>05</span><span>CrossX</span><span>Drawer Navigation</span></div>
+
+### WebView SPA의 스택형 화면 전환 및 뒤로가기 제어
+
+WebView 기반 SPA에서 네이티브 앱과 유사한 화면 전환 경험을 제공하기 위해 여러 화면을 Drawer 형태로 쌓는 스택 구조를 구현하였습니다. 현재 Drawer의 드래그 진행률을 기준으로 이전 Drawer의 이동량도 함께 계산하고, 진행률에 easing을 적용해 이전 Drawer가 자연스럽게 밀려났다가 복귀하도록 구성하였습니다. 이를 통해 두 Drawer가 하나의 화면처럼 연결되는 자연스러운 전환 효과를 구현하였습니다.
+
+단일 라우트 SPA에서는 Drawer를 열어도 URL이 변경되지 않아 Android 뒤로가기 버튼으로 열린 Drawer를 순서대로 닫을 수 없는 문제가 있었습니다. 이를 해결하기 위해 Drawer가 열릴 때 가상 히스토리 항목을 추가하고, 뒤로가기 시 가장 상단의 Drawer부터 닫히도록 처리했습니다. 이를 통해 실제 페이지를 이동하지 않고도 Android 뒤로가기와 Drawer 스택의 이동을 동기화했습니다.
+
+<PortfolioVideo
+  src="/images/portfolio/drawer-transition.mp4"
+  poster="/images/portfolio/drawer-transition-thumbnail.png"
+  label="CrossX 스택형 Drawer 화면 전환 동작 영상"
+/>
+
+<CaseCodeDetails>
+  <summary>구현 코드</summary>
+
+```tsx
+const PREV_DRAWER_OFFSET = 100;
+const DURATION = 400;
+const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+const easeOutCubic = (s: number) => 1 - Math.pow(1 - s, 3);
+
+function animatePrevDrawer(
+  element: HTMLDivElement,
+  open: boolean | undefined
+) {
+  element.style.willChange = "transform";
+  element.style.transition = "none";
+
+  const initialTransform = open
+    ? "translate3d(0px, 0, 0)"
+    : `translate3d(${-PREV_DRAWER_OFFSET}px, 0, 0)`;
+
+  element.style.transform = initialTransform;
+
+  // iOS WebView에서 초기 위치가 먼저 반영된 뒤
+  // transition이 시작되도록 적용 시점을 분리
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      element.style.transition = `transform ${DURATION}ms ${EASING}`;
+
+      const finalTransform = open
+        ? `translate3d(${-PREV_DRAWER_OFFSET}px, 0, 0)`
+        : "translate3d(0px, 0, 0)";
+
+      element.style.transform = finalTransform;
+    });
+  });
+}
+
+function animatePrevDrawerWithDrag(
+  element: HTMLDivElement,
+  rafIdRef: React.RefObject<number | null>,
+  percentage: number
+) {
+  element.style.willChange = "transform";
+  element.style.transition = "none";
+
+  // 현재 Drawer의 드래그 진행률로
+  // 이전 Drawer의 이동 거리 계산
+  const eased = easeOutCubic(percentage);
+  const x =
+    -PREV_DRAWER_OFFSET + eased * PREV_DRAWER_OFFSET;
+
+  rafIdRef.current = requestAnimationFrame(() => {
+    element.style.transform = `translate3d(${x}px, 0, 0)`;
+  });
+}
+
+export default function AnimatedDrawer({
+  children,
+  open,
+  ...props
+}: React.ComponentProps<typeof Drawer>) {
+  const rafIdRef = React.useRef<number | null>(null);
+  const isDraggedRef = React.useRef(false);
+
+  const handleDrag = (_: unknown, percentage: number) => {
+    isDraggedRef.current = true;
+
+    const prevDrawer = getPrevDrawer();
+    const currentDrawer = getCurrentDrawer();
+
+    if (!prevDrawer || shouldSkipAnimation(currentDrawer)) {
+      return;
+    }
+
+    // 이전 프레임을 취소하고
+    // 가장 최근 드래그 위치만 반영
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
+    animatePrevDrawerWithDrag(
+      prevDrawer,
+      rafIdRef,
+      percentage
+    );
+  };
+
+  return (
+    <Drawer
+      data-vaul-drawer
+      {...props}
+      open={open}
+      onDrag={handleDrag}
+    >
+      {children}
+    </Drawer>
+  );
+}
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study case-study-compact-media">
+  <div className="case-study-meta"><span>06</span><span>CrossX</span><span>Canvas Visualization</span></div>
+
+### 인터랙티브 Area 차트 커스터마이징
+
+- 차트를 터치하거나 드래그하면 터치 지점과 가장 가까운 데이터의 시점과 값을 찾아 기준선과 함께 표시
+- 선택한 지점을 기준으로 이전 구간은 강조 색상, 이후 구간은 비활성 색상으로 표시
+- 최대·최소값 라벨이 차트 밖으로 넘어가지 않도록 실제 라벨 너비에 맞춰 위치 조정
+
+<PortfolioVideo
+  src="/images/portfolio/interactive-area-chart.mp4"
+  poster="/images/portfolio/interactive-area-chart-thumbnail.png"
+  label="CrossX Canvas 기반 인터랙티브 Area Chart 동작 영상"
+/>
+
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>07</span><span>CrossX</span><span>Pull to Refresh</span></div>
+
+### 중첩 스크롤을 고려한 Pull-To-Refresh
+
+화면을 공통 Pull-To-Refresh 컴포넌트로 감싸기만 하면 별도의 구현 없이 iOS 네이티브처럼 화면을 아래로 당기는 인터랙션을 적용할 수 있도록 구성했습니다. 내부에 스크롤 영역이 있는 화면에서는 스크롤이 최상단일 때만 당김 동작을 시작해 제스처가 충돌하지 않도록 했고, 당긴 거리에 따라 저항이 점점 커지도록 처리해 자연스러운 움직임을 구현했습니다. 새로고침이 필요한 화면에서는 기준 지점을 넘었을 때 햅틱과 Rive Indicator를 실행한 뒤 비동기 작업을 수행하고, 완료되면 화면을 원래 위치로 복귀하도록 구성했습니다.
+
+<PortfolioVideo
+  src="/images/portfolio/pull-to-refresh.mp4"
+  poster="/images/portfolio/pull-to-refresh-thumbnail.png"
+  label="CrossX Pull-to-Refresh 동작 영상"
+/>
+
+<CaseCodeDetails>
+  <summary>구현 코드</summary>
+
+```tsx
+const handleTouchMove = (event: TouchEvent) => {
+  const currentY = event.touches[0]?.clientY ?? 0;
+  pendingDeltaRef.current = currentY - startYRef.current;
+
+  if (pendingDeltaRef.current <= 0 || framePendingRef.current) return;
+  framePendingRef.current = true;
+
+  requestAnimationFrame(() => {
+    const distance = pendingDeltaRef.current;
+    const damped = distance * (1 - Math.exp(-distance / 60)) * 0.5;
+    const offset = Math.min(damped, maxPullDistance);
+
+    setOffsetY(offset);
+    thresholdPassedRef.current = offset >= refreshThreshold;
+    framePendingRef.current = false;
+  });
+};
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>08</span><span>Cross Ecosystem</span><span>Shared Package</span></div>
+
+### 여러 서비스의 App Launcher를 하나의 패키지로 표준화
+
+각 서비스에서 App Launcher의 UI와 설정을 개별적으로 관리하고 있어, 공통 변경이 발생할 때마다 여러 프로젝트에 동일한 작업을 반복해야 하는 문제가 있었습니다. 이를 개선하기 위해 App Launcher UI를 공통 패키지로 분리하고, 서비스별 노출 정보는 하나의 S3 설정에서 관리하도록 통합하였습니다. 서비스 추가나 노출 정보 변경 시 S3의 공통 설정만 수정하면 전체 서비스에 반영되도록 개선하였습니다.
+
+<PortfolioVideo
+  src="/images/portfolio/app-launcher.mp4"
+  poster="/images/portfolio/app-launcher-thumbnail.png"
+  label="서비스 공통 App Launcher 동작 영상"
+/>
+
+</section>
+
+</section>
+
+## CERTIFICATION
 
 <div className="education-list">
   <div className="education-item">
-    <span className="education-period">2014.03 – 2022.02</span>
-    <span className="education-content"><span className="education-title">한국기술교육대학교 응용화학공학과</span></span>
+    <span className="education-content"><span className="education-title">컴퓨터활용능력 1급 <span className="education-period">2019.03</span></span></span>
   </div>
   <div className="education-item">
-    <span className="education-period">2022.03 – 2022.07</span>
-    <span className="education-content"><span className="education-title">바닐라코딩 부트캠프 풀스택 과정</span><span>React를 중심으로 웹 프론트엔드를 학습하고, Node.js와 MongoDB를 활용해 웹 서비스 전반을 구현했습니다.</span></span>
+    <span className="education-content"><span className="education-title">TOEIC 825 <span className="education-period">2019.08</span></span></span>
+  </div>
+</div>
+
+## EDUCATION
+
+<div className="education-list">
+  <div className="education-item">
+    <span className="education-content"><span className="education-title">한국기술교육대학교 응용화학공학과 <span className="education-period">2014.03 – 2022.02</span></span></span>
   </div>
   <div className="education-item">
-    <span className="education-period">2020.07 – 2021.02</span>
-    <span className="education-content"><span className="education-title">코리아IT아카데미 웹&amp;앱 개발자 과정</span><span>Java, 웹 표준, JavaScript, Tomcat, JSP, jQuery, Oracle, Spring을 학습하고 웹 서비스 흐름을 이해하기 위한 팀 프로젝트를 진행했습니다.</span></span>
+    <span className="education-content"><span className="education-title">바닐라코딩 부트캠프 풀스택 과정 <span className="education-period">2022.03 – 2022.07</span></span><span>JavaScript, Node.js, React 등 풀스택 웹 개발 핵심 기술 학습 및 애자일 스프린트 방식의 팀·개인 프로젝트를 통한 실무 협업 경험</span></span>
   </div>
   <div className="education-item">
-    <span className="education-period">2020.07 – 2020.09</span>
-    <span className="education-content"><span className="education-title">부스트코스 코딩 뉴비 챌린지 · 커넥츠</span><span>Harvard CS50을 통해 C 언어 기반의 컴퓨팅 사고, 배열, 알고리즘, 자료구조를 학습하고, Slack으로 팀원들과 주간 미션을 해결한 뒤 코치 피드백을 받았습니다.</span></span>
+    <span className="education-content"><span className="education-title">코리아IT아카데미 웹&amp;앱 개발자 과정 <span className="education-period">2020.07 – 2021.02</span></span><span>HTML/CSS, JavaScript, Java 등 웹 개발 기초 학습 및 JSP, Tomcat, MyBatis, Oracle, Spring 기반 백엔드 개발 실습 및 프로젝트 수행</span></span>
+  </div>
+  <div className="education-item">
+    <span className="education-content"><span className="education-title">부스트코스 코딩 뉴비 챌린지 · 커넥츠 <span className="education-period">2020.07 – 2020.09</span></span><span>Harvard CS50을 통해 C언어 기반의 컴퓨팅 사고, 배열, 알고리즘, 자료구조를 학습하고, Slack으로 팀원들과 주간 미션을 해결</span></span>
   </div>
 </div>

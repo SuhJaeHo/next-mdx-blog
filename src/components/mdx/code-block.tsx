@@ -8,20 +8,37 @@ const CodeBlock: React.FC<ICodeBlockProps> = ({ className, ...props }) => {
   const preRef = useRef<HTMLPreElement>(null);
   const [copied, setCopied] = useState(false);
 
-  const onCopy = () => {
-    if (preRef.current) {
+  const onCopy = async () => {
+    const code = preRef.current?.textContent ?? "";
+    if (!code) return;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = code;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+
       setCopied(true);
-      navigator.clipboard.writeText(preRef.current.textContent ?? "");
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy code", error);
     }
   };
 
   return (
     <div className="relative rounded-lg">
       <button
+        type="button"
         aria-label="Copy code"
+        data-code-copy-button
         className={`absolute right-2 top-2 h-8 w-8 rounded p-1 ${copied ? "border-green-400 focus:border-green-400 focus:outline-none" : "border-gray-600"}`}
         onClick={onCopy}
       >

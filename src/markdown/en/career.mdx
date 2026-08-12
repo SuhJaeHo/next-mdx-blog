@@ -1,158 +1,628 @@
-# Professional Experience
+<header className="resume-hero">
+  <div className="resume-identity">
+    <strong>Jaeho Seo</strong>
+    <span>Frontend Engineer</span>
+  </div>
+  <div className="resume-contact">
+    <span>Phone : <a href="tel:+821050606277">+82 10-5060-6277</a></span>
+    <span>Email : <a href="mailto:seojaeho118@gmail.com">seojaeho118@gmail.com</a></span>
+    <span>Links : <a href="https://github.com/SuhJaeHo" target="_blank" rel="noreferrer">GITHUB</a></span>
+  </div>
+</header>
 
-## Jaeho Seo · Frontend Engineer
+<p className="resume-summary">
+  <strong>I strive to design frontend architecture with scalability and maintainability in mind.</strong><br />
+  I migrated per-market API and WebSocket endpoints from environment variables to S3-based external configuration, enabling market additions and removals through configuration changes without redeployment. I also consolidated service-specific App Launchers into a shared component package and a single S3-based configuration, applying the same structure consistently across 12 services.
+</p>
 
-A frontend engineer who identifies operational problems and drives them through resolution in high-frequency real-time data and Web3 transaction environments. Over four years, I have developed blockchain web services and WebView applications from architecture and implementation through launch and operations.
+<p className="resume-summary">
+  <strong>I think about improvements that can support user experience and business growth.</strong><br />
+  When wallet-app orders remained stuck in Pending due to missing signature responses, I resolved the issue with synchronization logic between TX hashes and WebSocket order data. This improved the mobile wallet ordering experience and contributed to an approximately 78% DAU increase and 3x growth in trading volume.
+</p>
 
-## Technical Skills
+## PROFESSIONAL EXPERIENCE
 
-- **Languages** TypeScript, JavaScript, Python
-- **Frontend** React, Next.js, Zustand, Redux Toolkit, TanStack Query
-- **Web3** Wagmi, Ethers.js, Viem, WalletConnect, Reown AppKit
-- **Real-time & Visualization** WebSocket, TradingView, Canvas API, Rive
-- **UI & Styling** Tailwind CSS, Emotion, MUI, Framer Motion
-- **Tooling & Infra** Jira, Confluence, Slack, Figma, GitHub Actions
+<section className="professional-experience">
 
-## [NEXUS](https://www.homepage.nexus/) · Frontend Engineer
+### [NEXUS](https://www.homepage.nexus/)（2025.02 ～ 2026.05） Team Member • Web Frontend Development Team
 
-Feb 2025 – May 2026
+#### Service Architecture and Operational Stability Improvements
 
-### [Cross Public Sale](https://www.crosstoken.sale) · Token Sale Service
+- Introduced FSD(Feature-Sliced Design) architecture to increase feature-level cohesion and minimize file conflicts during team collaboration
+- Migrated per-market API and WebSocket endpoints from environment variables to S3-based external configuration, enabling market additions and removals through configuration changes without redeployment
+- Consolidated service-specific App Launchers into a shared component package and a single S3-based configuration, applying the common structure across 12 services
 
-<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Zustand</span><span>Framer Motion</span></div>
+#### [Cross Public Sales](https://www.crosstoken.sale) · Token Sale Service
 
-- Delivered project setup, design requirements, wallet integration, RPC, KYC, and smart-contract calls within one week
-- Built a validation layer with React Hook Form and Zod, separating base input rules into schemas and ensuring data consistency through dynamic validation against live balance and remaining-sale data plus final validation before submission
-- Diagnosed blockchain query delays caused by public RPC rate limits and migrated to a JWT-authenticated private RPC, improving the reliability of balance and token queries
-- Completed a public sale worth approximately KRW 20 billion without a critical incident
+- Implemented an EIP-4361(SIWE)-based wallet signature authentication flow to verify wallet ownership and establish authenticated sessions
+- Reflected cookie-based wallet connection state in SSR to remove hydration mismatches, immediately restore wallet addresses, and achieve CLS 0
+- Code-split modules unnecessary for the initial load, reducing the initial JS bundle by about 35%(330KB → 216KB)
+- Analyzed public RPC rate-limit causes and switched to a private RPC, maintaining zero balance and token query errors during the sale
+- Contributed to stable operation of a one-week Public Sale worth approximately KRW 25 billion
 
-### [CrossX](https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=en) · WebView Hybrid Wallet
+#### [CrossX](https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=en) · RN WebView-Based In-House Wallet Application
 
-<div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Rive</span><span>Framer Motion</span><span>Turborepo</span></div>
+- Released a WebView-based hybrid app on both iOS and Android, reaching more than 100,000 cumulative downloads
+- Designed the RN Bridge to be compatible with TanStack Query's QueryFn, integrating bridge communication into the same asynchronous state-management model as API calls
+- Applied easing to Drawer drag progress to synchronize current and previous Drawer offsets and implement native-like screen transition gestures
+- Built a shared Pull-To-Refresh component that integrates top-of-scroll gesture detection, pull-distance resistance, and haptic feedback for an iOS-native-like refresh interaction
+- Applied Tag-Based Deploy to a Turborepo monorepo, enabling independent deployment by environment and service without branch dependency
 
-- Led implementation of the wallet's core user flows and developed key screens for asset and token lookup, transfers, receiving, transaction history and details, and settings
-- Message-based bridge communication
-- Made the RN Bridge compatible with TanStack Query's QueryFn, unifying bridge communication and server APIs under the same asynchronous state-management model
-- Designed a History API-based virtual history stack for a single-route SPA, connecting Android hardware back navigation with per-screen state
-- Synchronized lower Drawer offsets with the upper Drawer's drag progress in a stacked Drawer UI to create natural screen-transition gestures
-- Applied tag-based deployment to a Turborepo monorepo, enabling branch-independent builds and deployments per environment and service while improving maintainability and development efficiency through shared-module packaging
-- Released on both iOS and Android, reaching more than 100,000 cumulative downloads
+#### [Cross Exchange](https://x.crosstoken.io) · Game-Token Exchange
 
-### [Cross Exchange](https://x.crosstoken.io) · Game-Token Exchange
+- Analyzed duplicated transaction-processing logic and unified it into a single interface by injecting an adapter into the SDK
+- Simplified the Parallel Routes-based mobile and desktop slot structure into layout-level branching, consolidating duplicate components and reducing code by about 30%
+- Improved the endpoint update timing of Axios instances on market changes, reducing duplicate calls from 3 to 1 and resolving stale market URL requests
+- Improved duplicated state management between TanStack Query and Zustand, removing unnecessary global state and reducing global state variables by about 50%
+- Built an API-spec-based code generation script, reducing task time by about 97%(30 minutes → 1 minute) and preventing human error
 
-<div className="project-tech"><span>React</span><span>TypeScript</span><span>Zustand</span><span>Zod</span><span>Tailwind CSS</span><span>shadcn/ui</span><span>Monorepo</span></div>
-
-- Unified duplicated transaction flows through an adapter injected into the SDK
-- Led migration from a monorepo to an independent project
-- Introduced Feature-Sliced Design (FSD) across the project, organizing it into app, pages, widgets, features, entities, and shared layers to strengthen feature-level cohesion and minimize file conflicts during team collaboration
-- Built a structure that analyzes Swagger specifications to generate baseline DTO, Entity, and Repository code, and encapsulated API response mapping in the Repository layer to minimize the propagation of server schema changes into UI components
-- Unified mobile- and desktop-specific components and business logic, and redefined the responsibilities of local and global state to reduce the codebase by approximately 30% while preserving existing functionality
-- Migrated per-market API and WebSocket endpoints from environment variables to S3-hosted external configuration, eliminating code changes and redeployment when adding a market
-
-### [Cross STAKING](https://stake.ogfcorp.com) · Token Staking Service
-
-<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Tailwind CSS</span><span>Rive</span><span>Zod</span></div>
-
-- Enhanced the key screens and features of an internal AI-generated prototype to match Figma designs and service requirements
-- Built date and time controls in the test environment to validate screen and feature transitions for each operational period
-- Resolved layout defects and wallet-integration issues within five days of handoff, completed the core features, and launched on schedule
-
-### [Cross Forge](https://www.onechain.nexus/forge) · Bonding-Curve Token Platform
-
-<div className="project-tech"><span>Next.js</span><span>TypeScript</span><span>Wagmi</span><span>Viem</span><span>Privy</span><span>Lightweight Charts</span><span>TanStack Query</span><span>Zod</span></div>
-
-- Abstracted five wallet SDKs—including CROSS Embedded SDK, MetaMask, Privy, and Reown AppKit—behind a unified interface, providing consistent signing and transaction flows regardless of connection method
-- Compensated for indexer update latency with Optimistic UI and API polling, showing the expected state immediately after a transaction and safely reconciling it with the actual query result
-- Introduced Feature-Sliced Design and reorganized the project into app, pages, widgets, features, entities, and shared layers, clarifying feature ownership and dependency boundaries to improve maintainability and collaboration
-
-### Cross Points · Points Service
-
-<div className="project-tech"><span>Next.js</span><span>Rive</span><span>shadcn/ui</span><span>Tailwind CSS</span></div>
+#### Cross Points · Points Service
 
 - Used EIP-1193 wallet detection to reduce the wallet connection flow from three steps to two and improve the connection UX
-- Designed a cookie-based JWT architecture and consolidated authentication behind a single API entry point by handling token extraction, refresh, and header injection in a middleware proxy
+- Designed a cookie-based JWT authentication architecture and consolidated authentication APIs into a single entry point by handling token extraction, refresh, and header injection in a middleware proxy
 - Implemented PKCE-based Twitter OAuth 2.0 and resolved authentication-session loss in iOS in-app browsers through deep-link callback redirects
 
-## [Wemade](https://www.wemade.com/en) · Frontend Engineer
+### [Wemade](https://www.wemade.com/en)（2022.09 ～ 2025.02） Team Member • Web Frontend Development Team
 
-Sep 2022 – Feb 2025
+#### Improving Frontend Time Complexity and Scalability Through Algorithmic Thinking
 
-### [Pnix Exchange](https://pnix.exchange) · Multi-Market Order-Book DEX
+- Implemented binary search to locate an order-book indicator position for a given order price, improving search complexity from O(n) to O(log n)
+- Processed variable-depth nested API responses through recursive traversal, building a data-parsing structure independent of a specific depth
 
-<div className="project-tech"><span>React</span><span>TypeScript</span><span>React Router</span><span>Redux Toolkit</span><span>TanStack Query</span><span>styled-components</span></div>
+#### [PNIX Exchange](https://pnix.exchange) · Real-Time Multi-Market Game-Token Exchange Based on Order Books
 
-- Owned the web frontend in a two-person team from initial DEX architecture through launch and maintenance
-- Integrated historical market APIs and live WebSocket streams through the TradingView DataFeed interface
-- Buffered high-frequency WebSocket order-book data in refs and applied it in 500ms batches, reducing frame drops and render latency during large-scale traffic bot tests
-- Used the Page Visibility API to control real-time subscriptions and UI updates in inactive tabs, reducing frame drops caused by accumulated-message processing when returning to the tab
-- Designed React keys around order prices and updated only changed rows, preserving quantity-change animations while minimizing unnecessary component recreation and re-renders
-- Diagnosed CSS transitions skipped by style changes accumulating within the same frame and moved to requestAnimationFrame-based animation for reliable state transitions
-- Used useDeferredValue to separate rendering priorities and preserve tab responsiveness during rapid trades
-- Reduced reliance on heavyweight UI frameworks such as MUI by designing a reusable, custom-hook-based table header component, optimizing bundle size and increasing styling flexibility
+- Connected historical market APIs and real-time trade WebSocket data to the TradingView DataFeed interface to implement a real-time streaming chart
+- Buffered WebSocket order-book data and processed it in 500ms batches, resolving frame drops during stress bot tests
+- Used the Page Visibility API to disconnect WebSocket connections in inactive tabs, preventing buffer buildup and frame drops
+- Resolved overlapping and skipped animations during continuous order-book quantity updates through explicit Framer Motion-based control
+- Removed the MUI table dependency and implemented shared table logic with custom hooks and components, reducing bundle size and improving styling flexibility
 
-### 40 Wonders
+</section>
 
-- Migrated landing-page JSON resources to Azure Storage with AzCopy
-- Separated content updates from application deployments, improving operational efficiency
+## SIDE PROJECT
 
-## Side Project
-
-### Chrome-like Tab Resizing UI
+### Chrome-like Tab Resizing UI - Chrome Tab UX Recreation NPM Release
 
 - Implemented eight-direction resizing, group movement, tab reordering, splitting, and merging with the Vanilla DOM API
-- Recreated Chrome's tab UX and published it as an NPM package
+- Published to NPM and used as the group/tab UI component and format for the MDX-based portfolio
 
-## Portfolio
+## SKILL
 
-<div className="portfolio-grid">
-  <a className="portfolio-card" href="https://www.crosstoken.sale" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/cross-public-sale.jpg" alt="Cross Public Sale" />
-    <span className="portfolio-card-body"><span>Cross Public Sale</span><span>Web3 public sale · KYC · RPC · smart-contract integration</span></span>
-  </a>
-  <a className="portfolio-card" href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=en" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/crossx.png" alt="CrossX" />
-    <span className="portfolio-card-body"><span>CrossX</span><span>WebView hybrid wallet · over 100K downloads</span></span>
-  </a>
-  <a className="portfolio-card" href="https://x.crosstoken.io" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/cross-exchange.png" alt="Cross Exchange" />
-    <span className="portfolio-card-body"><span>Cross Exchange</span><span>Game-token exchange · transaction architecture and market automation</span></span>
-  </a>
-  <a className="portfolio-card" href="https://stake.ogfcorp.com" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/cross-staking.png" alt="Cross STAKING" />
-    <span className="portfolio-card-body"><span>Cross STAKING</span><span>Token staking · scheduled operational feature transitions</span></span>
-  </a>
-  <a className="portfolio-card" href="https://www.onechain.nexus/forge" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/cross-forge.png" alt="Cross Forge" />
-    <span className="portfolio-card-body"><span>Cross Forge</span><span>Bonding-curve token platform</span></span>
-  </a>
-  <a className="portfolio-card" href="https://pnix.exchange" target="_blank" rel="noreferrer">
-    <img src="/images/portfolio/pnix-exchange.png" alt="Pnix Exchange" />
-    <span className="portfolio-card-body"><span>Pnix Exchange</span><span>Multi-market order-book DEX · real-time data optimization</span></span>
-  </a>
+<div className="skill-list">
+  <div className="skill-row">
+    <strong>Languages</strong>
+    <span><span>TypeScript</span><span>JavaScript</span></span>
+  </div>
+  <div className="skill-row">
+    <strong>Frontend</strong>
+    <span><span>React</span><span>Next.js</span><span>Zustand</span><span>Redux Toolkit</span><span>TanStack Query</span></span>
+  </div>
+  <div className="skill-row">
+    <strong>UI &amp; Styling</strong>
+    <span><span>Tailwind CSS</span><span>Emotion</span><span>MUI</span><span>Framer Motion</span></span>
+  </div>
 </div>
 
-## Certifications
+<section className="technical-portfolio-section">
 
-- Computer Specialist in Spreadsheet & Database, Level 1, Mar 2019
-- TOEIC 825, Aug 2019
+## TECHNICAL PORTFOLIO
 
-## Education
+<div className="case-study-intro">
+  A selection of problems I solved while building and operating production services.
+</div>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>01</span><span>Pnix Exchange</span><span>Rendering</span></div>
+
+### Optimizing Real-Time Order Book Rendering and Animation Stability
+
+As WebSocket traffic increased, excessive state updates and rendering caused frame drops. To resolve this, I applied buffering and 500ms batch updates to the incoming data to reduce the number of state updates, and even under a stress-bot test simulating extreme traffic, the service kept receiving real-time updates without interruption.
+
+I also used the Page Visibility API to detect tab inactivity, close the WebSocket connection, and reconnect once the tab became active again. While in the background, data kept accumulating in the buffer and was processed all at once on return, which intermittently caused frame drops. Since the first message after reconnecting always arrived as a full latest snapshot, I closed the connection to prevent unnecessary buffer buildup and simply reconnected on return, which resolved the issue.
+
+I used the quote price as the key for each order book row so that the same quote's component instance stays the same even when the sort order changes or the order quantity at that quote is updated. This let me detect changes by comparing the previous and current order quantity, and implement the blink animation without any separate state.
+
+The blink animation is implemented with Framer Motion instead of CSS Transition. In an order book, where order quantities change repeatedly in quick succession, relying on CSS state changes made it hard to stop a running animation at the right moment and restart it cleanly from the beginning. So I used Framer Motion to manage the animation's execution state directly. When a new order quantity comes in, the running blink animation is stopped immediately, reset, and replayed from the start.
+
+<figure className="case-image case-image-compact">
+  <img src="/images/portfolio/pnix-orderbook.png" alt="Pnix Exchange real-time order book and chart" />
+</figure>
+
+<CaseCodeDetails>
+  <summary><span>Real-time Data Buffering and Batch Updates</span></summary>
+
+```tsx
+const diffOrderbookRef = React.useRef<OrderbookDiff[]>([]);
+
+React.useEffect(() => {
+  const response = getLastJsonMessage(WS_FEED_ENUM.ORDERBOOK);
+  if (!response) return;
+
+  const previousOrders = response.order_book?.bid?.order_list ?? [];
+  const changedOrders = response.diff_order_book?.bid?.order_list ?? [];
+
+  diffOrderbookRef.current.push(
+    getDiffByCompareOrders(previousOrders, changedOrders)
+  );
+}, [getLastJsonMessage, pairAddress]);
+
+React.useEffect(() => {
+  const intervalId = window.setInterval(() => {
+    const pendingDiffs = diffOrderbookRef.current;
+    if (pendingDiffs.length === 0) return;
+
+    // Separate the diffs to process now from ones received later
+    diffOrderbookRef.current = [];
+
+    setOrderBookLevels((currentLevels) =>
+      pendingDiffs.reduce(
+        (levels, diff) => updateOrderbook(levels, diff),
+        currentLevels
+      )
+    );
+  }, 500);
+
+  return () => {
+    window.clearInterval(intervalId);
+    diffOrderbookRef.current = [];
+  };
+}, [pairAddress, selectedTickSize]);
+```
+
+</CaseCodeDetails>
+
+<CaseCodeDetails>
+  <summary><span>Quote Blink Animation</span></summary>
+
+```tsx
+const backgroundAlpha = useMotionValue(0);
+
+React.useEffect(() => {
+  if (disableAnimation || prevAmount === undefined) return;
+  if (prevAmount === order.amount) return;
+
+  backgroundAlpha.set(0.15);
+
+  let controls: ReturnType<typeof animate> | undefined;
+
+  const frameId = requestAnimationFrame(() => {
+    controls = animate(backgroundAlpha, 0, {
+      duration: 0.7,
+      ease: "linear"
+    });
+  });
+
+  return () => {
+    cancelAnimationFrame(frameId);
+    controls?.stop();
+  };
+}, [backgroundAlpha, disableAnimation, order.amount, prevAmount]);
+
+const backgroundColor = useTransform(backgroundAlpha, (alpha) =>
+  side === "ask"
+    ? `rgba(243, 88, 91, ${alpha})`
+    : `rgba(71, 225, 122, ${alpha})`
+);
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>02</span><span>Pnix Exchange</span><span>Real-time Chart</span></div>
+
+### Connecting Real-Time Chart Data with TradingView
+
+I implemented Pnix Exchange's real-time chart on top of TradingView. When a token is selected from the market list, I fetch the initial price and volume data for that asset via API, and the TradingView DataFeed adapter reshapes the server response into the OHLCV format and time units the chart expects. Live trade data then arrives over WebSocket and is applied to the current candle for the selected interval, or used to open a new candle when a new time interval begins.
+
+I also made sure that changing the asset or interval doesn't recreate the chart instance — the existing instance is kept and only its data source and subscription are swapped. This reduced unnecessary chart re-initialization and rendering cost, and improved the user experience by minimizing the sense of the screen stalling or the chart reloading when switching assets.
+
+<figure className="case-image case-image-wide">
+  <img src="/images/portfolio/pnix-tradingview-chart.png" alt="Pnix Exchange TradingView real-time candlestick chart" />
+</figure>
+
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>03</span><span>CrossX</span><span>Web–Native Architecture</span></div>
+
+### Abstracting the RN WebView Bridge into an Async API
+
+In the React Native WebView environment, requests were passed through a message-based Bridge between the WebView and the React Native app, with responses arriving asynchronously through message events. This meant request code and response-handling code were separated, making it hard for callers to receive a response value directly and continue their logic, or to manage request state the way a normal async API would.
+
+To improve this, I abstracted the WebView-Native Bridge communication into a shared function that returns a Promise. I defined the request parameters and response shape per message as types, and stored the Promise's resolve keyed by a message id at request time. When the native app's response arrived, a shared event handler looked up the resolve matching the response id and called it, making the message-based Bridge communication usable like a normal async API.
+
+This let callers receive the response value and continue their logic without needing to know the internal messaging mechanism, and by wiring it into TanStack Query's queryFn, Bridge calls could be managed with the same loading, error, and response handling as a server API.
+
+<CaseCodeDetails>
+  <summary><span>Converting Bridge Requests and Responses to Promises</span></summary>
+
+```tsx
+type RNBridgeMessageMap = {
+  "get-is-use-biometric": {
+    params: null;
+    response: BridgeResponse;
+  };
+};
+
+const pendingRequestsRef = useRef<
+  Record<
+    keyof RNBridgeMessageMap,
+    {
+      resolve: (response: BridgeResponse) => void;
+      reject: (error: unknown) => void;
+    }
+  >
+>({});
+
+const callRN = useCallback(
+  <K extends keyof RNBridgeMessageMap>(
+    message: {
+      id: K;
+      params: RNBridgeMessageMap[K]["params"];
+    }
+  ): Promise<RNBridgeMessageMap[K]["response"]> => {
+    return new Promise((resolve, reject) => {
+      // Link the message id to this request's Promise
+      pendingRequestsRef.current[message.id] = {
+        resolve,
+        reject,
+      };
+
+      window.ReactNativeWebView?.postMessage(
+        JSON.stringify(message)
+      );
+    });
+  },
+  []
+);
+
+const handleMessage = useCallback((event: MessageEvent) => {
+  const response = JSON.parse(event.data) as BridgeResponse;
+
+  // Find the Promise matching the native response's id
+  const pendingRequest =
+    pendingRequestsRef.current[response.id];
+
+  if (!pendingRequest) return;
+
+  pendingRequest.resolve(response);
+  delete pendingRequestsRef.current[response.id];
+}, []);
+```
+
+</CaseCodeDetails>
+
+<CaseCodeDetails>
+  <summary><span>Calling the Native API via TanStack Query</span></summary>
+
+```tsx
+const getUseIsBiometricAuth = async () => {
+  const response = await callRN({
+    id: "get-is-use-biometric",
+    params: null,
+  });
+
+  return response.data;
+};
+
+const { data: useIsBiometricAuthState } = useQuery({
+  queryKey: ["useIsBiometricAuthState"],
+  queryFn: getUseIsBiometricAuth,
+});
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>04</span><span>CrossX</span><span>Interaction</span></div>
+
+### Unifying Haptic Feedback with Event Delegation
+
+Implementing haptic handling directly on every button in the WebView tightly coupled UI components to how the Native Bridge was called, and repeated the same event-handling code across components. To improve this, I declared a data-haptic attribute on any element that needed haptics and moved to an event-delegation structure with a shared touch event listener that reads that attribute.
+
+The shared handler looks up the data-haptic attribute on the element where the touch ended to determine the haptic type, then calls the Native Bridge. This let individual components declare haptic behavior with just an HTML attribute, without managing Bridge calls or event listeners directly, and the same rule applied automatically to dynamically added elements.
+
+I also stored the touch start coordinates and, as the touch moved, calculated the distance to decide whether it had become a scroll or drag once it crossed a threshold. In that case, haptics were skipped even if the touch ended, preventing unintended haptics during scrolling.
+
+- Used event delegation and the data-haptic attribute to unify Native Bridge calls and reduce the coupling between UI components and haptic logic
+- Distinguished taps from scroll/drag using a touch-movement threshold to prevent unintended haptic feedback
+
+<CaseCodeDetails>
+  <summary>Implementation</summary>
+
+```tsx
+export default function useHapticFeedback() {
+  const { needHapticFeedback } = useRNBridgeFetchers();
+
+  const startPositionRef = useRef<{ x: number; y: number } | null>(null);
+  const isDraggingRef = useRef(false);
+
+  useEffect(() => {
+    const handleTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!touch) return;
+
+      startPositionRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+      };
+
+      isDraggingRef.current = false;
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      const startPosition = startPositionRef.current;
+      const touch = event.touches[0];
+
+      if (!startPosition || !touch) return;
+
+      const dx = Math.abs(touch.clientX - startPosition.x);
+      const dy = Math.abs(touch.clientY - startPosition.y);
+
+      // Treat movement past a threshold as a scroll/drag, not a tap
+      if (dx > 10 || dy > 10) {
+        isDraggingRef.current = true;
+      }
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      if (isDraggingRef.current) return;
+
+      // Look up haptic config on the touched element or its ancestor
+      const element = (event.target as HTMLElement).closest<HTMLElement>(
+        "[data-haptic]"
+      );
+
+      const type = element?.dataset.haptic as
+        | HapticFeedbackTypes
+        | undefined;
+
+      if (!type) return;
+
+      needHapticFeedback({ type });
+    };
+
+    document.addEventListener("touchstart", handleTouchStart, {
+      capture: true,
+    });
+    document.addEventListener("touchmove", handleTouchMove, {
+      capture: true,
+    });
+    document.addEventListener("touchend", handleTouchEnd, {
+      capture: true,
+    });
+
+    return () => {
+      document.removeEventListener("touchstart", handleTouchStart, true);
+      document.removeEventListener("touchmove", handleTouchMove, true);
+      document.removeEventListener("touchend", handleTouchEnd, true);
+    };
+  }, [needHapticFeedback]);
+}
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>05</span><span>CrossX</span><span>Drawer Navigation</span></div>
+
+### Stacked Screen Transitions and Back Navigation in a WebView SPA
+
+To give a WebView-based SPA a screen-transition experience close to a native app, I implemented a stack structure that piles multiple screens as Drawers. I calculate the previous Drawer's movement from the active Drawer's drag progress and apply easing so the previous Drawer is pushed out naturally and eases back in. This makes the two Drawers feel connected, as if they were a single screen transitioning together.
+
+Because opening a Drawer doesn't change the URL in a single-route SPA, the Android back button couldn't close open Drawers in order. To fix this, I push a virtual history entry each time a Drawer opens and close the topmost Drawer first on back navigation. This synchronizes the Android back gesture with the Drawer stack without any actual page navigation.
+
+<PortfolioVideo
+  src="/images/portfolio/drawer-transition.mp4"
+  poster="/images/portfolio/drawer-transition-thumbnail.png"
+  label="CrossX stacked Drawer transition video"
+/>
+
+<CaseCodeDetails>
+  <summary>Implementation</summary>
+
+```tsx
+const PREV_DRAWER_OFFSET = 100;
+const DURATION = 400;
+const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+const easeOutCubic = (s: number) => 1 - Math.pow(1 - s, 3);
+
+function animatePrevDrawer(
+  element: HTMLDivElement,
+  open: boolean | undefined
+) {
+  element.style.willChange = "transform";
+  element.style.transition = "none";
+
+  const initialTransform = open
+    ? "translate3d(0px, 0, 0)"
+    : `translate3d(${-PREV_DRAWER_OFFSET}px, 0, 0)`;
+
+  element.style.transform = initialTransform;
+
+  // Split the timing so the initial position is painted on iOS WebView
+  // before the transition starts
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      element.style.transition = `transform ${DURATION}ms ${EASING}`;
+
+      const finalTransform = open
+        ? `translate3d(${-PREV_DRAWER_OFFSET}px, 0, 0)`
+        : "translate3d(0px, 0, 0)";
+
+      element.style.transform = finalTransform;
+    });
+  });
+}
+
+function animatePrevDrawerWithDrag(
+  element: HTMLDivElement,
+  rafIdRef: React.RefObject<number | null>,
+  percentage: number
+) {
+  element.style.willChange = "transform";
+  element.style.transition = "none";
+
+  // Derive the previous Drawer's offset from the active Drawer's
+  // drag progress
+  const eased = easeOutCubic(percentage);
+  const x =
+    -PREV_DRAWER_OFFSET + eased * PREV_DRAWER_OFFSET;
+
+  rafIdRef.current = requestAnimationFrame(() => {
+    element.style.transform = `translate3d(${x}px, 0, 0)`;
+  });
+}
+
+export default function AnimatedDrawer({
+  children,
+  open,
+  ...props
+}: React.ComponentProps<typeof Drawer>) {
+  const rafIdRef = React.useRef<number | null>(null);
+  const isDraggedRef = React.useRef(false);
+
+  const handleDrag = (_: unknown, percentage: number) => {
+    isDraggedRef.current = true;
+
+    const prevDrawer = getPrevDrawer();
+    const currentDrawer = getCurrentDrawer();
+
+    if (!prevDrawer || shouldSkipAnimation(currentDrawer)) {
+      return;
+    }
+
+    // Cancel the pending frame and apply only the latest
+    // drag position
+    if (rafIdRef.current) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
+    animatePrevDrawerWithDrag(
+      prevDrawer,
+      rafIdRef,
+      percentage
+    );
+  };
+
+  return (
+    <Drawer
+      data-vaul-drawer
+      {...props}
+      open={open}
+      onDrag={handleDrag}
+    >
+      {children}
+    </Drawer>
+  );
+}
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study case-study-compact-media">
+  <div className="case-study-meta"><span>06</span><span>CrossX</span><span>Canvas Visualization</span></div>
+
+### Customizing an Interactive Area Chart
+
+- Touching or dragging the chart finds the data point closest to the touch position and displays its time and value alongside a guide line
+- Highlights the segment before the selected point in an accent color and the segment after it in a muted color
+- Adjusts the position of the max/min value labels against their actual rendered width so they never overflow the chart
+
+<PortfolioVideo
+  src="/images/portfolio/interactive-area-chart.mp4"
+  poster="/images/portfolio/interactive-area-chart-thumbnail.png"
+  label="CrossX interactive Canvas Area Chart video"
+/>
+
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>07</span><span>CrossX</span><span>Pull to Refresh</span></div>
+
+### Pull-to-Refresh for nested scrolling
+
+Wrapping a screen in a shared Pull-to-Refresh component applies an iOS-native-style pull-down interaction without any per-screen implementation. On screens with an inner scroll area, the pull gesture only starts when that scroll is at the top, so it never conflicts with normal scrolling, and resistance increases gradually with pull distance for a natural feel. On screens that need a refresh, crossing the threshold triggers haptics and the Rive indicator before running the async task, and the screen returns to its original position once it completes.
+
+<PortfolioVideo
+  src="/images/portfolio/pull-to-refresh.mp4"
+  poster="/images/portfolio/pull-to-refresh-thumbnail.png"
+  label="CrossX Pull-to-Refresh video"
+/>
+
+<CaseCodeDetails>
+  <summary>Implementation</summary>
+
+```tsx
+const handleTouchMove = (event: TouchEvent) => {
+  const currentY = event.touches[0]?.clientY ?? 0;
+  pendingDeltaRef.current = currentY - startYRef.current;
+
+  if (pendingDeltaRef.current <= 0 || framePendingRef.current) return;
+  framePendingRef.current = true;
+
+  requestAnimationFrame(() => {
+    const distance = pendingDeltaRef.current;
+    const damped = distance * (1 - Math.exp(-distance / 60)) * 0.5;
+    const offset = Math.min(damped, maxPullDistance);
+
+    setOffsetY(offset);
+    thresholdPassedRef.current = offset >= refreshThreshold;
+    framePendingRef.current = false;
+  });
+};
+```
+
+</CaseCodeDetails>
+</section>
+
+<section className="case-study">
+  <div className="case-study-meta"><span>08</span><span>Cross Ecosystem</span><span>Shared Package</span></div>
+
+### Standardizing the App Launcher Across Services into One Package
+
+Each service managed its own App Launcher UI and configuration separately, so the same change had to be repeated across multiple projects. To fix this, I extracted the App Launcher UI into a shared package and consolidated each service's display information into a single S3 configuration. Now adding a service or changing its display information only requires updating the shared S3 configuration, and it takes effect across every service.
+
+<PortfolioVideo
+  src="/images/portfolio/app-launcher.mp4"
+  poster="/images/portfolio/app-launcher-thumbnail.png"
+  label="Shared App Launcher demonstration"
+/>
+
+</section>
+
+</section>
+
+## CERTIFICATION
 
 <div className="education-list">
   <div className="education-item">
-    <span className="education-period">Mar 2014 – Feb 2022</span>
-    <span className="education-content"><span className="education-title">B.E. in Applied Chemical Engineering · Korea University of Technology and Education</span></span>
+    <span className="education-content"><span className="education-title">Computer Specialist in Spreadsheet &amp; Database, Level 1 <span className="education-period">Mar 2019</span></span></span>
   </div>
   <div className="education-item">
-    <span className="education-period">Mar 2022 – Jul 2022</span>
-    <span className="education-content"><span className="education-title">Vanilla Coding Full-Stack Bootcamp</span><span>Focused on web frontend development with React and implemented end-to-end web services using Node.js and MongoDB.</span></span>
+    <span className="education-content"><span className="education-title">TOEIC 825 <span className="education-period">Aug 2019</span></span></span>
+  </div>
+</div>
+
+## EDUCATION
+
+<div className="education-list">
+  <div className="education-item">
+    <span className="education-content"><span className="education-title">B.E. in Applied Chemical Engineering · Korea University of Technology and Education <span className="education-period">Mar 2014 – Feb 2022</span></span></span>
   </div>
   <div className="education-item">
-    <span className="education-period">Jul 2020 – Feb 2021</span>
-    <span className="education-content"><span className="education-title">Korea IT Academy Web &amp; App Developer Program</span><span>Studied Java, web standards, JavaScript, Tomcat, JSP, jQuery, Oracle, and Spring, and completed a team project to understand the full web-service flow.</span></span>
+    <span className="education-content"><span className="education-title">Vanilla Coding Full-Stack Bootcamp <span className="education-period">Mar 2022 – Jul 2022</span></span><span>Studied core full-stack web development technologies including JavaScript, Node.js, and React, and gained practical collaboration experience through agile sprint-based team and individual projects</span></span>
   </div>
   <div className="education-item">
-    <span className="education-period">Jul 2020 – Sep 2020</span>
-    <span className="education-content"><span className="education-title">Boostcourse Coding Newbie Challenge · Connects</span><span>Studied computational thinking, arrays, algorithms, and data structures in C through Harvard CS50, solved weekly missions with teammates over Slack, and received coach feedback.</span></span>
+    <span className="education-content"><span className="education-title">Korea IT Academy Web &amp; App Developer Program <span className="education-period">Jul 2020 – Feb 2021</span></span><span>Studied web development fundamentals including HTML/CSS, JavaScript, and Java, and completed backend development practice and projects based on JSP, Tomcat, MyBatis, Oracle, and Spring</span></span>
+  </div>
+  <div className="education-item">
+    <span className="education-content"><span className="education-title">Boostcourse Coding Newbie Challenge · Connects <span className="education-period">Jul 2020 – Sep 2020</span></span><span>Studied C-language-based computational thinking, arrays, algorithms, and data structures through Harvard CS50, and solved weekly missions with teammates over Slack</span></span>
   </div>
 </div>

@@ -31,14 +31,14 @@ pre[class*="language-"]::-moz-selection,
 pre[class*="language-"] ::-moz-selection,
 code[class*="language-"]::-moz-selection,
 code[class*="language-"] ::-moz-selection {
-  background: #8da1b9;
+  background: hsla(160, 72%, 45%, 0.38);
 }
 
 pre[class*="language-"]::selection,
 pre[class*="language-"] ::selection,
 code[class*="language-"]::selection,
 code[class*="language-"] ::selection {
-  background: #8da1b9;
+  background: hsla(160, 72%, 45%, 0.38);
 }
 
 /* Code blocks */
@@ -344,7 +344,7 @@ pre > code.diff-highlight .token.token.inserted:not(.prefix) {
   pre[class*="language-"] *::selection,
   code[class*="language-"] *::selection {
     text-shadow: none;
-    background: #264f78;
+    background: hsla(160, 72%, 45%, 0.38);
   }
 
   @media print {

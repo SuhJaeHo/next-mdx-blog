@@ -11,9 +11,14 @@
     "portfolioOverview": "概要",
     "introduce": "自己紹介書",
     "career": "職務経歴",
+    "careerPortfolio": "技術ポートフォリオ",
     "npmPublish": "パッケージ化",
     "mdx": "コンテンツ構成",
     "npmReadme": "ドキュメント"
+  },
+  "CareerPortfolio": {
+    "downloadPdf": "PDFとして保存",
+    "pdfTitle": "ソ・ジェホ_技術ポートフォリオ"
   },
   "Header": {
     "language": "言語を選択",

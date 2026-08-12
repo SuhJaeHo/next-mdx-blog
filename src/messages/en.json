@@ -11,9 +11,14 @@
     "portfolioOverview": "Overview",
     "introduce": "About Me",
     "career": "Experience",
+    "careerPortfolio": "Technical Portfolio",
     "npmPublish": "Packaging",
     "mdx": "Content Setup",
     "npmReadme": "DOCS"
+  },
+  "CareerPortfolio": {
+    "downloadPdf": "Save as PDF",
+    "pdfTitle": "Jaeho_Seo_Technical_Portfolio"
   },
   "Header": {
     "language": "Select language",

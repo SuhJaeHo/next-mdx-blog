@@ -34,6 +34,10 @@ const tabMessageKeys = {
   "npm-readme.mdx": "npmReadme",
 } as const;
 
+const tabMessageKeysById = {
+  "introduce-portfolio-tab": "careerPortfolio",
+} as const;
+
 // Only applied when a dragged group snaps into the half-size drop indicator on release.
 const GROUP_RESIZE_SNAP_TRANSITION = ["top", "left", "width", "height"]
   .map((property) => `${property} ${GROUP_RESIZE_SNAP_DURATION_MS}ms ease-out`)
@@ -1025,7 +1029,7 @@ interface IGroupProps extends React.ComponentPropsWithoutRef<"div"> {
 const Group = React.forwardRef<React.ElementRef<"div">, IGroupProps>(({ children, className, groupData, mdxSources, ...props }, forwardedRef) => {
   const { boardDataState } = useBoardDataContext();
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handlePointerDownCapture = (e: React.PointerEvent) => {
     setGroupElementForeground(e.currentTarget.id);
   };
 
@@ -1036,7 +1040,7 @@ const Group = React.forwardRef<React.ElementRef<"div">, IGroupProps>(({ children
       ref={forwardedRef}
       className={cn("absolute", className)}
       style={{ width: groupData.size.width, height: groupData.size.height, left: groupData.position.x, top: groupData.position.y }}
-      onMouseDown={handleMouseDown}
+      onPointerDownCapture={handlePointerDownCapture}
       id={groupData.id}
       data-group
       data-page-id={boardDataState.selectedPageId}
@@ -1237,7 +1241,7 @@ const TabContent = React.forwardRef<React.ElementRef<"div">, ITabContentProps>((
       style={{ userSelect: "text", WebkitUserSelect: "text" }}
       onMouseDown={(event) => event.stopPropagation()}
     >
-      {!mdxContent ? <div>{children}</div> : React.cloneElement(children as React.ReactElement, { groupId: id, mdxContent, contentFile })}
+      {!mdxContent ? <div>{children}</div> : React.cloneElement(children as React.ReactElement, { groupId: id, tabId: selectedTabId, mdxContent, contentFile })}
     </div>
   );
 });
@@ -1303,7 +1307,10 @@ const Tab = React.forwardRef<React.ElementRef<"div">, ITabProps>(({ className, g
       data-position={JSON.stringify({ x: 0, y: 0 })}
       data-selected={tabId === selectedTabId}
     >
-      {t(tabMessageKeys[boardDataState.tab[tabId].contentFile as keyof typeof tabMessageKeys])}
+      {t(
+        tabMessageKeysById[tabId as keyof typeof tabMessageKeysById] ??
+          tabMessageKeys[boardDataState.tab[tabId].contentFile as keyof typeof tabMessageKeys]
+      )}
     </div>
   );
 });

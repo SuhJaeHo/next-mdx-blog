@@ -18,6 +18,7 @@ interface IGroupTabsLayoutProps {
 const INTRO_GROUP_ID = "introduce-profile-group";
 const INTRO_TAB_ID = "introduce-cover-letter-tab";
 const CAREER_TAB_ID = "introduce-career-tab";
+const PORTFOLIO_TAB_ID = "introduce-portfolio-tab";
 
 function IntroSplitEntrance() {
   const { boardDataState } = useBoardDataContext();
@@ -49,6 +50,26 @@ function IntroSplitEntrance() {
       const careerFrom = centerOf(careerTab);
       await simulateDrag(careerTab, careerFrom, { x: containerRect.right + careerTab.offsetWidth, y: careerFrom.y }, { signal: controller.signal, steps: 38, stepDelayMs: 26 });
       await sleep(360, controller.signal);
+
+      // 직무경력과 기술 포트폴리오는 같은 패널에 유지한다. 직무경력 탭이
+      // 분리된 뒤 기술 포트폴리오 탭을 해당 패널의 헤더로 옮겨 합친다.
+      const portfolioTab = document.getElementById(PORTFOLIO_TAB_ID);
+      const splitCareerTab = document.getElementById(CAREER_TAB_ID);
+      const careerHeader = splitCareerTab?.closest<HTMLElement>("[data-group-header]");
+      if (!portfolioTab || !splitCareerTab || !careerHeader) return;
+
+      const portfolioFrom = centerOf(portfolioTab);
+      const careerHeaderRect = careerHeader.getBoundingClientRect();
+      await simulateDrag(
+        portfolioTab,
+        portfolioFrom,
+        {
+          x: careerHeaderRect.left + Math.min(splitCareerTab.offsetWidth / 2, careerHeaderRect.width / 2),
+          y: careerHeaderRect.top + careerHeaderRect.height / 2,
+        },
+        { signal: controller.signal, steps: 30, stepDelayMs: 24 }
+      );
+      await sleep(320, controller.signal);
 
       const introTab = document.getElementById(INTRO_TAB_ID);
       if (!introTab) return;
