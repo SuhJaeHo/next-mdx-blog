@@ -1046,6 +1046,10 @@
     display: none;
   }
 
+  > :global(.technical-portfolio-section[data-hidden="true"]) {
+    display: none !important;
+  }
+
   :global(.case-study) {
     position: relative;
     margin: 0 0 46px;
