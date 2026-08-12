@@ -98,7 +98,7 @@ export default function GroupTabsLayout({ data, mdxSourcesByLocale }: IGroupTabs
       <Board.Root
         key={resetKey}
         boardData={{ ...data, selectedPageId: resetPageId }}
-        customConstants={{ TAB_SIZES: { WIDTH: 100, HEIGHT: 50 }, GROUP_MINIMUM_SIZE: { WIDTH: 400, HEIGHT: 300 } }}
+        customConstants={{ TAB_SIZES: { WIDTH: 128, HEIGHT: 50 }, GROUP_MINIMUM_SIZE: { WIDTH: 400, HEIGHT: 300 } }}
       >
         <IntroSplitEntrance />
         <TutorialController onFinish={handleTutorialFinish} />
@@ -113,7 +113,7 @@ export default function GroupTabsLayout({ data, mdxSourcesByLocale }: IGroupTabs
               className="grid grid-rows-[auto_1fr] border border-border/60 bg-background shadow-[0_8px_28px_-20px_rgba(0,0,0,0.34)] ring-1 ring-foreground/[0.025] transition-group duration-200 data-[foreground=true]:border-border/90 data-[foreground=true]:shadow-[0_22px_48px_-24px_rgba(0,0,0,0.46)] dark:border-foreground/15 dark:shadow-[0_10px_34px_-24px_rgba(0,0,0,0.9)] dark:data-[foreground=true]:border-foreground/30 dark:data-[foreground=true]:ring-foreground/[0.07] dark:data-[foreground=true]:shadow-[0_24px_52px_-26px_rgba(0,0,0,0.95)]"
             >
               <Board.GroupHeader className="cursor-pointer border-b border-border/55 bg-secondary/45 shadow-[inset_0_-1px_0_hsl(var(--border)/0.35)] dark:border-foreground/15 dark:bg-secondary/20">
-                <Board.Tab className="flex cursor-pointer items-center justify-center whitespace-normal bg-secondary/25 px-3 text-center text-sm text-muted-foreground transition-tab duration-300 hover:bg-secondary/60 hover:text-foreground data-[selected=true]:z-10 data-[selected=true]:bg-background data-[selected=true]:text-foreground data-[selected=true]:shadow-[0_8px_20px_-13px_hsl(var(--foreground)/0.5)] dark:bg-secondary/10 dark:hover:bg-secondary/30 dark:data-[selected=true]:bg-background dark:data-[selected=true]:shadow-[0_10px_24px_-14px_hsl(var(--foreground)/0.38)]" />
+                <Board.Tab className="flex cursor-pointer items-center justify-center whitespace-normal bg-secondary/35 px-3 text-center text-sm text-muted-foreground shadow-[inset_-1px_0_0_hsl(var(--border)/0.58)] transition-tab duration-300 hover:bg-secondary/55 hover:text-foreground data-[selected=true]:z-10 data-[selected=true]:bg-background data-[selected=true]:text-foreground data-[selected=true]:shadow-[inset_-1px_0_0_hsl(var(--border)/0.48),0_8px_20px_-13px_hsl(var(--foreground)/0.5)] dark:bg-secondary/12 dark:shadow-[inset_-1px_0_0_hsl(var(--foreground)/0.16)] dark:hover:bg-secondary/30 dark:data-[selected=true]:bg-background dark:data-[selected=true]:shadow-[inset_-1px_0_0_hsl(var(--foreground)/0.16),0_10px_24px_-14px_hsl(var(--foreground)/0.38)]" />
                 <Board.TabIndicate className="border border-indicator bg-indicator/20" />
               </Board.GroupHeader>
               <Board.TabContent className="bg-background text-foreground">
