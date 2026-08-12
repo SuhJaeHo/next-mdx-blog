@@ -1,36 +1,17 @@
-# BoardへのMDX統合
+# MDX
 
 MDXはJSX構文を使えるように拡張されたMarkdownです。文章、Markdown構造、JavaScript式、コンポーネントを同じドキュメント処理パイプラインで扱えます。
 
-このポートフォリオでは、MDXによってコンテンツとBoardのインタラクションコードを分離しています。タブは`contentFile`を保持し、選択されたファイルは`Board.TabContent`内でレンダリングされます。
-
 ## コンパイルパイプライン
 
-処理を簡略化すると次のようになります。
+<div className="code-explanation-list">
+  <div><strong>MarkdownとMDX構文を解析してAbstract Syntax Treeへ変換</strong><span>MarkdownノードとMDX固有ノードをMarkdown抽象構文木として表現します。</span></div>
+  <div><strong>remarkプラグインを実行</strong><span>remarkプラグインはmdastを検査・変換します。remark-gfmは表やタスクリストなどGitHub Flavored Markdownの機能を追加します。</span></div>
+  <div><strong>Markdown ASTをHTML ASTへ変換</strong><span>Markdown ASTをHTML ASTへ変換し、MDXのJSXと式は後続のコンパイル段階で処理できるよう保持します。</span></div>
+  <div><strong>rehypeプラグインを実行</strong><span>rehypeプラグインはhastを検査・変換します。このポートフォリオではrehype-prism-plusでコードブロックにシンタックスハイライト情報を付けます。</span></div>
+</div>
 
-1. **MarkdownとMDX構文をmdastへ解析**
-
-   MarkdownノードとMDX固有ノードをMarkdown抽象構文木として表現します。
-
-2. **remarkプラグインを実行**
-
-   remarkプラグインはmdastを検査・変換します。`remark-gfm`は表やタスクリストなどGitHub Flavored Markdownの機能を追加します。
-
-3. **mdastをhastへ変換**
-
-   Markdown構造をHTML形式の抽象構文木へ変換し、MDXノードは後でJavaScriptやコンポーネント式にできるよう保持します。
-
-4. **rehypeプラグインを実行**
-
-   rehypeプラグインはhastを検査・変換します。このポートフォリオでは`rehype-prism-plus`でコードブロックにシンタックスハイライト情報を付けます。
-
-5. **JavaScriptへコンパイル**
-
-   MDXは最終的にJSXランタイムを使うJavaScriptになります。結果のモジュールをレンダリングするとReact要素が生成され、単純なHTML文字列を返す仕組みではありません。
-
-## このポートフォリオでの読み込み方法
-
-サーバーは静的生成時にMarkdownファイルを読み、シリアライズします。
+## MDXレンダリング過程
 
 ```ts
 import { serialize } from "next-mdx-remote/serialize";
@@ -46,7 +27,9 @@ const source = await serialize(fileContent, {
 });
 ```
 
-シリアライズした結果をレンダラーへ渡します。
+<div className="code-explanation-list">
+  <div><strong>MDXファイルのシリアライズ</strong><span>静的生成の過程でMDXファイルを読み、serializeでシリアライズします。</span></div>
+</div>
 
 ```tsx
 import { MDXRemote } from "next-mdx-remote";
@@ -58,68 +41,12 @@ export function CustomMDX({ source }) {
 }
 ```
 
-`serialize`は原文を、コンパイル済みコードとscope情報を持つシリアライズ可能なオブジェクトへ変換します。`MDXRemote`はJSXランタイムでそれを評価し、React要素をレンダリングします。このプロジェクトでは標準の`pre`要素を独自のコードブロックコンポーネントに置き換えています。
-
-## タブとドキュメントの接続
-
-Boardデータにはタブとドキュメントの関係だけを保存します。
-
-```json
-{
-  "id": "portfolio-overview-tab",
-  "groupId": "portfolio-group",
-  "name": "Overview",
-  "contentFile": "portfolio-overview.mdx"
-}
-```
-
-レンダリング時に対象ドキュメントを取得します。
-
-```ts
-const contentFile = boardData.tab[selectedTabId].contentFile;
-const mdxContent = mdxSources[contentFile];
-```
-
-この分離には次の利点があります。
-
-- Board reducerがドキュメント内容を知る必要がありません。
-- ドラッグやレイアウト処理を変更せずにドキュメントを追加できます。
-- 同じBoardで履歴書、自己紹介書、パッケージドキュメント、学習ノートを表示できます。
-- 現在のBoard状態を保ったまま、ロケール別ファイルへ切り替えられます。
-
-## MDXコアコンパイラの利用
-
-同じ考え方を`@mdx-js/mdx`で直接実装することもできます。
-
-```tsx
-import { compile, run } from "@mdx-js/mdx";
-import * as runtime from "react/jsx-runtime";
-
-const compiled = await compile(mdxContent, { outputFormat: "function-body" });
-const { default: MDXContent } = await run(String(compiled), {
-  ...runtime,
-  baseUrl: import.meta.url,
-});
-
-return <MDXContent />;
-```
-
-`compile`はJavaScriptコードを含む仮想ファイルを返します。`run`は渡されたJSXランタイムでコードを評価します。ユーザーが入力したMDXを評価するとJavaScriptが実行される可能性があるため、信頼できる原文だけを使用する必要があります。
-
-## RemarkとRehype
-
-- **Remarkプラグイン**は主にMarkdown構文とmdastを処理します。
-- **Rehypeプラグイン**は主にHTML形式の構造とhastを処理します。
-- 違いは最終結果がMarkdownかHTMLかではなく、どの構文木を受け取るかにあります。
-
-## セキュリティと保守
-
-このポートフォリオは任意のユーザー入力ではなく、バージョン管理されたローカルMDXファイルだけを読み込みます。コンパイル済みMDXは実行可能なJavaScriptであるため、この信頼境界が重要です。
-
-`next-mdx-remote`リポジトリは2026年4月から読み取り専用でアーカイブされています。現在の統合は動作しますが、将来はRSC向けAPIや継続的に保守されているMDXソリューションへの移行を検討できます。
+<div className="code-explanation-list">
+  <div><strong>React要素のレンダリング</strong><span>シリアライズした結果をMDXRemoteへ渡し、React要素としてレンダリングします。</span></div>
+</div>
 
 ## 参考資料
 
 - [MDXとは](https://mdxjs.com/docs/what-is-mdx/)
-- [`@mdx-js/mdx` API](https://mdxjs.com/packages/mdx/)
-- [`next-mdx-remote`ドキュメント](https://github.com/hashicorp/next-mdx-remote)
+- [@mdx-js/mdx API](https://mdxjs.com/packages/mdx/)
+- [next-mdx-remoteドキュメント](https://github.com/hashicorp/next-mdx-remote)

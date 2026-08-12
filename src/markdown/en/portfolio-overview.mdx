@@ -1,37 +1,16 @@
-# Building This Portfolio
+# Chrome-like Group Tabs
 
-This is not a portfolio assembled from a fixed template. Inspired by Chrome-style tabs, I designed an **interactive workspace** where documents can be arranged and compared freely. I call the core component responsible for the entire layout and its interactions the **Board**.
+Inspired by Chrome-style group tabs, I designed an interactive workspace where documents can be arranged and compared freely.
 
-> This project presents not only the finished interface, but also how I designed its browser interactions, built and shipped a reusable foundation, and continued improving it through use.
+## Feature Implementation List
 
-## What I Built
+<ul className="overview-feature-list">
+  <li><strong>Chrome-like group tab interactions</strong><span>Implemented tab reordering, splitting into independent panels, and merging them back together with Vanilla DOM APIs</span></li>
+  <li><strong>Resizing implementation</strong><span>When a tab or group is dragged outside the panel and dropped, it resizes to half of the target area, and double-clicking the group header toggles between fullscreen and the previous size</span></li>
+  <li><strong>NPM packaging</strong><span>Separated the Chrome-like tab resizing UI into an independent package and published it to NPM</span></li>
+  <li><strong>MDX-based content rendering</strong><span>Serialized MDX content with next-mdx-remote and rendered tab-specific document content with GFM and code highlighting applied</span></li>
+</ul>
 
-- **Chrome-style tab interactions** — implemented tab reordering, splitting into independent panels, and merging them back together
-- **Layout engine built with Vanilla DOM APIs** — implemented eight-direction resizing, group movement, and tab reorder, split, and merge without an external drag library
-- **Boundary-aware layout** — panels and tabs snap to half-screen regions at viewport edges, with fullscreen and previous-state restoration
-- **Reusable package** — isolated the Board foundation and published it through NPM for use beyond this site
-- **MDX content system** — separated content from interface logic so new writing can be added without rebuilding the Board
-- **Localized portfolio** — presents my profile, professional experience, and portfolio implementation notes in English, Korean, and Japanese
+## Motivation for Building This Portfolio
 
-## Why This Format
-
-An introduction, professional experience, and implementation notes carry different priorities depending on the visitor. I decided that opening and arranging the relevant documents would serve this portfolio better than a single, fixed scrolling sequence.
-
-Each document opens as an independent tab. Visitors can compare my introduction and experience side by side or split an implementation note into its own panel. The Board is the **layout and interaction engine** that enables this way of exploring the content.
-
-## How the Pieces Connect
-
-| Layer | Responsibility |
-| --- | --- |
-| Board | Manages the full-screen layout, tab and panel movement, eight-direction resizing, split, merge, and focus |
-| NPM package | Makes the Chrome-style tab and panel interaction model reusable in other projects |
-| MDX | Stores career documents and technical writing independently from UI code |
-| Locale content | Provides English, Korean, and Japanese versions without resetting Board state |
-| Next.js | Pre-renders routes and delivers the portfolio as an actual maintained product |
-
-## Document Structure
-
-1. **Overview** explains why this portfolio exists and what it demonstrates.
-2. **Board Package** covers how the reusable UI was packaged and published.
-3. **MDX Integration** explains how documents are connected to tabs.
-4. **DOCS** shows how another developer can install and use the package.
+I thought it would be useful to use Chrome-style group tab interactions to provide a format where freely written posts can be separated, merged, or viewed together at the same time. I built this as my own portfolio, and I also plan to use the format as a blog for recording and organizing what I learn.

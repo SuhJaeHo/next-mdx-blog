@@ -12,8 +12,8 @@
     "introduce": "자기소개서",
     "career": "직무경력",
     "careerPortfolio": "기술 포트폴리오",
-    "npmPublish": "패키징",
-    "mdx": "콘텐츠 구성",
+    "npmPublish": "패키지화",
+    "mdx": "MDX",
     "npmReadme": "문서화"
   },
   "CareerPortfolio": {

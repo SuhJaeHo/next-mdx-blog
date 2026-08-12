@@ -1,8 +1,6 @@
-# Boardパッケージのビルドと公開
+# Chrome-likeグループタブコンポーネントパッケージの公開
 
-Boardは、並べ替え可能なタブを持つパネルを移動・サイズ変更できる、このポートフォリオのインタラクションモデルとして始まりました。再利用可能な基盤をポートフォリオのコンテンツから分離し、NPMパッケージとして公開しました。
-
-[`group-tabs-layout` NPMページ](https://www.npmjs.com/package/group-tabs-layout)
+Chrome-likeグループタブインタラクションとリサイズロジックをコンテンツから分離し、再利用可能なコンポーネントパッケージとして構成しました。Rollupベースのビルド環境を整備し、型宣言とスタイル出力を含めて<a className="npm-inline-link" href="https://www.npmjs.com/package/group-tabs-layout" target="_blank" rel="noreferrer">NPM</a>へ公開することで、同じタブ・パネルインタラクションを他のプロジェクトでも利用できるようにしました。
 
 ## Rollupを選んだ理由
 
@@ -14,29 +12,15 @@ Rollupはコンポーネントライブラリに次の利点を提供します�
 
 ツリーシェイキングだけで、すべての利用者に最小のバンドルが保証されるわけではありません。ES Moduleの境界を保ち、不要な副作用を避け、パッケージのメタデータを正しく宣言する必要があります。
 
-## ビルド構成の役割
+## Rollupプラグイン構成と役割
 
-### `@rollup/plugin-typescript`
-
-TypeScriptコンパイラでコードを変換し、診断情報を出力します。`declaration`を有効にすると型宣言ファイルも生成できます。CIでは、バンドルとは独立して型検査を理解・実行できるように`tsc --noEmit`も使用します。
-
-### `@rollup/plugin-node-resolve`
-
-Node方式でパッケージを解決し、Rollupが`node_modules`内の依存関係を見つけられるようにします。
-
-### `@rollup/plugin-commonjs`
-
-CommonJSモジュールを、Rollupが解析できるES Moduleへ変換します。
-
-### Peer dependencyと`external`
-
-Reactコンポーネントライブラリでは、ReactとReact DOMをpeer dependencyとして宣言します。利用側のアプリケーションがランタイムを提供するため、Reactの二重バンドルを防げます。
-
-peer dependencyの宣言だけではRollupからの除外は保証されないため、ビルド設定でも`external`に指定します。
-
-### PostCSS
-
-`rollup-plugin-postcss`はimportされたスタイルを処理します。JavaScriptからCSSを注入する方法と、利用者が明示的にimportする別ファイルへ抽出する方法を選べます。
+<div className="code-explanation-list">
+  <div><strong>@rollup/plugin-typescript</strong><span>TypeScriptコンパイラでコードを変換し、診断情報を出力します。declarationを有効にすると型宣言ファイルも生成できます。</span></div>
+  <div><strong>@rollup/plugin-node-resolve</strong><span>Node方式でパッケージを解決し、Rollupがnode_modules内の依存関係を見つけられるようにします。</span></div>
+  <div><strong>@rollup/plugin-commonjs</strong><span>CommonJSモジュールを、Rollupが解析できるES Moduleへ変換します。</span></div>
+  <div><strong>Peer dependencyとexternal</strong><span>ReactとReact DOMはpeer dependencyとして宣言し、利用側のアプリケーションがランタイムを提供するため、Reactの二重バンドルを防げます。peer dependencyの宣言だけではRollupからの除外は保証されないため、ビルド設定でもexternalに指定します。</span></div>
+  <div><strong>rollup-plugin-postcss</strong><span>importされたスタイルを処理します。JavaScriptからCSSを注入する方法と、利用者が明示的にimportする別ファイルへ抽出する方法を選べます。</span></div>
+</div>
 
 ## Rollup設定
 
@@ -64,8 +48,6 @@ export default {
 };
 ```
 
-この例ではBabelを使用していません。TypeScriptがモダンJavaScriptを直接出力できるため、役割が重なる変換処理を避けています。対象環境ごとの構文変換が必要な場合は、TypeScriptとBabelの責務を明確に分けます。
-
 ## TypeScriptビルド設定
 
 ```json
@@ -87,7 +69,10 @@ export default {
 }
 ```
 
-RollupのTypeScriptプラグインがJavaScriptと型宣言を同時に生成するため、`emitDeclarationOnly`は`false`です。型宣言を別の`tsc`処理で生成する場合は、その専用設定で`true`を使用します。
+<div className="code-explanation">
+  <strong>設定説明</strong>
+  <span>RollupのTypeScriptプラグインがJavaScriptと型宣言を同時に生成するため、emitDeclarationOnlyはfalseにします。</span>
+</div>
 
 ## パッケージのエントリーポイント
 
@@ -109,15 +94,6 @@ RollupのTypeScriptプラグインがJavaScriptと型宣言を同時に生成す
   "sideEffects": ["**/*.css"]
 }
 ```
-
-- `main`は従来のCommonJSエントリーポイントです。
-- `module`はES Moduleビルドを示す一般的な規約です。
-- `exports`は最新のNode.jsとバンドラーが使用する公開エントリーポイントのマップです。
-- `types`はTypeScript型宣言の場所を示します。
-- `files`は公開パッケージに含めるファイルを制限します。
-- `sideEffects`はJavaScriptのツリーシェイキングを許可しつつ、CSS importを保持します。
-
-公開前に`npm pack --dry-run`を実行すると、含まれるファイルを確認できます。
 
 ## 参考資料
 

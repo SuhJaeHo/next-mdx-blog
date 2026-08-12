@@ -37,7 +37,7 @@
       },
       "ed3bc28c-f05c-4033-8545-3d7c16c56c07": {
         "id": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
-        "tabIds": ["portfolio-overview-tab", "5a76f275-0917-4d11-94cf-547b57be5fe6", "abf3a276-c01c-473f-93e9-2b3a2cbac3a9", "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0"],
+        "tabIds": ["portfolio-overview-tab", "5a76f275-0917-4d11-94cf-547b57be5fe6", "abf3a276-c01c-473f-93e9-2b3a2cbac3a9"],
         "selectedTabId": "portfolio-overview-tab",
         "size": {
           "width": 320,
@@ -79,20 +79,14 @@
       "5a76f275-0917-4d11-94cf-547b57be5fe6": {
         "id": "5a76f275-0917-4d11-94cf-547b57be5fe6",
         "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
-        "name": "Board Package",
+        "name": "패키지화",
         "contentFile": "npm-publish.mdx"
       },
       "abf3a276-c01c-473f-93e9-2b3a2cbac3a9": {
         "id": "abf3a276-c01c-473f-93e9-2b3a2cbac3a9",
         "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
-        "name": "MDX Integration",
+        "name": "MDX",
         "contentFile": "mdx.mdx"
-      },
-      "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0": {
-        "id": "1c107a6b-e84f-4bb7-9ea9-18be0cd511e0",
-        "groupId": "ed3bc28c-f05c-4033-8545-3d7c16c56c07",
-        "name": "DOCS",
-        "contentFile": "npm-readme.mdx"
       }
     }
   }

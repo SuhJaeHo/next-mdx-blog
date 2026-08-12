@@ -1,8 +1,6 @@
-# Building and Publishing the Board Package
+# Publishing a Chrome-like Group Tab Component Package
 
-The Board began as the interaction model behind this portfolio: movable and resizable groups containing reorderable tabs. I separated the reusable foundation from the portfolio content and published it as an NPM package.
-
-[`group-tabs-layout` on NPM](https://www.npmjs.com/package/group-tabs-layout)
+I separated Chrome-like group tab interactions and resizing logic from the content, turning them into a reusable component package. I configured a Rollup-based build pipeline and published the package to <a className="npm-inline-link" href="https://www.npmjs.com/package/group-tabs-layout" target="_blank" rel="noreferrer">NPM</a> with type declarations and style output so the same tab and panel interactions can be used in other projects.
 
 ## Why Rollup
 
@@ -14,31 +12,17 @@ Rollup is a good fit for a component library because it:
 
 Tree-shaking is not automatic proof that every consumer receives the smallest possible bundle. It works best when the library preserves ES module boundaries, avoids unnecessary side effects, and declares package metadata correctly.
 
-## Build Responsibilities
+## Rollup Plugin Configuration and Responsibilities
 
-### `@rollup/plugin-typescript`
+<div className="code-explanation-list">
+  <div><strong>@rollup/plugin-typescript</strong><span>Uses the TypeScript compiler to transpile TypeScript and report compiler diagnostics. It can also emit declaration files when declaration is enabled.</span></div>
+  <div><strong>@rollup/plugin-node-resolve</strong><span>Resolves packages using Node-style resolution so Rollup can locate dependencies imported from node_modules.</span></div>
+  <div><strong>@rollup/plugin-commonjs</strong><span>Converts CommonJS modules into ES modules that Rollup can analyze.</span></div>
+  <div><strong>Peer dependencies and external</strong><span>React and React DOM should be peer dependencies, and the consuming application supplies them, which prevents the package from bundling a second React runtime. Declaring a peer dependency does not, by itself, guarantee that Rollup excludes it, so the build should also mark it as external.</span></div>
+  <div><strong>rollup-plugin-postcss</strong><span>Processes imported styles. Depending on the package contract, CSS can be injected by JavaScript or extracted into a separate file that consumers import explicitly.</span></div>
+</div>
 
-Uses the TypeScript compiler to transpile TypeScript and report compiler diagnostics. It can also emit declaration files when `declaration` is enabled. I still run `tsc --noEmit` separately in CI because an explicit type-check command is easier to understand and enforce independently from bundling.
-
-### `@rollup/plugin-node-resolve`
-
-Resolves packages using Node-style resolution so Rollup can locate dependencies imported from `node_modules`.
-
-### `@rollup/plugin-commonjs`
-
-Converts CommonJS modules into ES modules that Rollup can analyze. Rollup itself is centered on ES modules, so this plugin is useful when a dependency only exposes CommonJS.
-
-### Peer dependencies and `external`
-
-React and React DOM should be peer dependencies of a React component library. The consuming application supplies them, which prevents the package from bundling a second React runtime.
-
-Declaring a peer dependency does not, by itself, guarantee that Rollup excludes it. The build should also mark it as `external` (or use a plugin that derives externals from `peerDependencies`).
-
-### PostCSS
-
-`rollup-plugin-postcss` processes imported styles. Depending on the package contract, CSS can be injected by JavaScript or extracted into a separate file that consumers import explicitly.
-
-## Corrected Rollup Configuration
+## Rollup Configuration
 
 ```js
 import commonjs from "@rollup/plugin-commonjs";
@@ -51,32 +35,18 @@ export default {
   input: "src/index.ts",
   external: ["react", "react-dom"],
   output: [
-    {
-      file: "dist/index.js",
-      format: "esm",
-      sourcemap: true,
-    },
-    {
-      file: "dist/index.cjs",
-      format: "cjs",
-      exports: "named",
-      sourcemap: true,
-    },
+    { file: "dist/index.js", format: "esm", sourcemap: true },
+    { file: "dist/index.cjs", format: "cjs", exports: "named", sourcemap: true },
   ],
   plugins: [
     resolve(),
     commonjs(),
     typescript({ tsconfig: "./tsconfig.build.json" }),
-    postcss({
-      extract: "styles.css",
-      minimize: true,
-    }),
+    postcss({ extract: "styles.css", minimize: true }),
     terser(),
   ],
 };
 ```
-
-This example intentionally omits Babel. TypeScript can emit modern JavaScript directly, which avoids running two overlapping transpilation pipelines. Babel is still useful when a library needs target-specific syntax transforms; in that case, `@babel/preset-typescript` or a clearly separated TypeScript/Babel responsibility is required.
 
 ## TypeScript Build Configuration
 
@@ -99,11 +69,12 @@ This example intentionally omits Babel. TypeScript can emit modern JavaScript di
 }
 ```
 
-`emitDeclarationOnly` is `false` because this configuration asks the TypeScript Rollup plugin to produce JavaScript as well as declarations. If declarations are generated in a separate `tsc` step, then `emitDeclarationOnly: true` belongs in that separate declaration-specific configuration.
+<div className="code-explanation">
+  <strong>Configuration note</strong>
+  <span>The TypeScript Rollup plugin generates JavaScript and declaration files together, so emitDeclarationOnly is set to false.</span>
+</div>
 
 ## Package Entry Points
-
-A modern package should expose its public API explicitly:
 
 ```json
 {
@@ -126,15 +97,6 @@ A modern package should expose its public API explicitly:
   "sideEffects": ["**/*.css"]
 }
 ```
-
-- `main` is the legacy CommonJS entry point.
-- `module` is a widely supported convention for the ES module build.
-- `exports` is the authoritative public entry-point map for modern Node.js and bundlers.
-- `types` points TypeScript to the package declarations.
-- `files` limits the files included in the published package.
-- `sideEffects` preserves CSS imports while allowing JavaScript tree-shaking.
-
-Before publishing, `npm pack --dry-run` is useful for checking exactly which files will be included.
 
 ## References
 
