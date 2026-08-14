@@ -103,137 +103,87 @@
   </div>
 </div>
 
-{/* TECHNICAL PORTFOLIO: hidden temporarily */}
-<section className="technical-portfolio-section" data-hidden="true">
+<section className="technical-portfolio-section">
 
-## TECHNICAL PORTFOLIO
+## PROJECT NOTES
 
 <div className="case-study-intro">
-  実際のサービス開発・運用で解決した課題をまとめています。
+  実際のサービス開発・運用で解決した課題と経験をまとめています。
 </div>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>01</span><span>Pnix Exchange</span><span>Rendering</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>01</span><span><a href="https://pnix.exchange" target="_blank" rel="noreferrer">Pnix Exchange</a></span><span>Rendering</span></div>
 
-### リアルタイムオーダーブック描画の最適化とアニメーション安定化
+<div className="case-solution-block">
 
-WebSocketのリアルタイム受信トラフィックが増加し、状態更新とレンダリングが過剰に発生してフレームドロップが生じました。これを解決するため、受信データにバッファリングと500ms単位のバッチ更新を適用して状態更新の回数を減らし、極端なトラフィックを想定したストレスボットテストでもリアルタイムのデータ更新を維持しながら途切れなくサービスを利用できるようにしました。
+### リアルタイムオーダーブック描画の最適化
 
-また、Page Visibility APIでタブの非アクティブ化を検知してWebSocket接続を切断し、タブが再びアクティブになると再接続するように実装しました。バックグラウンドにいる間にデータがバッファに溜まり、復帰時に一括で処理されることで間欠的にフレームドロップが発生していましたが、WebSocket接続後の最初の受信データが常に最新スナップショット全体として届く構造だったため、接続を切断して不要なバッファの蓄積を防ぎ、復帰時に再接続する方式で解決しました。
+WebSocketのリアルタイムデータのトラフィックが増加し、頻繁な状態更新とレンダリングによってフレームドロップが発生しました。
 
-各オーダーブック行のkeyには気配値を使用し、並び替えが発生した場合やその気配値の注文数量が更新された場合でも、同じ気配値のコンポーネントインスタンスが維持されるように構成しました。これにより、以前の注文数量と現在の注文数量を比較して変更の有無を検知し、別途状態を持たずにブリンクアニメーションを実行できました。
+- リアルタイム受信データをバッファリングし、500ms単位でバッチ更新して状態更新の回数を減らしました。
+- 極端なトラフィックを想定したストレスボットテストでも、リアルタイムデータ更新を維持しながら安定してUIを利用できるように改善しました。
+- 非アクティブなタブで不要なデータが蓄積されないよう、Page Visibility APIを使ってWebSocket接続を切断し、タブ復帰時に再接続するように実装しました。
+- 再接続時に最新のオーダーブック全体スナップショットを受信するサーバー構造を活用し、バックグラウンドデータの蓄積と復帰時の大量処理を解消しました。
 
-ブリンクアニメーションはCSS Transitionの代わりにFramer Motionを使って実装しました。オーダーブックのように注文数量が短い間隔で連続して変わる場合、CSSの状態変更に依存する方式では、進行中のアニメーションを狙ったタイミングで止めて最初からやり直すよう制御するのが難しくなります。そこでFramer Motionを使ってアニメーションの実行状態を直接管理しました。新しい注文数量が届くと、進行中のブリンクアニメーションを即座に停止し、初期化したうえで最初から再生するようにしました。
+<div className="case-tags"><span>React</span><span>WebSocket</span><span>Page Visibility API</span></div>
 
-<figure className="case-image case-image-compact">
-  <img src="/images/portfolio/pnix-orderbook.png" alt="Pnix Exchangeのリアルタイムオーダーブックとチャート画面" />
-</figure>
+</div>
 
-<CaseCodeDetails>
-  <summary><span>リアルタイムデータのバッファリングとバッチ更新</span></summary>
+<div className="case-solution-block">
 
-```tsx
-const diffOrderbookRef = React.useRef<OrderbookDiff[]>([]);
+### オーダーブック数量変更アニメーションの安定化
 
-React.useEffect(() => {
-  const response = getLastJsonMessage(WS_FEED_ENUM.ORDERBOOK);
-  if (!response) return;
+注文数量がリアルタイムで素早く変わる状況でも、変更有無を正確に表現し、アニメーションを安定して再実行できるように改善しました。
 
-  const previousOrders = response.order_book?.bid?.order_list ?? [];
-  const changedOrders = response.diff_order_book?.bid?.order_list ?? [];
+- オーダーブック各行のkeyに気配値を使用し、並び替えや注文数量の変更があっても同じ気配値のコンポーネントインスタンスが維持されるように構成しました。
+- 以前の注文数量と現在の注文数量を比較して変更有無を判断し、別途アニメーション状態を持たずにブリンク実行条件を処理しました。
+- 連続的なデータ変更ではCSS Transitionだけで進行中のアニメーションを中断し、最初から再実行する制御が難しいためFramer Motionを適用しました。
+- 新しい注文数量が届くと既存のアニメーションを即座に停止し、初期化したうえで再実行することで、短い間隔の連続更新でも一貫したフィードバックを提供しました。
 
-  diffOrderbookRef.current.push(
-    getDiffByCompareOrders(previousOrders, changedOrders)
-  );
-}, [getLastJsonMessage, pairAddress]);
+<div className="case-tags"><span>React</span><span>Framer Motion</span></div>
 
-React.useEffect(() => {
-  const intervalId = window.setInterval(() => {
-    const pendingDiffs = diffOrderbookRef.current;
-    if (pendingDiffs.length === 0) return;
+</div>
 
-    // 今回処理するdiffと、以降に受信するdiffを分離
-    diffOrderbookRef.current = [];
-
-    setOrderBookLevels((currentLevels) =>
-      pendingDiffs.reduce(
-        (levels, diff) => updateOrderbook(levels, diff),
-        currentLevels
-      )
-    );
-  }, 500);
-
-  return () => {
-    window.clearInterval(intervalId);
-    diffOrderbookRef.current = [];
-  };
-}, [pairAddress, selectedTickSize]);
-```
-
-</CaseCodeDetails>
-
-<CaseCodeDetails>
-  <summary><span>気配値のブリンクアニメーション</span></summary>
-
-```tsx
-const backgroundAlpha = useMotionValue(0);
-
-React.useEffect(() => {
-  if (disableAnimation || prevAmount === undefined) return;
-  if (prevAmount === order.amount) return;
-
-  backgroundAlpha.set(0.15);
-
-  let controls: ReturnType<typeof animate> | undefined;
-
-  const frameId = requestAnimationFrame(() => {
-    controls = animate(backgroundAlpha, 0, {
-      duration: 0.7,
-      ease: "linear"
-    });
-  });
-
-  return () => {
-    cancelAnimationFrame(frameId);
-    controls?.stop();
-  };
-}, [backgroundAlpha, disableAnimation, order.amount, prevAmount]);
-
-const backgroundColor = useTransform(backgroundAlpha, (alpha) =>
-  side === "ask"
-    ? `rgba(243, 88, 91, ${alpha})`
-    : `rgba(71, 225, 122, ${alpha})`
-);
-```
-
-</CaseCodeDetails>
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>02</span><span>Pnix Exchange</span><span>Real-time Chart</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>02</span><span><a href="https://pnix.exchange" target="_blank" rel="noreferrer">Pnix Exchange</a></span><span>Real-time Chart</span></div>
+
+<div className="case-solution-block">
 
 ### TradingViewを用いたリアルタイムチャートデータ連携
 
-Pnix ExchangeのリアルタイムチャートはTradingViewをベースに実装しました。マーケットリストでトークンを選択すると、該当銘柄の初期価格および取引量データをAPIで取得し、TradingViewのDataFeedアダプターでサーバーレスポンスをチャートが要求するOHLCV形式と時間単位に加工して渡しました。その後、リアルタイム約定データはWebSocketで受信し、選択中の時間足を基準に現在のローソク足へ反映するか、新しい時間区間に入った場合は新しいローソク足を生成するように処理しました。
+TradingView DataFeedとWebSocketを連携し、初期価格データとリアルタイム約定データを一つのチャートの流れとして構成しました。また、銘柄・時間足変更時の不要なチャート再初期化を減らしました。
 
-また、銘柄や時間足が変更されるたびにチャートインスタンスを新規作成せず、既存のインスタンスを維持したままデータソースと購読だけを切り替えるように実装しました。これにより不要なチャートの再初期化とレンダリングコストを減らし、銘柄切り替え時に画面が途切れたりチャートが再読み込みされる印象を最小化してユーザー体験を改善しました。
+- 銘柄選択時にAPIで初期価格と取引量データを取得し、サーバーレスポンスをTradingViewが要求するOHLCV形式と時間単位へ変換してDataFeedへ渡しました。
+- リアルタイム約定データはWebSocketで受信し、選択中の時間足を基準に既存ローソク足へ反映し、新しい時間区間に入ると新しいローソク足を生成するように実装しました。
+- 銘柄や時間足の変更時にはチャートインスタンスを新規作成せず、既存インスタンスを維持したままデータソースとリアルタイム購読だけを切り替える構成にしました。
+- これによりチャート再初期化と不要なレンダリングを減らし、銘柄切り替え時の画面の途切れや再読み込み感を最小化しました。
 
-<figure className="case-image case-image-wide">
-  <img src="/images/portfolio/pnix-tradingview-chart.png" alt="Pnix Exchange TradingViewリアルタイムローソク足チャート" />
-</figure>
+<div className="case-tags"><span>TradingView</span><span>WebSocket</span></div>
+
+</div>
 
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>03</span><span>CrossX</span><span>Web–Native Architecture</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>03</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Web–Native Architecture</span></div>
 
-### RN WebView Bridgeの非同期API抽象化
+<div className="case-solution-block">
 
-React Native WebView環境では、WebViewとReact Nativeアプリ間でメッセージベースのBridgeを介してリクエストを伝え、処理結果はメッセージイベントを通じて非同期に受信する構造でした。そのためリクエストコードと応答処理コードが分離しており、呼び出し元で応答値を直接受け取って後続の処理につなげたり、一般的な非同期APIのようにリクエスト状態を管理することが難しくなっていました。
+### RN WebView Bridge通信のPromiseベースAPI抽象化
 
-これを改善するため、WebView-Native間のBridge通信をPromiseを返す共通関数として抽象化しました。メッセージごとのリクエストパラメータと応答形式を型として定義し、リクエスト時にメッセージidを基準にPromiseのresolveを保存しました。その後応答が届くと、共通イベントハンドラーで応答idに対応するPromiseのresolveを探して呼び出すように構成し、メッセージベースのBridge通信を一般的な非同期APIのように使えるようにしました。
+React Native WebViewのメッセージベースBridge通信をPromiseベースの共通APIとして抽象化し、呼び出し側で一般的な非同期APIと同じ方法で使えるように改善しました。
 
-これにより呼び出し側では内部のメッセージ処理方式を知る必要なく応答値を受け取って後続の処理を行えるようになり、TanStack QueryのqueryFnと連携してBridge通信もサーバーAPIと同様の方法でローディング・エラー・応答データを管理できるようになりました。
+- 既存のBridgeはリクエスト送信と応答イベント処理が分離されており、呼び出し元で応答値を直接受け取って後続処理を行ったり、リクエスト状態を管理することが難しい構造でした。
+- BridgeリクエストをPromiseを返す共通関数として抽象化し、メッセージごとのリクエストパラメータと応答形式をTypeScriptの型として定義しました。
+- リクエスト時に生成したmessage idを基準にPromiseのresolveを保存し、応答受信時に共通イベントハンドラーで同じidのresolveを探して実行するように構成しました。
+- これにより呼び出し側は内部のpostMessageやイベント処理構造を知る必要なく、awaitベースの一般的な非同期APIのようにBridgeを利用できるようになりました。
+- 共通Bridge関数をTanStack QueryのqueryFnと連携し、Native通信もサーバーAPIと同じようにローディング・エラー・応答データの状態を管理できるようにしました。
+
+<div className="case-tags"><span>React Native WebView</span><span>TypeScript</span><span>Promise</span><span>TanStack Query</span></div>
+
+</div>
 
 <CaseCodeDetails>
   <summary><span>Bridgeリクエスト・応答のPromise変換</span></summary>
@@ -316,225 +266,67 @@ const { data: useIsBiometricAuthState } = useQuery({
 </CaseCodeDetails>
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>04</span><span>CrossX</span><span>Interaction</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>04</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Interaction</span></div>
+
+<div className="case-solution-block">
 
 ### イベント委譲によるハプティックフィードバックの共通化
 
-WebViewでボタンごとにハプティック処理を直接実装すると、UIコンポーネントとNative Bridge呼び出しロジックの結合度が高まり、同じイベント処理コードが繰り返される問題がありました。これを改善するため、ハプティックが必要な要素にはdata-haptic属性のみを宣言し、共通のタッチイベントリスナーを登録して該当属性を基準にハプティックを処理するイベント委譲構造に変更しました。
+WebViewでボタンごとにハプティック処理を直接実装すると、UIコンポーネントとNative Bridge呼び出しロジックの結合度が高まり、同じイベント処理コードが繰り返される問題がありました。
 
-共通ハンドラーでは、タッチが終了した要素からdata-haptic属性を探索して必要なハプティックタイプを確認し、Native Bridgeを呼び出すように構成しました。これにより各コンポーネントではBridge呼び出しやイベントリスナーを直接管理する必要なく、HTML属性だけでハプティック動作を宣言できるようになり、動的に追加される要素にも同じルールを適用できました。
+- ハプティックが必要な要素にはdata-haptic属性だけを宣言し、共通のタッチイベントリスナーでその属性を基準にハプティックを処理するイベント委譲構造へ変更しました。
+- 共通ハンドラーでは、タッチが終了した要素からdata-haptic属性を探索して必要なハプティックタイプを確認し、Native Bridgeを呼び出すように構成しました。
+- これにより各コンポーネントではBridge呼び出しやイベントリスナーを直接管理せず、HTML属性だけでハプティック動作を宣言できるようになり、動的に追加される要素にも同じルールを適用できました。
+- タッチ開始時点の座標を保存し、移動距離を計算して一定のしきい値を超えた場合はスクロールまたはドラッグと判定するように実装しました。
+- スクロール・ドラッグと判定された場合は、タッチ終了時にもハプティックを実行しないようにして、スクロール中に発生する意図しないハプティックを防ぎました。
 
-また、タッチ開始時点の座標を保存し、移動過程で距離を計算して一定のしきい値を超えるとスクロールまたはドラッグと判定しました。この場合はタッチが終了してもハプティックを実行しないようにし、スクロール中に意図しないハプティックが発生することを防ぎました。
+<div className="case-tags"><span>WebView</span></div>
 
-- イベント委譲とdata-haptic属性を活用してNative Bridge呼び出しを共通化し、UIコンポーネントとハプティック実装ロジックの結合度を低減
-- タッチ移動のしきい値を基準にタップとスクロール・ドラッグを区別し、意図しないハプティック実行を防止
+</div>
 
-<CaseCodeDetails>
-  <summary>実装コード</summary>
-
-```tsx
-export default function useHapticFeedback() {
-  const { needHapticFeedback } = useRNBridgeFetchers();
-
-  const startPositionRef = useRef<{ x: number; y: number } | null>(null);
-  const isDraggingRef = useRef(false);
-
-  useEffect(() => {
-    const handleTouchStart = (event: TouchEvent) => {
-      const touch = event.touches[0];
-      if (!touch) return;
-
-      startPositionRef.current = {
-        x: touch.clientX,
-        y: touch.clientY,
-      };
-
-      isDraggingRef.current = false;
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      const startPosition = startPositionRef.current;
-      const touch = event.touches[0];
-
-      if (!startPosition || !touch) return;
-
-      const dx = Math.abs(touch.clientX - startPosition.x);
-      const dy = Math.abs(touch.clientY - startPosition.y);
-
-      // 一定距離以上移動した場合はタップではなくスクロール・ドラッグと判定
-      if (dx > 10 || dy > 10) {
-        isDraggingRef.current = true;
-      }
-    };
-
-    const handleTouchEnd = (event: TouchEvent) => {
-      if (isDraggingRef.current) return;
-
-      // 実際にタッチされた要素、またはその上位要素からハプティック設定を探索
-      const element = (event.target as HTMLElement).closest<HTMLElement>(
-        "[data-haptic]"
-      );
-
-      const type = element?.dataset.haptic as
-        | HapticFeedbackTypes
-        | undefined;
-
-      if (!type) return;
-
-      needHapticFeedback({ type });
-    };
-
-    document.addEventListener("touchstart", handleTouchStart, {
-      capture: true,
-    });
-    document.addEventListener("touchmove", handleTouchMove, {
-      capture: true,
-    });
-    document.addEventListener("touchend", handleTouchEnd, {
-      capture: true,
-    });
-
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStart, true);
-      document.removeEventListener("touchmove", handleTouchMove, true);
-      document.removeEventListener("touchend", handleTouchEnd, true);
-    };
-  }, [needHapticFeedback]);
-}
-```
-
-</CaseCodeDetails>
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>05</span><span>CrossX</span><span>Drawer Navigation</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>05</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Drawer Navigation</span></div>
 
-### WebView SPAのスタック型画面遷移と戻る操作の制御
+<div className="case-solution-block">
 
-WebViewベースのSPAでネイティブアプリに近い画面遷移体験を提供するため、複数の画面をDrawer形式で積み重ねるスタック構造を実装しました。現在のDrawerのドラッグ進行率を基準に前のDrawerの移動量も一緒に計算し、進行率にeasingを適用して前のDrawerが自然に押し出されてから戻るように構成しました。これにより、二つのDrawerが一つの画面のようにつながる自然な遷移効果を実現しました。
+### WebView SPAにおけるスタック型画面遷移と戻る操作の制御
 
-単一ルートのSPAではDrawerを開いてもURLが変わらないため、Androidの戻るボタンで開いているDrawerを順番に閉じることができない問題がありました。これを解決するため、Drawerが開く際に仮想の履歴項目を追加し、戻る操作時に最も上にあるDrawerから閉じるように処理しました。これにより、実際のページ遷移を伴わずにAndroidの戻る操作とDrawerスタックの移動を同期させました。
+WebViewベースのSPAでネイティブアプリに近い画面遷移体験を提供するため、複数の画面をDrawerとして重ねるスタック構造を実装しました。
+
+- 現在のDrawerのドラッグ進行率を基準に前のDrawerの移動量も計算し、進行率にeasingを適用して前のDrawerが自然に押し出されて戻るように構成しました。
+- これにより、2つのDrawerが別々に動くのではなく、一つの画面としてつながる自然な遷移効果を実現しました。
+- 単一ルートのSPAではDrawerを開いてもURLが変わらないため、Androidの戻るボタンで開いたDrawerを順番に閉じられない問題がありました。
+- これを解決するため、Drawerが開かれると仮想履歴エントリを追加し、戻る操作時には最上位のDrawerから閉じるように処理しました。
+- これにより実際のページ遷移を行わずに、Androidの戻る動作とDrawerスタックの状態を同期しました。
+
+<div className="case-tags"><span>WebView SPA</span><span>History API</span><span>Drawer Gesture</span></div>
+
+</div>
 
 <PortfolioVideo
   src="/images/portfolio/drawer-transition.mp4"
   poster="/images/portfolio/drawer-transition-thumbnail.png"
   label="CrossX スタック型Drawer画面遷移動画"
 />
-
-<CaseCodeDetails>
-  <summary>実装コード</summary>
-
-```tsx
-const PREV_DRAWER_OFFSET = 100;
-const DURATION = 400;
-const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
-
-const easeOutCubic = (s: number) => 1 - Math.pow(1 - s, 3);
-
-function animatePrevDrawer(
-  element: HTMLDivElement,
-  open: boolean | undefined
-) {
-  element.style.willChange = "transform";
-  element.style.transition = "none";
-
-  const initialTransform = open
-    ? "translate3d(0px, 0, 0)"
-    : `translate3d(${-PREV_DRAWER_OFFSET}px, 0, 0)`;
-
-  element.style.transform = initialTransform;
-
-  // iOS WebViewで初期位置が先に反映されてから
-  // transitionが始まるようにタイミングを分離
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      element.style.transition = `transform ${DURATION}ms ${EASING}`;
-
-      const finalTransform = open
-        ? `translate3d(${-PREV_DRAWER_OFFSET}px, 0, 0)`
-        : "translate3d(0px, 0, 0)";
-
-      element.style.transform = finalTransform;
-    });
-  });
-}
-
-function animatePrevDrawerWithDrag(
-  element: HTMLDivElement,
-  rafIdRef: React.RefObject<number | null>,
-  percentage: number
-) {
-  element.style.willChange = "transform";
-  element.style.transition = "none";
-
-  // 現在のDrawerのドラッグ進行率から
-  // 前のDrawerの移動距離を計算
-  const eased = easeOutCubic(percentage);
-  const x =
-    -PREV_DRAWER_OFFSET + eased * PREV_DRAWER_OFFSET;
-
-  rafIdRef.current = requestAnimationFrame(() => {
-    element.style.transform = `translate3d(${x}px, 0, 0)`;
-  });
-}
-
-export default function AnimatedDrawer({
-  children,
-  open,
-  ...props
-}: React.ComponentProps<typeof Drawer>) {
-  const rafIdRef = React.useRef<number | null>(null);
-  const isDraggedRef = React.useRef(false);
-
-  const handleDrag = (_: unknown, percentage: number) => {
-    isDraggedRef.current = true;
-
-    const prevDrawer = getPrevDrawer();
-    const currentDrawer = getCurrentDrawer();
-
-    if (!prevDrawer || shouldSkipAnimation(currentDrawer)) {
-      return;
-    }
-
-    // 直前のフレームをキャンセルし、
-    // 最新のドラッグ位置だけを反映
-    if (rafIdRef.current) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-    }
-
-    animatePrevDrawerWithDrag(
-      prevDrawer,
-      rafIdRef,
-      percentage
-    );
-  };
-
-  return (
-    <Drawer
-      data-vaul-drawer
-      {...props}
-      open={open}
-      onDrag={handleDrag}
-    >
-      {children}
-    </Drawer>
-  );
-}
-```
-
-</CaseCodeDetails>
 </section>
 
-<section className="case-study case-study-compact-media">
-  <div className="case-study-meta"><span>06</span><span>CrossX</span><span>Canvas Visualization</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>06</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Canvas Visualization</span></div>
+
+<div className="case-solution-block">
 
 ### インタラクティブArea Chartのカスタマイズ
 
-- チャートをタップまたはドラッグすると、タッチ地点に最も近いデータの時点と値を基準線とともに表示
-- 選択した地点を基準に、それ以前の区間は強調色、それ以降の区間は非活性色で表示
-- 最大・最小値ラベルがチャート外にはみ出さないよう、実際のラベル幅に合わせて位置を調整
+チャートのタッチおよびドラッグインタラクションを直接実装し、ユーザーが特定時点の値を直感的に確認できるように構成しました。
+
+- チャートをタッチまたはドラッグすると、タッチ地点に最も近いデータの時点と値を探し、基準線とともに表示しました。
+- 選択した地点を基準に、以前の区間は強調色、以降の区間は非活性色で分け、現在の選択位置を視覚的に明確に表現しました。
+- 最大・最小値ラベルがチャート領域の外へ出ないよう、実際のラベル幅を基準に位置を補正しました。
+
+</div>
 
 <PortfolioVideo
   src="/images/portfolio/interactive-area-chart.mp4"
@@ -544,51 +336,47 @@ export default function AnimatedDrawer({
 
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>07</span><span>CrossX</span><span>Pull to Refresh</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>07</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Pull to Refresh</span></div>
+
+<div className="case-solution-block">
 
 ### ネストスクロールを考慮したPull-to-Refresh
 
-画面を共通のPull-to-Refreshコンポーネントで包むだけで、個別の実装なしにiOSネイティブのように画面を下に引くインタラクションを適用できるように構成しました。内部にスクロール領域がある画面ではスクロールが最上部にあるときだけ引く動作を開始するようにしてジェスチャーが競合しないようにし、引いた距離に応じて抵抗が徐々に強くなるように処理して自然な動きを実現しました。更新が必要な画面では、基準地点を超えた時点でハプティックとRive Indicatorを実行した後に非同期処理を行い、完了すると画面を元の位置へ復帰させるように構成しました。
+画面を共通コンポーネントで包むだけで、iOSネイティブに近いPull-To-Refreshインタラクションを適用できるように実装しました。
+
+- 内部にスクロール領域がある場合、スクロールが最上部にあるときだけ引く動作を開始するようにし、ネストスクロールとのジェスチャー衝突を防ぎました。
+- 引いた距離に応じて抵抗が徐々に増えるように計算し、自然なジェスチャーの動きを実現しました。
+- 基準地点を超えるとハプティックとRive Indicatorを実行し、非同期の更新処理を行った後、完了時に画面を元の位置へ戻すように構成しました。
+- 共通コンポーネントとして構成することで、各画面では個別のジェスチャーロジックなしにPull-To-Refreshを適用できるようにしました。
+
+<div className="case-tags"><span>Pull-To-Refresh</span><span>Rive</span></div>
+
+</div>
 
 <PortfolioVideo
   src="/images/portfolio/pull-to-refresh.mp4"
   poster="/images/portfolio/pull-to-refresh-thumbnail.png"
   label="CrossX Pull-to-Refresh動画"
 />
-
-<CaseCodeDetails>
-  <summary>実装コード</summary>
-
-```tsx
-const handleTouchMove = (event: TouchEvent) => {
-  const currentY = event.touches[0]?.clientY ?? 0;
-  pendingDeltaRef.current = currentY - startYRef.current;
-
-  if (pendingDeltaRef.current <= 0 || framePendingRef.current) return;
-  framePendingRef.current = true;
-
-  requestAnimationFrame(() => {
-    const distance = pendingDeltaRef.current;
-    const damped = distance * (1 - Math.exp(-distance / 60)) * 0.5;
-    const offset = Math.min(damped, maxPullDistance);
-
-    setOffsetY(offset);
-    thresholdPassedRef.current = offset >= refreshThreshold;
-    framePendingRef.current = false;
-  });
-};
-```
-
-</CaseCodeDetails>
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>08</span><span>Cross Ecosystem</span><span>Shared Package</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>08</span><span><a href="https://x.crosstoken.io" target="_blank" rel="noreferrer">Cross Ecosystem</a></span><span>Shared Package</span></div>
+
+<div className="case-solution-block">
 
 ### 複数サービスのApp Launcherを一つのパッケージへ標準化
 
-各サービスでApp LauncherのUIと設定を個別に管理しており、共通の変更が発生するたびに複数のプロジェクトへ同じ作業を繰り返す必要がありました。これを改善するため、App LauncherのUIを共通パッケージに分離し、サービスごとの表示情報は一つのS3設定で管理するように統合しました。サービスの追加や表示情報の変更時にS3の共通設定を修正するだけで全サービスに反映されるように改善しました。
+各サービスでApp LauncherのUIと設定を個別に管理しており、共通変更時に複数のプロジェクトへ同じ作業を繰り返す必要がありました。
+
+- App Launcher UIを共通パッケージへ分離し、複数サービスで同じ実装を再利用できるように構成しました。
+- サービスごとの表示情報は一つのS3設定へ統合し、UIコードとサービス別設定を分離しました。
+- サービス追加や表示情報変更時に各プロジェクトを修正せず、共通S3設定だけを変更すれば全サービスへ反映されるように改善しました。
+
+<div className="case-tags"><span>Shared Package</span><span>S3 Config</span></div>
+
+</div>
 
 <PortfolioVideo
   src="/images/portfolio/app-launcher.mp4"

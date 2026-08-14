@@ -34,6 +34,7 @@ export default function CustomMDX({ className, mdxContent, groupId, tabId, conte
   const isProfile = contentFile === "introduce.mdx" || contentFile === "career.mdx" || contentFile === "portfolio-overview.mdx";
   const isTechnicalArticle = contentFile === "npm-publish.mdx" || contentFile === "mdx.mdx" || contentFile === "npm-readme.mdx";
   const isCareerPortfolio = tabId === "introduce-portfolio-tab";
+  const showPortfolioPrintToolbar = false;
 
   const handlePrint = async () => {
     const source = document.querySelector<HTMLElement>(
@@ -126,7 +127,7 @@ export default function CustomMDX({ className, mdxContent, groupId, tabId, conte
         contentFile === "portfolio-overview.mdx" && style.showcase
       )}
     >
-      {isCareerPortfolio && (
+      {isCareerPortfolio && showPortfolioPrintToolbar && (
         <div className={style.portfolioPrintToolbar} data-print-hidden>
           <button type="button" onClick={handlePrint}>
             <span aria-hidden>↓</span>

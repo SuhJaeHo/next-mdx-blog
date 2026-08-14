@@ -16,7 +16,6 @@ interface IGroupTabsLayoutProps {
 }
 
 const INTRO_GROUP_ID = "introduce-profile-group";
-const INTRO_TAB_ID = "introduce-cover-letter-tab";
 const CAREER_TAB_ID = "introduce-career-tab";
 
 function IntroSplitEntrance() {
@@ -50,11 +49,16 @@ function IntroSplitEntrance() {
       await simulateDrag(careerTab, careerFrom, { x: containerRect.right + careerTab.offsetWidth, y: careerFrom.y }, { signal: controller.signal, steps: 38, stepDelayMs: 26 });
       await sleep(360, controller.signal);
 
-      const introTab = document.getElementById(INTRO_TAB_ID);
-      if (!introTab) return;
+      const sourceGroupHeader = sourceGroup.querySelector<HTMLElement>("[data-group-header]");
+      if (!sourceGroupHeader) return;
 
-      const introFrom = centerOf(introTab);
-      await simulateDrag(introTab, introFrom, { x: containerRect.left - introTab.offsetWidth, y: introFrom.y }, { signal: controller.signal, steps: 38, stepDelayMs: 26 });
+      const introGroupFrom = centerOf(sourceGroupHeader);
+      await simulateDrag(
+        sourceGroupHeader,
+        introGroupFrom,
+        { x: containerRect.left - sourceGroupHeader.offsetWidth, y: introGroupFrom.y },
+        { signal: controller.signal, steps: 38, stepDelayMs: 26 }
+      );
     };
 
     run()
@@ -103,7 +107,7 @@ export default function GroupTabsLayout({ data, mdxSourcesByLocale }: IGroupTabs
         <IntroSplitEntrance />
         <TutorialController onFinish={handleTutorialFinish} />
         <Board.Nav className="flex h-full w-[210px] flex-col border-r border-border/60 bg-background/80 p-3.5 shadow-[4px_0_18px_-18px_rgba(0,0,0,0.55)] max-md:h-auto max-md:w-full max-md:flex-row max-md:border-b max-md:border-r-0 max-md:p-2 max-md:shadow-none max-md:[&>div]:flex max-md:[&>div]:w-full max-md:[&>div]:gap-1 max-md:[&>div]:overflow-x-auto">
-          <Board.NavList className="relative mb-1.5 cursor-pointer rounded-lg px-3 py-2.5 text-[13px] text-muted-foreground transition-colors before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-foreground before:opacity-0 hover:bg-secondary/55 hover:text-foreground data-[selected=true]:bg-secondary/80 data-[selected=true]:text-foreground data-[selected=true]:before:opacity-100 max-md:mb-0 max-md:shrink-0 max-md:whitespace-nowrap max-md:px-3 max-md:py-2 max-md:before:hidden" />
+          <Board.NavList className="mb-1.5 cursor-pointer rounded-lg px-3 py-2.5 text-[13px] text-muted-foreground transition-[color,transform] duration-200 hover:text-foreground data-[selected=true]:text-foreground data-[selected=true]:font-medium max-md:mb-0 max-md:shrink-0 max-md:whitespace-nowrap max-md:px-3 max-md:py-2" />
         </Board.Nav>
         <Board.Panel autoFitIntroduce={false} className="bg-[radial-gradient(circle_at_50%_0%,hsl(var(--secondary)/0.45),transparent_52%)] dark:bg-[radial-gradient(circle_at_50%_0%,hsl(var(--secondary)/0.18),transparent_48%)]">
           <Board.GroupIndicate className="border border-indicator bg-indicator/20 shadow-[0_0_0_3px_hsl(var(--indicator)/0.08)]" />

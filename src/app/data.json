@@ -16,7 +16,7 @@
     "group": {
       "introduce-profile-group": {
         "id": "introduce-profile-group",
-        "tabIds": ["introduce-cover-letter-tab", "introduce-career-tab"],
+        "tabIds": ["introduce-cover-letter-tab", "introduce-career-tab", "introduce-portfolio-tab"],
         "selectedTabId": "introduce-cover-letter-tab",
         "size": {
           "width": 720,
@@ -74,6 +74,12 @@
         "id": "introduce-career-tab",
         "groupId": "introduce-profile-group",
         "name": "Experience",
+        "contentFile": "career.mdx"
+      },
+      "introduce-portfolio-tab": {
+        "id": "introduce-portfolio-tab",
+        "groupId": "introduce-profile-group",
+        "name": "Project Notes",
         "contentFile": "career.mdx"
       },
       "5a76f275-0917-4d11-94cf-547b57be5fe6": {

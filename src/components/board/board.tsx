@@ -150,8 +150,36 @@ const NavList = React.forwardRef<React.ElementRef<"div">, INavListProps>(({ clas
   const { boardDataState, boardDataDispatch } = useBoardDataContext();
   const { locale } = useLocaleController();
   const t = useTranslations("Navigation");
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [indicatorStyle, setIndicatorStyle] = React.useState<React.CSSProperties>({ opacity: 0 });
   const currentPageId = boardDataState.selectedPageId;
   const pathnamePageId = pathname.split("/").filter(Boolean).at(-1);
+  const pageIds = Object.keys(boardDataState.page);
+
+  const setRootRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      rootRef.current = node;
+      if (typeof forwardedRef === "function") forwardedRef(node);
+      else if (forwardedRef) forwardedRef.current = node;
+    },
+    [forwardedRef]
+  );
+
+  const updateIndicator = React.useCallback(() => {
+    const currentItem = itemRefs.current[currentPageId];
+    if (!currentItem) {
+      setIndicatorStyle({ opacity: 0 });
+      return;
+    }
+
+    setIndicatorStyle({
+      width: currentItem.offsetWidth,
+      height: currentItem.offsetHeight,
+      opacity: 1,
+      transform: `translate3d(${currentItem.offsetLeft}px, ${currentItem.offsetTop}px, 0)`,
+    });
+  }, [currentPageId]);
 
   useEffect(() => {
     if (pathnamePageId && boardDataState.page[pathnamePageId]) {
@@ -159,15 +187,48 @@ const NavList = React.forwardRef<React.ElementRef<"div">, INavListProps>(({ clas
     }
   }, [boardDataDispatch, boardDataState.page, pathnamePageId]);
 
+  useLayoutEffect(() => {
+    const animationFrame = requestAnimationFrame(updateIndicator);
+    const root = rootRef.current;
+    if (!root || !("ResizeObserver" in window)) {
+      return () => cancelAnimationFrame(animationFrame);
+    }
+
+    const observer = new ResizeObserver(updateIndicator);
+    observer.observe(root);
+    pageIds.forEach((pageId) => {
+      const item = itemRefs.current[pageId];
+      if (item) observer.observe(item);
+    });
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      observer.disconnect();
+    };
+  }, [pageIds, updateIndicator]);
+
   const handleClickNavItem = (pageId: string) => {
     boardDataDispatch({ type: "SELECT_PAGE", payload: { pageId } });
     history.pushState({}, "", `/${locale}/${boardDataState.page[pageId].id}`);
   };
 
   return (
-    <div>
-      {Object.keys(boardDataState.page).map((pageId) => (
-        <div className={cn(className)} key={pageId} data-selected={pageId === currentPageId} onClick={() => handleClickNavItem(pageId)}>
+    <div ref={setRootRef} className="relative">
+      <div
+        className="pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-secondary/80 shadow-[inset_0_0_0_1px_hsl(var(--border)/0.5)] transition-[transform,width,height,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-indicator dark:bg-secondary/35 dark:shadow-[inset_0_0_0_1px_hsl(var(--foreground)/0.12)]"
+        style={indicatorStyle}
+        aria-hidden
+      />
+      {pageIds.map((pageId) => (
+        <div
+          ref={(node) => {
+            itemRefs.current[pageId] = node;
+          }}
+          className={cn("relative z-10", className)}
+          key={pageId}
+          data-selected={pageId === currentPageId}
+          onClick={() => handleClickNavItem(pageId)}
+        >
           {t(pageId)}
         </div>
       ))}

@@ -11,14 +11,14 @@
     "portfolioOverview": "소개",
     "introduce": "자기소개서",
     "career": "직무경력",
-    "careerPortfolio": "기술 포트폴리오",
+    "careerPortfolio": "프로젝트 노트",
     "npmPublish": "패키지화",
     "mdx": "MDX",
     "npmReadme": "문서화"
   },
   "CareerPortfolio": {
     "downloadPdf": "PDF로 저장",
-    "pdfTitle": "서재호_기술_포트폴리오"
+    "pdfTitle": "서재호_Project_Notes"
   },
   "Header": {
     "language": "언어 선택",

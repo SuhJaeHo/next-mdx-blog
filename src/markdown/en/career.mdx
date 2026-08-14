@@ -103,137 +103,87 @@
   </div>
 </div>
 
-{/* TECHNICAL PORTFOLIO: hidden temporarily */}
-<section className="technical-portfolio-section" data-hidden="true">
+<section className="technical-portfolio-section">
 
-## TECHNICAL PORTFOLIO
+## PROJECT NOTES
 
 <div className="case-study-intro">
-  A selection of problems I solved while building and operating production services.
+  A selection of problems and experiences from building and operating production services.
 </div>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>01</span><span>Pnix Exchange</span><span>Rendering</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>01</span><span><a href="https://pnix.exchange" target="_blank" rel="noreferrer">Pnix Exchange</a></span><span>Rendering</span></div>
 
-### Optimizing Real-Time Order Book Rendering and Animation Stability
+<div className="case-solution-block">
 
-As WebSocket traffic increased, excessive state updates and rendering caused frame drops. To resolve this, I applied buffering and 500ms batch updates to the incoming data to reduce the number of state updates, and even under a stress-bot test simulating extreme traffic, the service kept receiving real-time updates without interruption.
+### Optimizing Real-Time Order Book Rendering
 
-I also used the Page Visibility API to detect tab inactivity, close the WebSocket connection, and reconnect once the tab became active again. While in the background, data kept accumulating in the buffer and was processed all at once on return, which intermittently caused frame drops. Since the first message after reconnecting always arrived as a full latest snapshot, I closed the connection to prevent unnecessary buffer buildup and simply reconnected on return, which resolved the issue.
+As WebSocket real-time traffic increased, frequent state updates and rendering caused frame drops.
 
-I used the quote price as the key for each order book row so that the same quote's component instance stays the same even when the sort order changes or the order quantity at that quote is updated. This let me detect changes by comparing the previous and current order quantity, and implement the blink animation without any separate state.
+- Buffered incoming real-time data and applied 500ms batch updates to reduce state update frequency.
+- Improved the UI so it could remain stable while preserving real-time updates even under stress-bot tests simulating extreme traffic.
+- Used the Page Visibility API to disconnect the WebSocket in inactive tabs and reconnect when the tab becomes active again, preventing unnecessary background data accumulation.
+- Used the server structure that sends a full latest order book snapshot on reconnect to remove background buffer buildup and large catch-up processing on tab return.
 
-The blink animation is implemented with Framer Motion instead of CSS Transition. In an order book, where order quantities change repeatedly in quick succession, relying on CSS state changes made it hard to stop a running animation at the right moment and restart it cleanly from the beginning. So I used Framer Motion to manage the animation's execution state directly. When a new order quantity comes in, the running blink animation is stopped immediately, reset, and replayed from the start.
+<div className="case-tags"><span>React</span><span>WebSocket</span><span>Page Visibility API</span></div>
 
-<figure className="case-image case-image-compact">
-  <img src="/images/portfolio/pnix-orderbook.png" alt="Pnix Exchange real-time order book and chart" />
-</figure>
+</div>
 
-<CaseCodeDetails>
-  <summary><span>Real-time Data Buffering and Batch Updates</span></summary>
+<div className="case-solution-block">
 
-```tsx
-const diffOrderbookRef = React.useRef<OrderbookDiff[]>([]);
+### Stabilizing Order Quantity Change Animation
 
-React.useEffect(() => {
-  const response = getLastJsonMessage(WS_FEED_ENUM.ORDERBOOK);
-  if (!response) return;
+I improved the order book so it could accurately express quantity changes and reliably replay animations even when quantities changed rapidly in real time.
 
-  const previousOrders = response.order_book?.bid?.order_list ?? [];
-  const changedOrders = response.diff_order_book?.bid?.order_list ?? [];
+- Used the quote price as each order book row's key so the same quote keeps the same component instance even when sorting or quantities change.
+- Compared previous and current order quantities to decide whether to run the blink animation without adding separate animation state.
+- Switched to Framer Motion because CSS Transition alone made it difficult to stop an in-progress animation and restart it cleanly during continuous data changes.
+- When a new quantity arrives, the existing animation is stopped, reset, and replayed to provide consistent feedback during rapid updates.
 
-  diffOrderbookRef.current.push(
-    getDiffByCompareOrders(previousOrders, changedOrders)
-  );
-}, [getLastJsonMessage, pairAddress]);
+<div className="case-tags"><span>React</span><span>Framer Motion</span></div>
 
-React.useEffect(() => {
-  const intervalId = window.setInterval(() => {
-    const pendingDiffs = diffOrderbookRef.current;
-    if (pendingDiffs.length === 0) return;
+</div>
 
-    // Separate the diffs to process now from ones received later
-    diffOrderbookRef.current = [];
-
-    setOrderBookLevels((currentLevels) =>
-      pendingDiffs.reduce(
-        (levels, diff) => updateOrderbook(levels, diff),
-        currentLevels
-      )
-    );
-  }, 500);
-
-  return () => {
-    window.clearInterval(intervalId);
-    diffOrderbookRef.current = [];
-  };
-}, [pairAddress, selectedTickSize]);
-```
-
-</CaseCodeDetails>
-
-<CaseCodeDetails>
-  <summary><span>Quote Blink Animation</span></summary>
-
-```tsx
-const backgroundAlpha = useMotionValue(0);
-
-React.useEffect(() => {
-  if (disableAnimation || prevAmount === undefined) return;
-  if (prevAmount === order.amount) return;
-
-  backgroundAlpha.set(0.15);
-
-  let controls: ReturnType<typeof animate> | undefined;
-
-  const frameId = requestAnimationFrame(() => {
-    controls = animate(backgroundAlpha, 0, {
-      duration: 0.7,
-      ease: "linear"
-    });
-  });
-
-  return () => {
-    cancelAnimationFrame(frameId);
-    controls?.stop();
-  };
-}, [backgroundAlpha, disableAnimation, order.amount, prevAmount]);
-
-const backgroundColor = useTransform(backgroundAlpha, (alpha) =>
-  side === "ask"
-    ? `rgba(243, 88, 91, ${alpha})`
-    : `rgba(71, 225, 122, ${alpha})`
-);
-```
-
-</CaseCodeDetails>
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>02</span><span>Pnix Exchange</span><span>Real-time Chart</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>02</span><span><a href="https://pnix.exchange" target="_blank" rel="noreferrer">Pnix Exchange</a></span><span>Real-time Chart</span></div>
+
+<div className="case-solution-block">
 
 ### Connecting Real-Time Chart Data with TradingView
 
-I implemented Pnix Exchange's real-time chart on top of TradingView. When a token is selected from the market list, I fetch the initial price and volume data for that asset via API, and the TradingView DataFeed adapter reshapes the server response into the OHLCV format and time units the chart expects. Live trade data then arrives over WebSocket and is applied to the current candle for the selected interval, or used to open a new candle when a new time interval begins.
+I connected TradingView DataFeed with WebSocket so initial market data and live trade data formed one continuous chart flow, and reduced unnecessary chart re-initialization when the symbol or interval changed.
 
-I also made sure that changing the asset or interval doesn't recreate the chart instance — the existing instance is kept and only its data source and subscription are swapped. This reduced unnecessary chart re-initialization and rendering cost, and improved the user experience by minimizing the sense of the screen stalling or the chart reloading when switching assets.
+- When a symbol is selected, I fetched initial price and volume data through the API, converted the server response into TradingView's required OHLCV format and time units, and passed it to the DataFeed.
+- I received live trade data over WebSocket, reflected it into the existing candle for the selected interval, and created a new candle when a new time window began.
+- When the symbol or interval changed, I kept the existing chart instance and replaced only the data source and live subscription instead of recreating the chart.
+- This reduced chart re-initialization and unnecessary rendering, minimizing screen stutter and the feeling of a reload during symbol changes.
 
-<figure className="case-image case-image-wide">
-  <img src="/images/portfolio/pnix-tradingview-chart.png" alt="Pnix Exchange TradingView real-time candlestick chart" />
-</figure>
+<div className="case-tags"><span>TradingView</span><span>WebSocket</span></div>
+
+</div>
 
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>03</span><span>CrossX</span><span>Web–Native Architecture</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>03</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Web–Native Architecture</span></div>
 
-### Abstracting the RN WebView Bridge into an Async API
+<div className="case-solution-block">
 
-In the React Native WebView environment, requests were passed through a message-based Bridge between the WebView and the React Native app, with responses arriving asynchronously through message events. This meant request code and response-handling code were separated, making it hard for callers to receive a response value directly and continue their logic, or to manage request state the way a normal async API would.
+### Abstracting RN WebView Bridge Communication into a Promise-Based API
 
-To improve this, I abstracted the WebView-Native Bridge communication into a shared function that returns a Promise. I defined the request parameters and response shape per message as types, and stored the Promise's resolve keyed by a message id at request time. When the native app's response arrived, a shared event handler looked up the resolve matching the response id and called it, making the message-based Bridge communication usable like a normal async API.
+I abstracted React Native WebView's message-based Bridge communication into a shared Promise-based API so callers could use it the same way as a normal asynchronous API.
 
-This let callers receive the response value and continue their logic without needing to know the internal messaging mechanism, and by wiring it into TanStack Query's queryFn, Bridge calls could be managed with the same loading, error, and response handling as a server API.
+- The existing Bridge separated request sending from response event handling, making it difficult for the caller to receive a response value directly, continue follow-up logic, or manage request state.
+- I abstracted Bridge requests into a shared function that returns a Promise and defined each message's request parameters and response shape with TypeScript types.
+- I stored each Promise's resolve by the generated message id at request time, then used a shared event handler to find and execute the matching resolve when a response arrived.
+- This let callers use the Bridge like a normal await-based async API without knowing the internal postMessage and event-handling structure.
+- I connected the shared Bridge function to TanStack Query's queryFn so native communication could manage loading, error, and response data state the same way as server APIs.
+
+<div className="case-tags"><span>React Native WebView</span><span>TypeScript</span><span>Promise</span><span>TanStack Query</span></div>
+
+</div>
 
 <CaseCodeDetails>
   <summary><span>Converting Bridge Requests and Responses to Promises</span></summary>
@@ -316,225 +266,67 @@ const { data: useIsBiometricAuthState } = useQuery({
 </CaseCodeDetails>
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>04</span><span>CrossX</span><span>Interaction</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>04</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Interaction</span></div>
+
+<div className="case-solution-block">
 
 ### Unifying Haptic Feedback with Event Delegation
 
-Implementing haptic handling directly on every button in the WebView tightly coupled UI components to how the Native Bridge was called, and repeated the same event-handling code across components. To improve this, I declared a data-haptic attribute on any element that needed haptics and moved to an event-delegation structure with a shared touch event listener that reads that attribute.
+Implementing haptic handling directly on every button in the WebView tightly coupled UI components to Native Bridge calls and repeated the same event-handling code across components.
 
-The shared handler looks up the data-haptic attribute on the element where the touch ended to determine the haptic type, then calls the Native Bridge. This let individual components declare haptic behavior with just an HTML attribute, without managing Bridge calls or event listeners directly, and the same rule applied automatically to dynamically added elements.
+- I changed the structure so elements that need haptics only declare a data-haptic attribute, and a shared touch event listener handles haptics through event delegation based on that attribute.
+- The shared handler searches for the data-haptic attribute from the element where the touch ended, determines the required haptic type, and calls the Native Bridge.
+- This let individual components declare haptic behavior with only an HTML attribute, without directly managing Bridge calls or event listeners, and the same rule also applied to dynamically added elements.
+- I stored the coordinates at touch start and calculated movement distance so movement over a threshold was treated as scroll or drag.
+- When the interaction was judged as scroll or drag, haptics were skipped even on touch end, preventing unintended haptic feedback during scrolling.
 
-I also stored the touch start coordinates and, as the touch moved, calculated the distance to decide whether it had become a scroll or drag once it crossed a threshold. In that case, haptics were skipped even if the touch ended, preventing unintended haptics during scrolling.
+<div className="case-tags"><span>WebView</span></div>
 
-- Used event delegation and the data-haptic attribute to unify Native Bridge calls and reduce the coupling between UI components and haptic logic
-- Distinguished taps from scroll/drag using a touch-movement threshold to prevent unintended haptic feedback
+</div>
 
-<CaseCodeDetails>
-  <summary>Implementation</summary>
-
-```tsx
-export default function useHapticFeedback() {
-  const { needHapticFeedback } = useRNBridgeFetchers();
-
-  const startPositionRef = useRef<{ x: number; y: number } | null>(null);
-  const isDraggingRef = useRef(false);
-
-  useEffect(() => {
-    const handleTouchStart = (event: TouchEvent) => {
-      const touch = event.touches[0];
-      if (!touch) return;
-
-      startPositionRef.current = {
-        x: touch.clientX,
-        y: touch.clientY,
-      };
-
-      isDraggingRef.current = false;
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      const startPosition = startPositionRef.current;
-      const touch = event.touches[0];
-
-      if (!startPosition || !touch) return;
-
-      const dx = Math.abs(touch.clientX - startPosition.x);
-      const dy = Math.abs(touch.clientY - startPosition.y);
-
-      // Treat movement past a threshold as a scroll/drag, not a tap
-      if (dx > 10 || dy > 10) {
-        isDraggingRef.current = true;
-      }
-    };
-
-    const handleTouchEnd = (event: TouchEvent) => {
-      if (isDraggingRef.current) return;
-
-      // Look up haptic config on the touched element or its ancestor
-      const element = (event.target as HTMLElement).closest<HTMLElement>(
-        "[data-haptic]"
-      );
-
-      const type = element?.dataset.haptic as
-        | HapticFeedbackTypes
-        | undefined;
-
-      if (!type) return;
-
-      needHapticFeedback({ type });
-    };
-
-    document.addEventListener("touchstart", handleTouchStart, {
-      capture: true,
-    });
-    document.addEventListener("touchmove", handleTouchMove, {
-      capture: true,
-    });
-    document.addEventListener("touchend", handleTouchEnd, {
-      capture: true,
-    });
-
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStart, true);
-      document.removeEventListener("touchmove", handleTouchMove, true);
-      document.removeEventListener("touchend", handleTouchEnd, true);
-    };
-  }, [needHapticFeedback]);
-}
-```
-
-</CaseCodeDetails>
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>05</span><span>CrossX</span><span>Drawer Navigation</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>05</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Drawer Navigation</span></div>
 
-### Stacked Screen Transitions and Back Navigation in a WebView SPA
+<div className="case-solution-block">
 
-To give a WebView-based SPA a screen-transition experience close to a native app, I implemented a stack structure that piles multiple screens as Drawers. I calculate the previous Drawer's movement from the active Drawer's drag progress and apply easing so the previous Drawer is pushed out naturally and eases back in. This makes the two Drawers feel connected, as if they were a single screen transitioning together.
+### Stack-Based Screen Transitions and Back Navigation in a WebView SPA
 
-Because opening a Drawer doesn't change the URL in a single-route SPA, the Android back button couldn't close open Drawers in order. To fix this, I push a virtual history entry each time a Drawer opens and close the topmost Drawer first on back navigation. This synchronizes the Android back gesture with the Drawer stack without any actual page navigation.
+To provide a native-app-like screen transition experience in a WebView-based SPA, I implemented a stack structure where multiple screens are layered as Drawers.
+
+- Based on the current Drawer's drag progress, I also calculated the previous Drawer's offset and applied easing to the progress so the previous Drawer is pushed away and returns naturally.
+- This made the two Drawers feel connected as one continuous screen transition instead of moving independently.
+- In a single-route SPA, opening a Drawer does not change the URL, so the Android back button could not close open Drawers in stack order.
+- To solve this, I added a virtual history entry when a Drawer opens and handled back navigation so the topmost Drawer closes first.
+- This synchronized Android back navigation with the Drawer stack state without actual page navigation.
+
+<div className="case-tags"><span>WebView SPA</span><span>History API</span><span>Drawer Gesture</span></div>
+
+</div>
 
 <PortfolioVideo
   src="/images/portfolio/drawer-transition.mp4"
   poster="/images/portfolio/drawer-transition-thumbnail.png"
   label="CrossX stacked Drawer transition video"
 />
-
-<CaseCodeDetails>
-  <summary>Implementation</summary>
-
-```tsx
-const PREV_DRAWER_OFFSET = 100;
-const DURATION = 400;
-const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
-
-const easeOutCubic = (s: number) => 1 - Math.pow(1 - s, 3);
-
-function animatePrevDrawer(
-  element: HTMLDivElement,
-  open: boolean | undefined
-) {
-  element.style.willChange = "transform";
-  element.style.transition = "none";
-
-  const initialTransform = open
-    ? "translate3d(0px, 0, 0)"
-    : `translate3d(${-PREV_DRAWER_OFFSET}px, 0, 0)`;
-
-  element.style.transform = initialTransform;
-
-  // Split the timing so the initial position is painted on iOS WebView
-  // before the transition starts
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      element.style.transition = `transform ${DURATION}ms ${EASING}`;
-
-      const finalTransform = open
-        ? `translate3d(${-PREV_DRAWER_OFFSET}px, 0, 0)`
-        : "translate3d(0px, 0, 0)";
-
-      element.style.transform = finalTransform;
-    });
-  });
-}
-
-function animatePrevDrawerWithDrag(
-  element: HTMLDivElement,
-  rafIdRef: React.RefObject<number | null>,
-  percentage: number
-) {
-  element.style.willChange = "transform";
-  element.style.transition = "none";
-
-  // Derive the previous Drawer's offset from the active Drawer's
-  // drag progress
-  const eased = easeOutCubic(percentage);
-  const x =
-    -PREV_DRAWER_OFFSET + eased * PREV_DRAWER_OFFSET;
-
-  rafIdRef.current = requestAnimationFrame(() => {
-    element.style.transform = `translate3d(${x}px, 0, 0)`;
-  });
-}
-
-export default function AnimatedDrawer({
-  children,
-  open,
-  ...props
-}: React.ComponentProps<typeof Drawer>) {
-  const rafIdRef = React.useRef<number | null>(null);
-  const isDraggedRef = React.useRef(false);
-
-  const handleDrag = (_: unknown, percentage: number) => {
-    isDraggedRef.current = true;
-
-    const prevDrawer = getPrevDrawer();
-    const currentDrawer = getCurrentDrawer();
-
-    if (!prevDrawer || shouldSkipAnimation(currentDrawer)) {
-      return;
-    }
-
-    // Cancel the pending frame and apply only the latest
-    // drag position
-    if (rafIdRef.current) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-    }
-
-    animatePrevDrawerWithDrag(
-      prevDrawer,
-      rafIdRef,
-      percentage
-    );
-  };
-
-  return (
-    <Drawer
-      data-vaul-drawer
-      {...props}
-      open={open}
-      onDrag={handleDrag}
-    >
-      {children}
-    </Drawer>
-  );
-}
-```
-
-</CaseCodeDetails>
 </section>
 
-<section className="case-study case-study-compact-media">
-  <div className="case-study-meta"><span>06</span><span>CrossX</span><span>Canvas Visualization</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>06</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Canvas Visualization</span></div>
+
+<div className="case-solution-block">
 
 ### Customizing an Interactive Area Chart
 
-- Touching or dragging the chart finds the data point closest to the touch position and displays its time and value alongside a guide line
-- Highlights the segment before the selected point in an accent color and the segment after it in a muted color
-- Adjusts the position of the max/min value labels against their actual rendered width so they never overflow the chart
+I implemented chart touch and drag interactions directly so users could intuitively check the value at a specific point in time.
+
+- When the chart is touched or dragged, the nearest data point's time and value are found and displayed with a guide line.
+- Based on the selected point, the previous segment is shown in an accent color and the following segment in a muted color, making the current selection visually clear.
+- Max and min value labels are positioned based on their actual rendered width so they do not overflow the chart area.
+
+</div>
 
 <PortfolioVideo
   src="/images/portfolio/interactive-area-chart.mp4"
@@ -544,51 +336,47 @@ export default function AnimatedDrawer({
 
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>07</span><span>CrossX</span><span>Pull to Refresh</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>07</span><span><a href="https://play.google.com/store/apps/details?id=com.nexus.crosswallet&hl=ko" target="_blank" rel="noreferrer">CrossX</a></span><span>Pull to Refresh</span></div>
 
-### Pull-to-Refresh for nested scrolling
+<div className="case-solution-block">
 
-Wrapping a screen in a shared Pull-to-Refresh component applies an iOS-native-style pull-down interaction without any per-screen implementation. On screens with an inner scroll area, the pull gesture only starts when that scroll is at the top, so it never conflicts with normal scrolling, and resistance increases gradually with pull distance for a natural feel. On screens that need a refresh, crossing the threshold triggers haptics and the Rive indicator before running the async task, and the screen returns to its original position once it completes.
+### Pull-To-Refresh with Nested Scrolling
+
+I implemented a shared component so screens can apply an iOS-native-like Pull-To-Refresh interaction simply by wrapping their content.
+
+- When an inner scroll area exists, the pull gesture starts only when the scroll position is at the top, preventing gesture conflicts with nested scrolling.
+- I calculated resistance so it gradually increases with pull distance, creating a natural gesture movement.
+- When the threshold is crossed, haptics and the Rive Indicator run, the async refresh task is performed, and the screen returns to its original position when the task completes.
+- By implementing this as a shared component, each screen can use Pull-To-Refresh without adding separate gesture logic.
+
+<div className="case-tags"><span>Pull-To-Refresh</span><span>Rive</span></div>
+
+</div>
 
 <PortfolioVideo
   src="/images/portfolio/pull-to-refresh.mp4"
   poster="/images/portfolio/pull-to-refresh-thumbnail.png"
   label="CrossX Pull-to-Refresh video"
 />
-
-<CaseCodeDetails>
-  <summary>Implementation</summary>
-
-```tsx
-const handleTouchMove = (event: TouchEvent) => {
-  const currentY = event.touches[0]?.clientY ?? 0;
-  pendingDeltaRef.current = currentY - startYRef.current;
-
-  if (pendingDeltaRef.current <= 0 || framePendingRef.current) return;
-  framePendingRef.current = true;
-
-  requestAnimationFrame(() => {
-    const distance = pendingDeltaRef.current;
-    const damped = distance * (1 - Math.exp(-distance / 60)) * 0.5;
-    const offset = Math.min(damped, maxPullDistance);
-
-    setOffsetY(offset);
-    thresholdPassedRef.current = offset >= refreshThreshold;
-    framePendingRef.current = false;
-  });
-};
-```
-
-</CaseCodeDetails>
 </section>
 
-<section className="case-study">
-  <div className="case-study-meta"><span>08</span><span>Cross Ecosystem</span><span>Shared Package</span></div>
+<section className="case-study case-study-featured">
+  <div className="case-study-meta"><span>08</span><span><a href="https://x.crosstoken.io" target="_blank" rel="noreferrer">Cross Ecosystem</a></span><span>Shared Package</span></div>
+
+<div className="case-solution-block">
 
 ### Standardizing the App Launcher Across Services into One Package
 
-Each service managed its own App Launcher UI and configuration separately, so the same change had to be repeated across multiple projects. To fix this, I extracted the App Launcher UI into a shared package and consolidated each service's display information into a single S3 configuration. Now adding a service or changing its display information only requires updating the shared S3 configuration, and it takes effect across every service.
+Each service managed its App Launcher UI and configuration separately, so common changes required repeating the same work across multiple projects.
+
+- I separated the App Launcher UI into a shared package so multiple services could reuse the same implementation.
+- I consolidated service-specific display information into a single S3 configuration, separating UI code from service-specific settings.
+- When adding a service or changing display information, the change can now be reflected across all services by updating only the shared S3 configuration instead of modifying each project.
+
+<div className="case-tags"><span>Shared Package</span><span>S3 Config</span></div>
+
+</div>
 
 <PortfolioVideo
   src="/images/portfolio/app-launcher.mp4"
